@@ -15,11 +15,16 @@ class _DashboardState extends State<DashboardWidget>{
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Text('Dashboard'),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Dashboard"),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new Text('Dashboard'),
+        ],
+      )
     );
   }
 }

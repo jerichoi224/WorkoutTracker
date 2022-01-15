@@ -15,11 +15,16 @@ class _CalendarState extends State<CalendarWidget>{
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Text('Workout'),
-      ],
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Calendar"),
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text('Calendar'),
+          ],
+        )
     );
   }
 }

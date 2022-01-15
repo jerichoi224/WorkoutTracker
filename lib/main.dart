@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:workout_tracker/HomeWidget.dart';
-import 'package:workout_tracker/InstructionWidget.dart';
+import 'package:workout_tracker/widgets/HomeWidget.dart';
+import 'package:workout_tracker/widgets/InstructionWidget.dart';
 
 void main() => runApp(MyApp());
 
@@ -31,7 +31,6 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainState extends State<MainApp> {
-
   @override
   void initState() {
     super.initState();

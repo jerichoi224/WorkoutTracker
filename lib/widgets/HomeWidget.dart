@@ -3,11 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 
-import 'package:workout_tracker/DashboardWidget.dart';
-import 'package:workout_tracker/CalendarWidget.dart';
-import 'package:workout_tracker/RoutineWidget.dart';
-import 'package:workout_tracker/WorkoutWidget.dart';
-import 'package:workout_tracker/SettingsWidget.dart';
+import 'package:workout_tracker/db/database_helpers.dart';
+import 'package:workout_tracker/widgets/DashboardWidget.dart';
+import 'package:workout_tracker/widgets/CalendarWidget.dart';
+import 'package:workout_tracker/widgets/RoutineWidget.dart';
+import 'package:workout_tracker/widgets/WorkoutWidget.dart';
+import 'package:workout_tracker/widgets/SettingsWidget.dart';
 
 class HomeWidget extends StatefulWidget {
   final BuildContext parentCtx;
@@ -20,8 +21,9 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeState extends State<HomeWidget>{
-  final pageController = PageController(initialPage: 1);
-  int _currentIndex = 1;
+  DatabaseHelper dbHelper = DatabaseHelper.instance;
+  final pageController = PageController(initialPage: 2);
+  int _currentIndex = 2;
   bool ready = false;
 
   @override
@@ -30,30 +32,34 @@ class _HomeState extends State<HomeWidget>{
   }
 
   List<Widget> _children() => [
-    CalendarWidget(),
-    DashboardWidget(),
+    WorkoutWidget(dbHelper: dbHelper),
     RoutineWidget(),
-    WorkoutWidget(),
+    DashboardWidget(),
+    CalendarWidget(),
+    SettingsWidget(),
   ];
-
-
-  // Navigate to Settings screen
-  void _pushSettings(BuildContext context) async {
-    // start the SecondScreen and wait for it to finish with a result
-
-    final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SettingsWidget(),
-        ));
-
-    setState(() {});
-  }
 
   changePage(int index){
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  Widget TitleText(){
+    switch(_currentIndex){
+      case 0:
+        return Text("Workout List");
+      case 1:
+        return Text("Routine List");
+      case 2:
+        return Text("Dashboard");
+      case 3:
+        return Text("Workout History");
+      case 4:
+        return Text("Settings");
+      default:
+        return Text("Workout Tracker");
+    }
   }
 
   @override
@@ -92,17 +98,6 @@ class _HomeState extends State<HomeWidget>{
 
     // App Loads
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Workout Tracker"),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                _pushSettings(context);
-              }
-          )
-        ],
-      ),
       body: PageView(
           onPageChanged: (index) {
             FocusScope.of(context).unfocus();
@@ -117,19 +112,23 @@ class _HomeState extends State<HomeWidget>{
         currentIndex: _currentIndex, // new
         items: [
           BottomNavigationBarItem(
-            icon: new Icon(Icons.calendar_today),
-            title: new Text('Calendar'),
-          ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.insert_chart_outlined),
-            title: new Text('Dashboard'),
+            icon: new Icon(Icons.fitness_center),
+            title: new Text('Workout'),
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.repeat),
             title: new Text('Routine'),
           ),
           BottomNavigationBarItem(
-            icon: new Icon(Icons.fitness_center),
+            icon: new Icon(Icons.insert_chart_outlined),
+            title: new Text('Dashboard'),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.calendar_today),
+            title: new Text('Calendar'),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.settings),
             title: new Text('Workout'),
           ),
         ],

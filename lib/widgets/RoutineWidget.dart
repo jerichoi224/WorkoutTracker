@@ -15,11 +15,16 @@ class _RoutineState extends State<RoutineWidget>{
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        new Text('Routine'),
-      ],
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Routine List"),
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text('Routine'),
+          ],
+        )
     );
   }
 }
