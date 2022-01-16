@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:workout_tracker/db/database_helpers.dart';
 import 'package:workout_tracker/widgets/DashboardWidget.dart';
 import 'package:workout_tracker/widgets/CalendarWidget.dart';
-import 'package:workout_tracker/widgets/RoutineWidget.dart';
-import 'package:workout_tracker/widgets/WorkoutWidget.dart';
+import 'package:workout_tracker/widgets/Routine/RoutineWidget.dart';
+import 'package:workout_tracker/widgets/Workout/WorkoutWidget.dart';
 import 'package:workout_tracker/widgets/SettingsWidget.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -33,7 +33,7 @@ class _HomeState extends State<HomeWidget>{
 
   List<Widget> _children() => [
     WorkoutWidget(dbHelper: dbHelper),
-    RoutineWidget(),
+    RoutineWidget(dbHelper: dbHelper),
     DashboardWidget(),
     CalendarWidget(),
     SettingsWidget(),
@@ -107,6 +107,7 @@ class _HomeState extends State<HomeWidget>{
           children: children
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Theme.of(widget.parentCtx).colorScheme.secondary,
         type: BottomNavigationBarType.fixed,
         onTap: onTabTapped, // new
         currentIndex: _currentIndex, // new

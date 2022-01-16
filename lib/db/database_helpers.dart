@@ -16,6 +16,7 @@ final String columnCaption = 'caption';
 final String columnPart = 'part';
 final String columnType = 'type';
 final String columnMetric = 'metric';
+final String columnDescription = 'description';
 
 
 // data model class
@@ -25,6 +26,7 @@ class WorkoutEntry {
   WorkoutType type;
   PartType part;
   String caption;
+  String description;
 
   WorkoutEntry();
 
@@ -32,9 +34,10 @@ class WorkoutEntry {
   WorkoutEntry.fromMap(Map<String, dynamic> map) {
     id = map[columnId];
     caption = map[columnCaption];
-    type = WorkoutType.values.firstWhere((e) => e.toString() == 'WorkoutType.' + map[columnType]);
-    part = PartType.values.firstWhere((e) => e.toString() == 'PartType.' + map[columnPart]);
-    metric = MetricType.values.firstWhere((e) => e.toString() == 'MetricType.' + map[columnMetric]);
+    description = map[columnDescription];
+    type = WorkoutType.values.firstWhere((e) => e.name == map[columnType]);
+    part = PartType.values.firstWhere((e) => e.name == map[columnPart]);
+    metric = MetricType.values.firstWhere((e) => e.name == map[columnMetric]);
   }
 
   // convenience method to create a Map from this object
@@ -44,6 +47,7 @@ class WorkoutEntry {
       columnPart: part.name,
       columnMetric: metric.name,
       columnCaption: caption,
+      columnDescription: description,
     };
     if (id != null) {
       map[columnId] = id;
@@ -53,7 +57,7 @@ class WorkoutEntry {
 
   @override
   String toString() {
-    return "{id: $id, caption: $caption, type: ${type.name}, part: ${part.name}, metric: ${metric.name}}";
+    return "{id: $id, caption: $caption, type: ${type.name}, part: ${part.name}, metric: ${metric.name}, description: $description}";
   }
 }
 
@@ -95,7 +99,8 @@ class DatabaseHelper {
                 $columnCaption TEXT NOT NULL,
                 $columnPart TEXT NOT NULL,
                 $columnType TEXT NOT NULL,
-                $columnMetric TEXT NOT NULL
+                $columnMetric TEXT NOT NULL,
+                $columnDescription TEXT
               )
               ''');
   }

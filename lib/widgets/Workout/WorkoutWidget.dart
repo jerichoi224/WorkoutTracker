@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/db/database_helpers.dart';
-import 'package:workout_tracker/widgets/EditWorkoutEntryWidget.dart';
-import 'package:workout_tracker/widgets/AddWorkoutEntryWidget.dart';
+import 'package:workout_tracker/widgets/Workout/EditWorkoutEntryWidget.dart';
+import 'package:workout_tracker/widgets/Workout/AddWorkoutEntryWidget.dart';
+
+import 'package:workout_tracker/util/languageTool.dart';
 
 class WorkoutWidget extends StatefulWidget {
   DatabaseHelper dbHelper;
@@ -13,7 +15,9 @@ class WorkoutWidget extends StatefulWidget {
 
 class _WorkoutState extends State<WorkoutWidget> {
   List<WorkoutEntry> WorkoutList;
-  final searchTextController = TextEditingController();
+  TextEditingController searchTextController = TextEditingController();
+  bool _isSearching = false;
+  String searchQuery = "";
 
   void initState() {
     super.initState();
@@ -86,6 +90,14 @@ class _WorkoutState extends State<WorkoutWidget> {
     setState(() {});
   }
 
+  String getFirstchar(String s){
+    if(isKorean(s))
+    {
+      return getKoreanFirstVowel(s);
+    }
+    return s;
+  }
+
   List<Widget> workoutList(){
     List<Widget> WorkoutWidgetList = [];
     int tmp = 0;
@@ -107,7 +119,7 @@ class _WorkoutState extends State<WorkoutWidget> {
         WorkoutWidgetList.add(
             Padding(
                 padding: EdgeInsets.fromLTRB(15, 7, 0, 0),
-                child: Text(firstChar,
+                child: Text(getFirstchar(firstChar),
                   style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -125,9 +137,7 @@ class _WorkoutState extends State<WorkoutWidget> {
               color: Colors.white,
               child: new InkWell(
                   borderRadius: BorderRadius.circular(10.0),
-                  onTap: () {
-                  print("tapped");
-                },
+                  onTap: () {},
                 child: ListTile(
                   dense: true,
                   title: RichText(
@@ -151,7 +161,103 @@ class _WorkoutState extends State<WorkoutWidget> {
       );
     }
     return WorkoutWidgetList.length > 0 ? WorkoutWidgetList : List.from(
-        [Text("No Workout Entry Found.")]);
+        [
+          Container(
+            alignment: Alignment.center,
+            margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+            child: Text(
+                "No Workout Found.",
+              style: TextStyle(fontSize: 14),
+            ),
+          )
+        ]);
+  }
+
+  Widget _buildSearchField() {
+    return Container(
+      width: double.infinity,
+      height: 40,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5)
+      ),
+      child: Center(
+        child:TextField(
+          controller: searchTextController,
+          autofocus: true,
+          decoration: InputDecoration(
+            prefixIcon: Icon(Icons.search),
+            hintText: "Search Workout",
+            border: InputBorder.none,
+            filled: true,
+            hintStyle: TextStyle(color: Colors.black12),
+          ),
+          style: TextStyle(color: Colors.black, fontSize: 16.0),
+          onChanged: (query) => updateSearchQuery(query),
+        )
+      )
+    );
+  }
+
+  List<Widget> _buildActions() {
+    if (_isSearching) {
+      return <Widget>[
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            if (searchTextController == null ||
+                searchTextController.text.isEmpty) {
+              Navigator.pop(context);
+              return;
+            }
+            _clearSearchQuery();
+          },
+        ),
+      ];
+    }
+
+    return <Widget>[
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: _startSearch,
+      ),
+      IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () {
+            _AddWorkoutEntry(context);
+          }
+      ),
+    ];
+  }
+
+  void _startSearch() {
+    ModalRoute.of(context)
+        .addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
+
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+    });
+  }
+
+  void _stopSearching() {
+    _clearSearchQuery();
+
+    setState(() {
+      _isSearching = false;
+    });
+  }
+
+  void _clearSearchQuery() {
+    setState(() {
+      searchTextController.clear();
+      updateSearchQuery("");
+    });
   }
 
   @override
@@ -160,35 +266,13 @@ class _WorkoutState extends State<WorkoutWidget> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
             appBar: AppBar(
-              title: Text("Workout List"),
-              actions: [
-                IconButton(
-                    icon: Icon(Icons.add),
-                    onPressed: () {
-                      _AddWorkoutEntry(context);
-                    }
-                ),
-              ],
+              title: _isSearching ? _buildSearchField() : Text("Workout List"),
+              actions: _buildActions(),
             ),
             body:
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    child: new TextField(
-                      controller: searchTextController,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
-                        hintText: "Search Workout",
-                      ),
-                      onChanged: (text) {
-                        setState(() {});
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 10),
                   Expanded(
                     child: SingleChildScrollView(
                       child: ConstrainedBox(

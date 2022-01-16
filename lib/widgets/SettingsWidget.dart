@@ -140,7 +140,7 @@ class _SettingsState extends State<SettingsWidget> {
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                                     margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                    color: Color.fromRGBO(149, 213, 178, 1),
+                                    color: Theme.of(context).colorScheme.primary,
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[

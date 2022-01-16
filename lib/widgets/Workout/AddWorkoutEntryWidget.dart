@@ -203,7 +203,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                                     margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                    color: Color.fromRGBO(149, 213, 178, 1),
+                                    color: Theme.of(context).colorScheme.primary,
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
@@ -220,9 +220,9 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
 
                                                 WorkoutEntry newEntry = new WorkoutEntry();
                                                 newEntry.caption = workoutNameController.text;
-                                                newEntry.type = WorkoutType.values.firstWhere((e) => e.toString() == 'WorkoutType.' + type);
-                                                newEntry.part = PartType.values.firstWhere((e) => e.toString() == 'PartType.' + part);
-                                                newEntry.metric = MetricType.values.firstWhere((e) => e.toString() == 'MetricType.' + metric);
+                                                newEntry.type = WorkoutType.values.firstWhere((e) => e.name == type);
+                                                newEntry.part = PartType.values.firstWhere((e) => e.name == part);
+                                                newEntry.metric = MetricType.values.firstWhere((e) => e.name == metric);
                                                 widget.dbHelper.insertWorkoutEntry(newEntry);
 
                                                 Navigator.pop(context, false);

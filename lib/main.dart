@@ -14,7 +14,8 @@ class MyApp extends StatelessWidget{
         debugShowCheckedModeBanner: false,
         title: 'Workout Tracker',
         theme: ThemeData(
-          primaryColor: Color.fromRGBO(149, 213, 178, 1.0),
+          brightness: Brightness.light,
+          primarySwatch: Colors.amber,
         ),
         home: MainApp(),
         routes: <String, WidgetBuilder>{
