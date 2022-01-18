@@ -1,5 +1,8 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/db/database_helpers.dart';
+import 'package:workout_tracker/dbModels/RoutineEntry.dart';
 import 'package:workout_tracker/widgets/Routine/AddRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/Routine/EditRoutineEntryWidget.dart';
 
@@ -12,18 +15,15 @@ class RoutineWidget extends StatefulWidget {
 }
 
 class _RoutineState extends State<RoutineWidget>{
-  List<WorkoutEntry> WorkoutList;
-  TextEditingController searchTextController = TextEditingController();
-  bool _isSearching = false;
-  String searchQuery = "";
+  List<RoutineEntry> RoutineList;
 
   void initState() {
     super.initState();
 
-    WorkoutList = [];
-    widget.dbHelper.queryAllWorkout().then((entries){
+    RoutineList = [];
+    widget.dbHelper.queryAllRoutine().then((entries){
       setState(() {
-        WorkoutList = entries;
+        RoutineList = entries;
       });
     });
   }
@@ -38,14 +38,14 @@ class _RoutineState extends State<RoutineWidget>{
           builder: (context) => AddRoutineEntryWidget(dbHelper: widget.dbHelper),
         ));
 
-    widget.dbHelper.queryAllWorkout().then((entries){
+    widget.dbHelper.queryAllRoutine().then((entries){
       setState(() {
-        WorkoutList = entries;
+        RoutineList = entries;
       });
     });
   }
 
-  Widget _popUpMenuButton(WorkoutEntry i) {
+  Widget _popUpMenuButton(RoutineEntry i) {
     return PopupMenuButton(
       icon: Icon(Icons.more_vert),
       itemBuilder: (context) => [
@@ -67,7 +67,7 @@ class _RoutineState extends State<RoutineWidget>{
         // Delete
         else if(selectedIndex == 1){
           widget.dbHelper.deleteWorkout(i.id);
-          WorkoutList.remove(i);
+          RoutineList.remove(i);
           setState(() {
           });
         }
@@ -75,38 +75,33 @@ class _RoutineState extends State<RoutineWidget>{
     );
   }
 
-  void _openEditWidget(WorkoutEntry workoutEntry) async {
+  void _openEditWidget(RoutineEntry workoutEntry) async {
     // start the SecondScreen and wait for it to finish with a result
-    final WorkoutEntry modifiedEntry = await Navigator.push(
+    final RoutineEntry modifiedEntry = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => EditRoutineEntryWidget(entry: workoutEntry),
         )
     );
 
-    widget.dbHelper.updateWorkout(modifiedEntry);
-    setState(() {});
+    if(modifiedEntry != null){
+      widget.dbHelper.updateRoutine(modifiedEntry);
+      setState(() {});
+    }
   }
 
-  List<Widget> workoutList(){
-    List<Widget> WorkoutWidgetList = [];
+  List<Widget> routineList(){
+    List<Widget> RoutineWidgetList = [];
     int tmp = 0;
     String firstChar = "";
 
-    WorkoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
+    RoutineList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
-    for(WorkoutEntry i in WorkoutList){
-      if(searchTextController.text.isNotEmpty) {
-        if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
-            &&!i.part.name.toLowerCase().contains(searchTextController.text.toLowerCase())
-        // && !i.type.name.toLowerCase().contains(searchTextController.text.toLowerCase())
-        )
-          continue;
-      }
+    for(RoutineEntry i in RoutineList){
       // If alphabet changes, add caption
       if(firstChar != i.caption[0].toUpperCase()){
         firstChar = i.caption[0].toUpperCase();
-        WorkoutWidgetList.add(
+        RoutineWidgetList.add(
             Padding(
                 padding: EdgeInsets.fromLTRB(15, 7, 0, 0),
                 child: Text((firstChar),
@@ -119,7 +114,7 @@ class _RoutineState extends State<RoutineWidget>{
             )
         );
       }
-      WorkoutWidgetList.add(
+      RoutineWidgetList.add(
           new Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
@@ -140,19 +135,19 @@ class _RoutineState extends State<RoutineWidget>{
                                 style: TextStyle(color: Colors.black)
                             ),
                             TextSpan(
-                                text: " (" + i.part.name + ")",
+                                text: " ("  + ")",
                                 style: TextStyle(color: Colors.black54)),
                           ],
                         ),
                       ),
-                      subtitle: Text(i.type.name),
+                      subtitle: Text(""),
                       trailing: _popUpMenuButton(i)
                   )
               )
           )
       );
     }
-    return WorkoutWidgetList.length > 0 ? WorkoutWidgetList : List.from(
+    return RoutineWidgetList.length > 0 ? RoutineWidgetList : List.from(
         [
           Container(
             alignment: Alignment.center,
@@ -163,32 +158,6 @@ class _RoutineState extends State<RoutineWidget>{
             ),
           )
         ]);
-  }
-
-  Widget _buildSearchField() {
-    return Container(
-        width: double.infinity,
-        height: 40,
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5)
-        ),
-        child: Center(
-            child:TextField(
-              controller: searchTextController,
-              autofocus: true,
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: "Search Workout",
-                border: InputBorder.none,
-                filled: true,
-                hintStyle: TextStyle(color: Colors.black12),
-              ),
-              style: TextStyle(color: Colors.black, fontSize: 16.0),
-              onChanged: (query) => updateSearchQuery(query),
-            )
-        )
-    );
   }
 
   List<Widget> _buildActions() {
@@ -208,67 +177,33 @@ class _RoutineState extends State<RoutineWidget>{
     ];
   }
 
-  void _startSearch() {
-    ModalRoute.of(context)
-        .addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
-
-    setState(() {
-      _isSearching = true;
-    });
-  }
-
-  void updateSearchQuery(String newQuery) {
-    setState(() {
-      searchQuery = newQuery;
-    });
-  }
-
-  void _stopSearching() {
-    _clearSearchQuery();
-
-    setState(() {
-      _isSearching = false;
-    });
-  }
-
-  void _clearSearchQuery() {
-    setState(() {
-      searchTextController.clear();
-      updateSearchQuery("");
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
-            appBar: AppBar(
-              title: Text("Routines"),
-              actions: _buildActions(),
-            ),
-            body:
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                    child: SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minHeight: 0
-                            ),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: workoutList()
-                            )
-                        )
-                    )
-                )
-              ],
-            )
+          body: CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                pinned: true,
+                snap: false,
+                floating: false,
+                backgroundColor: Colors.amberAccent,
+                expandedHeight: 100.0,
+                actions: _buildActions(),
+                flexibleSpace: const FlexibleSpaceBar(
+                  title: Text('Routine List'),
+//                  background: FlutterLogo(),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate(
+                    routineList()
+                ),
+              ),
+            ],
+          ),
         )
     );
   }
-
 }

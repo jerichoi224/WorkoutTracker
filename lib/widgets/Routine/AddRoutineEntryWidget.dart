@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/dbModels/RoutineEntry.dart';
+import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/db/database_helpers.dart';
+import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 
 class AddRoutineEntryWidget extends StatefulWidget {
   DatabaseHelper dbHelper;
@@ -11,16 +14,106 @@ class AddRoutineEntryWidget extends StatefulWidget {
 }
 
 class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
-  String part, type, metric, caption;
-  final workoutNameController = TextEditingController();
+  String caption;
+  int workoutCard_id;
+  final RoutineNameController = TextEditingController();
+
+  List<Card> WorkoutList = [];
 
   @override
   void initState() {
-    part = PartType.other.name;
-    type = WorkoutType.other.name;
-    metric = MetricType.kg.name;
+    workoutCard_id = 0;
     caption = "";
     super.initState();
+  }
+
+  Widget AddButton(String caption, Function method)
+  {
+    return ListTile(
+        title: new Row(
+            mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally,
+            children: <Widget>[
+              new Icon(
+                  Icons.add,
+                color: Colors.black38
+              ),
+              new Flexible(
+                child: new Text(caption,
+                  style: TextStyle(
+                    color: Colors.black38
+                  ),
+                )
+            )
+          ],
+        ),
+      onTap: () => {
+        method()
+      },
+    );
+  }
+
+  void AddSet() {
+
+  }
+
+  void removeWorkout(String i){
+    for(Card c in WorkoutList)
+    {
+      if(c.key == Key(i))
+        {
+          WorkoutList.remove(c);
+          break;
+        }
+    }
+    setState(() {});
+  }
+
+  void AddWorkout() async {
+    // start the SecondScreen and wait for it to finish with a result
+      final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WorkoutListWidget(dbHelper: widget.dbHelper),
+      ));
+
+      if(result.runtimeType == WorkoutEntry)
+      {
+        WorkoutEntry workoutEntry = result as WorkoutEntry;
+        WorkoutList.add(
+          Card(
+              key: Key(workoutCard_id.toString()),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+              margin: EdgeInsets.all(8.0),
+              child: Column(
+                  children: <Widget>[
+                    ListTile(
+                        title: new Row(
+                          children: <Widget>[
+                            new Flexible(
+                                child: new Text(workoutEntry.caption,
+                                style: TextStyle(
+                                    color: Colors.black
+                                ),
+                              )
+                            ),
+                          ],
+                        ),
+                      trailing: new Container(
+                        child: new IconButton(
+                          icon: new Icon(Icons.close),
+                          onPressed:()=> removeWorkout(workoutCard_id.toString())
+                        )
+                        ,
+                      ),
+                    ),
+                    AddButton("Add Set", AddSet)
+                  ]
+              )
+          )
+        );
+        setState(() {});
+        workoutCard_id++;
+      }
   }
 
   @override
@@ -36,7 +129,8 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
             },
             child: new Scaffold(
                 appBar: AppBar(
-                  title: Text("Add Workout"),
+                  title: Text("Add Routine"),
+                  backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
                     builder: (context) =>
@@ -47,7 +141,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                 // System Values
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Workout Name",
+                                    child: Text("Routine Name",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -64,7 +158,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                                 children: <Widget>[
                                                   new Flexible(
                                                       child: new TextField(
-                                                        controller: workoutNameController,
+                                                        controller: RoutineNameController,
                                                         decoration: InputDecoration(
                                                           border:InputBorder.none,
                                                           hintText: "Enter Name",
@@ -79,127 +173,23 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Workout Details",
+                                    child: Text("Routine Details",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
                                       ),
                                     )
                                 ),
+                                Column(children: WorkoutList,),
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                                     margin: EdgeInsets.all(8.0),
                                     child: Column(
-                                      children: <Widget>[
-                                        ListTile(
-                                            title: new Row(
-                                              children: <Widget>[
-                                                Text("Part"),
-                                                Spacer(),
-                                                DropdownButton<String>(
-                                                  value: part,
-                                                  iconSize: 24,
-                                                  elevation: 16,
-                                                  onChanged: (value){
-                                                    setState(() {part = value;});
-                                                  },
-                                                  underline: Container(
-                                                    height: 2,
-                                                  ),
-                                                  selectedItemBuilder: (BuildContext context) {
-                                                    return PartType.values.map<Widget>((PartType value) {
-                                                      return Container(
-                                                          alignment: Alignment.centerRight,
-                                                          width: 100, // TODO: Find Proper Width
-                                                          child: Text(value.name, textAlign: TextAlign.end)
-                                                      );
-                                                    }).toList();
-                                                  },
-                                                  items: PartType.values
-                                                      .map<DropdownMenuItem<String>>((PartType value) {
-                                                    return DropdownMenuItem<String>(
-                                                      value: value.name,
-                                                      child: Text(value.name),
-                                                    );
-                                                  }).toList(),
-                                                )
-                                              ],
-                                            )
-                                        ), // Part Dropdown
-                                        ListTile(
-                                            title: new Row(
-                                              children: <Widget>[
-                                                Text("Type"),
-                                                Spacer(),
-                                                DropdownButton<String>(
-                                                  value: type,
-                                                  iconSize: 24,
-                                                  elevation: 16,
-                                                  onChanged: (value){
-                                                    setState(() {type = value;});
-                                                  },
-                                                  underline: Container(
-                                                    height: 2,
-                                                  ),
-                                                  selectedItemBuilder: (BuildContext context) {
-                                                    return WorkoutType.values.map<Widget>((WorkoutType value) {
-                                                      return Container(
-                                                          alignment: Alignment.centerRight,
-                                                          width: 100, // TODO: Find Proper Width
-                                                          child: Text(value.name, textAlign: TextAlign.end)
-                                                      );
-                                                    }).toList();
-                                                  },
-                                                  items: WorkoutType.values
-                                                      .map<DropdownMenuItem<String>>((WorkoutType value) {
-                                                    return DropdownMenuItem<String>(
-                                                      value: value.name,
-                                                      child: Text(value.name),
-                                                    );
-                                                  }).toList(),
-                                                )
-                                              ],
-                                            )
-                                        ), // Type Dropdown
-                                        ListTile(
-                                            title: new Row(
-                                              children: <Widget>[
-                                                Text("Metric"),
-                                                Spacer(),
-                                                DropdownButton<String>(
-                                                  value: metric,
-                                                  iconSize: 24,
-                                                  elevation: 16,
-                                                  onChanged: (value){
-                                                    setState(() {metric = value;});
-                                                  },
-                                                  underline: Container(
-                                                    height: 2,
-                                                  ),
-                                                  selectedItemBuilder: (BuildContext context) {
-                                                    return MetricType.values.map<Widget>((MetricType value) {
-                                                      return Container(
-                                                          alignment: Alignment.centerRight,
-                                                          width: 100, // TODO: Find Proper Width
-                                                          child: Text(value.name, textAlign: TextAlign.end)
-                                                      );
-                                                    }).toList();
-                                                  },
-                                                  items: MetricType.values
-                                                      .map<DropdownMenuItem<String>>((MetricType value) {
-                                                    return DropdownMenuItem<String>(
-                                                      value: value.name,
-                                                      child: Text(value.name),
-                                                    );
-                                                  }).toList(),
-                                                )
-                                              ],
-                                            )
-                                        ), // Metric Dropdown
-                                      ],
+                                        children: <Widget>[
+                                          AddButton("Add Workout", AddWorkout)
+                                        ]
                                     )
                                 ),
-
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                                     margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
@@ -209,7 +199,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                         children: <Widget>[
                                           ListTile(
                                               onTap:(){
-                                                if(workoutNameController.text.isEmpty) {
+                                                if(RoutineNameController.text.isEmpty) {
                                                   final snackBar = SnackBar(
                                                     content: const Text('Please enter name for new workout'),
                                                   );
@@ -218,16 +208,14 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                                   return;
                                                 }
 
-                                                WorkoutEntry newEntry = new WorkoutEntry();
-                                                newEntry.caption = workoutNameController.text;
-                                                newEntry.type = WorkoutType.values.firstWhere((e) => e.name == type);
-                                                newEntry.part = PartType.values.firstWhere((e) => e.name == part);
-                                                newEntry.metric = MetricType.values.firstWhere((e) => e.name == metric);
-                                                widget.dbHelper.insertWorkoutEntry(newEntry);
+                                                RoutineEntry newEntry = new RoutineEntry();
+                                                newEntry.caption = RoutineNameController.text;
+                                                newEntry.routineJson = "";
+                                                widget.dbHelper.insertRoutineEntry(newEntry);
 
                                                 Navigator.pop(context, false);
                                               },
-                                              title: Text("Add Workout",
+                                              title: Text("Add Routine",
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                 ),

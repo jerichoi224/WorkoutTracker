@@ -1,0 +1,55 @@
+import 'package:workout_tracker/util/typedef.dart';
+import 'package:workout_tracker/dbModels/ColumnNames.dart';
+
+// data model class
+class RoutineEntry {
+  int id;
+  String caption;
+  String routineJson;
+  /*
+  * {
+  *   routine: [
+  *     {
+  *       id: WorkoutId,
+  *       numSet: ####
+  *       sets:
+  *       [
+  *         {
+  *           metric: XX
+  *           count:  XX
+  *           prev:   XX
+  *         },
+  *         ...
+  *       ]
+  *     },
+  *     ....
+  *   ]
+  * }
+  * */
+
+  RoutineEntry();
+
+  // convenience constructor to create a Word object
+  RoutineEntry.fromMap(Map<String, dynamic> map) {
+    id = map[columnId];
+    caption = map[columnCaption];
+    routineJson = map[columnRoutineJson];
+  }
+
+  // convenience method to create a Map from this object
+  Map<String, dynamic> toMap() {
+    var map = <String, dynamic>{
+      columnRoutineJson: routineJson,
+      columnCaption: caption
+    };
+    if (id != null) {
+      map[columnId] = id;
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return "{id: $id, caption: $caption, routine: $routineJson}";
+  }
+}

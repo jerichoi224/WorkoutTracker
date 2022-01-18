@@ -2,64 +2,14 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:workout_tracker/dbModels/RoutineEntry.dart';
 
-import 'package:workout_tracker/util/typedef.dart';
+import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
+import 'package:workout_tracker/dbModels/ColumnNames.dart';
 
 // database table and column names
 final String tableWorkout = 'WorkoutList';
 final String tableRoutine = 'RoutineList';
-
-final String tableSubscriptions = 'tableSubscriptions';
-
-final String columnId = '_id';
-final String columnCaption = 'caption';
-final String columnPart = 'part';
-final String columnType = 'type';
-final String columnMetric = 'metric';
-final String columnDescription = 'description';
-
-
-// data model class
-class WorkoutEntry {
-  int id;
-  MetricType metric;
-  WorkoutType type;
-  PartType part;
-  String caption;
-  String description;
-
-  WorkoutEntry();
-
-  // convenience constructor to create a Word object
-  WorkoutEntry.fromMap(Map<String, dynamic> map) {
-    id = map[columnId];
-    caption = map[columnCaption];
-    description = map[columnDescription];
-    type = WorkoutType.values.firstWhere((e) => e.name == map[columnType]);
-    part = PartType.values.firstWhere((e) => e.name == map[columnPart]);
-    metric = MetricType.values.firstWhere((e) => e.name == map[columnMetric]);
-  }
-
-  // convenience method to create a Map from this object
-  Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{
-      columnType: type.name,
-      columnPart: part.name,
-      columnMetric: metric.name,
-      columnCaption: caption,
-      columnDescription: description,
-    };
-    if (id != null) {
-      map[columnId] = id;
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return "{id: $id, caption: $caption, type: ${type.name}, part: ${part.name}, metric: ${metric.name}, description: $description}";
-  }
-}
 
 // singleton class to manage the database
 class DatabaseHelper {
@@ -98,20 +48,27 @@ class DatabaseHelper {
                 $columnId INTEGER PRIMARY KEY,
                 $columnCaption TEXT NOT NULL,
                 $columnPart TEXT NOT NULL,
-                $columnType TEXT NOT NULL,
+                $columnWorkoutType TEXT NOT NULL,
                 $columnMetric TEXT NOT NULL,
                 $columnDescription TEXT
               )
               ''');
+
+    await db.execute('''
+              CREATE TABLE $tableRoutine (
+                $columnId INTEGER PRIMARY KEY,
+                $columnCaption TEXT NOT NULL,
+                $columnRoutineJson TEXT NOT NULL
+              )
+              ''');
   }
 
-  // Database helper methods:
+  // Database Workout Entry methods:
   Future<int> insertWorkoutEntry(WorkoutEntry entry) async {
     Database db = await database;
     int id = await db.insert(tableWorkout, entry.toMap());
     return id;
   }
-
   Future<List<WorkoutEntry>> queryAllWorkout() async {
     Database db = await database;
     List<Map> maps = await db.rawQuery('SELECT * FROM $tableWorkout');
@@ -123,20 +80,51 @@ class DatabaseHelper {
     }
     return result;
   }
-
   Future<int> deleteWorkout(int id) async {
     Database db = await database;
     return await db.delete(tableWorkout, where: '$columnId = ?', whereArgs: [id]);
   }
-
   Future<int> updateWorkout(WorkoutEntry entry) async {
+    if(entry == null)
+      return 0;
+
     Database db = await database;
     return await db.update(tableWorkout, entry.toMap(),
         where: '$columnId = ?', whereArgs: [entry.id]);
   }
-
   Future<int> clearWorkoutTable() async{
     Database db = await database;
     return await db.delete(tableWorkout);
+  }
+
+  // Database Routine Entry methods:
+  Future<int> insertRoutineEntry(RoutineEntry entry) async {
+    Database db = await database;
+    int id = await db.insert(tableRoutine, entry.toMap());
+    return id;
+  }
+  Future<List<RoutineEntry>> queryAllRoutine() async {
+    Database db = await database;
+    List<Map> maps = await db.rawQuery('SELECT * FROM $tableRoutine');
+    List<RoutineEntry> result = [];
+    if (maps.length > 0) {
+      for(Map i in maps){
+        result.add(RoutineEntry.fromMap(i));
+      }
+    }
+    return result;
+  }
+  Future<int> deleteRoutine(int id) async {
+    Database db = await database;
+    return await db.delete(tableRoutine, where: '$columnId = ?', whereArgs: [id]);
+  }
+  Future<int> updateRoutine(RoutineEntry entry) async {
+    Database db = await database;
+    return await db.update(tableRoutine, entry.toMap(),
+        where: '$columnId = ?', whereArgs: [entry.id]);
+  }
+  Future<int> clearRoutineTable() async{
+    Database db = await database;
+    return await db.delete(tableRoutine);
   }
 }

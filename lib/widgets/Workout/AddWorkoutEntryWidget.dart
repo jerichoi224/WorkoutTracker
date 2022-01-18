@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/db/database_helpers.dart';
+import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
 
 class AddWorkoutEntryWidget extends StatefulWidget {
   DatabaseHelper dbHelper;
@@ -10,9 +11,16 @@ class AddWorkoutEntryWidget extends StatefulWidget {
   State createState() => _AddWorkoutEntryState();
 }
 
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+  }
+}
+
 class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
   String part, type, metric, caption;
   final workoutNameController = TextEditingController();
+  final descriptionController = TextEditingController();
 
   @override
   void initState() {
@@ -28,7 +36,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
     return WillPopScope(
         onWillPop: () async{
           Navigator.pop(context, false);
-          return true;
+          return false;
         },
         child: new GestureDetector(
             onTap: () {
@@ -37,6 +45,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
             child: new Scaffold(
                 appBar: AppBar(
                   title: Text("Add Workout"),
+                  backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
                     builder: (context) =>
@@ -111,7 +120,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                       return Container(
                                                           alignment: Alignment.centerRight,
                                                           width: 100, // TODO: Find Proper Width
-                                                          child: Text(value.name, textAlign: TextAlign.end)
+                                                          child: Text(value.name.capitalize(), textAlign: TextAlign.end)
                                                       );
                                                     }).toList();
                                                   },
@@ -119,7 +128,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                       .map<DropdownMenuItem<String>>((PartType value) {
                                                     return DropdownMenuItem<String>(
                                                       value: value.name,
-                                                      child: Text(value.name),
+                                                      child: Text(value.name.capitalize()),
                                                     );
                                                   }).toList(),
                                                 )
@@ -146,7 +155,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                       return Container(
                                                           alignment: Alignment.centerRight,
                                                           width: 100, // TODO: Find Proper Width
-                                                          child: Text(value.name, textAlign: TextAlign.end)
+                                                          child: Text(value.name.capitalize(), textAlign: TextAlign.end)
                                                       );
                                                     }).toList();
                                                   },
@@ -199,7 +208,41 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                       ],
                                     )
                                 ),
-
+                                Container(
+                                    padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                                    child: Text("Description",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey
+                                      ),
+                                    )
+                                ),
+                                Card(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                                    margin: EdgeInsets.all(8.0),
+                                    child: Column(
+                                        children: <Widget>[
+                                          ListTile(
+                                              title: new Row(
+                                                children: <Widget>[
+                                                  new Flexible(
+                                                      child: new TextFormField(
+                                                        keyboardType: TextInputType.multiline,
+                                                        maxLines: null,
+                                                        minLines: 4,
+                                                        controller: descriptionController,
+                                                        decoration: InputDecoration(
+                                                          border:InputBorder.none,
+                                                          hintText: "(Optional)",
+                                                        ),
+                                                      )
+                                                  )
+                                                ],
+                                              )
+                                          ),
+                                        ]
+                                    )
+                                ),
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                                     margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
@@ -223,9 +266,10 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                 newEntry.type = WorkoutType.values.firstWhere((e) => e.name == type);
                                                 newEntry.part = PartType.values.firstWhere((e) => e.name == part);
                                                 newEntry.metric = MetricType.values.firstWhere((e) => e.name == metric);
+                                                newEntry.description = descriptionController.text;
                                                 widget.dbHelper.insertWorkoutEntry(newEntry);
 
-                                                Navigator.pop(context, false);
+                                                Navigator.pop(context, true);
                                               },
                                               title: Text("Add Workout",
                                                 style: TextStyle(

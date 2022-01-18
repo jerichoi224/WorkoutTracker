@@ -57,31 +57,29 @@ class _DashboardState extends State<DashboardWidget>{
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
-            appBar: AppBar(
-              title: Text("Dashboard"),
-              actions: null,
-            ),
-            body:
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                    child: SingleChildScrollView(
-                        child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minHeight: 0
-                            ),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-
-                              ],
-                            )
-                        )
-                    )
-                )
-              ],
-            )
+          body: CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                pinned: true,
+                snap: false,
+                floating: false,
+                backgroundColor: Colors.amberAccent,
+                expandedHeight: 100.0,
+//                actions: _buildActions(),
+                flexibleSpace: const FlexibleSpaceBar(
+                  title: Text('Dashboard'),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate(
+                    [
+                      Text("HI")
+                    ]
+//                    routineList()
+                ),
+              ),
+            ],
+          ),
         )
     );
   }
