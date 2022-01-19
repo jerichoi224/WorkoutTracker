@@ -8,6 +8,7 @@ class WorkoutEntry {
   PartType part;
   String caption;
   String description;
+  String prevSessionJson;
 
   WorkoutEntry();
 
@@ -16,6 +17,7 @@ class WorkoutEntry {
     id = map[columnId];
     caption = map[columnCaption];
     description = map[columnDescription];
+    prevSessionJson = map[columnPreviousSessionJson];
     type = WorkoutType.values.firstWhere((e) => e.name == map[columnWorkoutType]);
     part = PartType.values.firstWhere((e) => e.name == map[columnPart]);
     metric = MetricType.values.firstWhere((e) => e.name == map[columnMetric]);
@@ -29,6 +31,7 @@ class WorkoutEntry {
       columnMetric: metric.name,
       columnCaption: caption,
       columnDescription: description,
+      columnPreviousSessionJson: prevSessionJson
     };
     if (id != null) {
       map[columnId] = id;

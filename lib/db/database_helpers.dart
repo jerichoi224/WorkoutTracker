@@ -50,7 +50,8 @@ class DatabaseHelper {
                 $columnPart TEXT NOT NULL,
                 $columnWorkoutType TEXT NOT NULL,
                 $columnMetric TEXT NOT NULL,
-                $columnDescription TEXT
+                $columnDescription TEXT,
+                $columnPreviousSessionJson TEXT
               )
               ''');
 

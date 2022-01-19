@@ -6,3 +6,4 @@ final String columnMetric = 'metric';
 final String columnDescription = 'description';
 final String columnEnumType = 'enumType';
 final String columnRoutineJson = 'routineJson';
+final String columnPreviousSessionJson = 'prevSessionJson';

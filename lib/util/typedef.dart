@@ -7,7 +7,7 @@ enum PartType {
   core,
   shoulder,
   cardio,
-  other
+  other,
 }
 
 enum WorkoutType {
@@ -16,12 +16,12 @@ enum WorkoutType {
   dumbbell,
   laps,
   cardio,
-  other
+  other,
 }
 
 enum MetricType {
   km,
   kg,
   floor,
-  none
+  none,
 }

@@ -163,7 +163,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                       .map<DropdownMenuItem<String>>((WorkoutType value) {
                                                     return DropdownMenuItem<String>(
                                                       value: value.name,
-                                                      child: Text(value.name),
+                                                      child: Text(value.name.capitalize()),
                                                     );
                                                   }).toList(),
                                                 )

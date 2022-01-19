@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/class/WorkoutCard.dart';
 import 'package:workout_tracker/dbModels/RoutineEntry.dart';
 import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
 import 'package:workout_tracker/util/typedef.dart';
@@ -13,16 +14,21 @@ class AddRoutineEntryWidget extends StatefulWidget {
   State createState() => _AddRoutineEntryState();
 }
 
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+  }
+}
+
 class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
   String caption;
-  int workoutCard_id;
   final RoutineNameController = TextEditingController();
 
-  List<Card> WorkoutList = [];
+  List<WorkoutEntry> WorkoutEntryList = [];
+  List<WorkoutCard> WorkoutCardList = [];
 
   @override
   void initState() {
-    workoutCard_id = 0;
     caption = "";
     super.initState();
   }
@@ -52,19 +58,14 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
     );
   }
 
-  void AddSet() {
-
+  void AddSet(int cardIndex) {
+    WorkoutCardList[cardIndex].addSet(0, 0);
+    setState(() {});
   }
 
-  void removeWorkout(String i){
-    for(Card c in WorkoutList)
-    {
-      if(c.key == Key(i))
-        {
-          WorkoutList.remove(c);
-          break;
-        }
-    }
+  void removeWorkout(int ind){
+    WorkoutCardList.removeAt(ind);
+    WorkoutEntryList.removeAt(ind);
     setState(() {});
   }
 
@@ -79,41 +80,122 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
       if(result.runtimeType == WorkoutEntry)
       {
         WorkoutEntry workoutEntry = result as WorkoutEntry;
-        WorkoutList.add(
-          Card(
-              key: Key(workoutCard_id.toString()),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-              margin: EdgeInsets.all(8.0),
-              child: Column(
-                  children: <Widget>[
-                    ListTile(
-                        title: new Row(
-                          children: <Widget>[
-                            new Flexible(
-                                child: new Text(workoutEntry.caption,
-                                style: TextStyle(
-                                    color: Colors.black
-                                ),
-                              )
-                            ),
-                          ],
-                        ),
-                      trailing: new Container(
-                        child: new IconButton(
-                          icon: new Icon(Icons.close),
-                          onPressed:()=> removeWorkout(workoutCard_id.toString())
-                        )
-                        ,
-                      ),
-                    ),
-                    AddButton("Add Set", AddSet)
-                  ]
-              )
-          )
-        );
+        WorkoutCard newCard = new WorkoutCard(workoutEntry);
+        WorkoutCardList.add(newCard);
+        AddSet(WorkoutCardList.length - 1);
         setState(() {});
-        workoutCard_id++;
       }
+  }
+
+  Widget _BuildWorkoutCards(BuildContext context, int index) {
+    return Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        margin: EdgeInsets.all(8.0),
+        child: Column(
+            children: <Widget>[
+              ListTile(
+                title: new Row(
+                  children: <Widget>[
+                    new Flexible(
+                        child: new Text(WorkoutCardList[index].entry.caption.capitalize(),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold
+                          ),
+                        )
+                    ),
+                  ],
+                ),
+                trailing: new Container(
+                  child: new IconButton(
+                      icon: new Icon(Icons.close),
+                      onPressed:(){
+                        WorkoutCardList.removeAt(index);
+                        setState(() {
+                        });
+                      }
+                  )
+                  ,
+                ),
+              ),
+              ListView.builder(
+                itemCount: WorkoutCardList[index].numSets,
+                itemBuilder: (BuildContext context, int ind) {
+                  return _BuildSets(context, ind, index);
+                },
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+              ),
+              AddButton("Add Set", (){AddSet(index);})
+            ]
+        )
+    );
+  }
+
+  Widget _BuildSets(BuildContext context, int index, int cardInd) {
+    return ListTile(
+      title: new Row(
+        children: <Widget>[
+          new Container(
+            width: 75,
+            height: 40,
+            child: new TextField(
+              cursorColor: Colors.black54,
+              maxLength: 5,
+              keyboardType: TextInputType.number,
+              controller: WorkoutCardList[cardInd].metricController[index],
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    // width: 0.0 produces a thin "hairline" border
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    borderSide: BorderSide.none,
+                    //borderSide: const BorderSide(),
+                  ),
+                counterText: "",
+                fillColor: Color.fromRGBO(240, 240, 240, 1),
+                filled: true
+              ),
+            ),
+          ),
+          if(WorkoutCardList[cardInd].entry.metric != MetricType.none) new Text(" " + WorkoutCardList[cardInd].entry.metric.name),
+          if(WorkoutCardList[cardInd].entry.metric == MetricType.kg || WorkoutCardList[cardInd].entry.metric == MetricType.none)
+            new Text(" × "),
+          if(WorkoutCardList[cardInd].entry.metric == MetricType.kg || WorkoutCardList[cardInd].entry.metric == MetricType.none)
+            new Container(
+              width: 75,
+              height: 40,
+              child: new TextField(
+                cursorColor: Colors.black54,
+                maxLength: 5,
+                keyboardType: TextInputType.number,
+                controller: WorkoutCardList[cardInd].countController[index],
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      // width: 0.0 produces a thin "hairline" border
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      borderSide: BorderSide.none,
+                      //borderSide: const BorderSide(),
+                    ),
+                    counterText: "",
+                    fillColor: Color.fromRGBO(240, 240, 240, 1),
+                    filled: true
+                ),
+              ),
+            ),
+        ],
+      ),
+      trailing: new Container(
+        child: new IconButton(
+            icon: new Icon(Icons.close),
+            onPressed:(){
+              WorkoutCardList[cardInd].remove(index);
+              setState(() {
+              });
+            }
+        )
+        ,
+      ),
+    );
   }
 
   @override
@@ -180,7 +262,13 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                       ),
                                     )
                                 ),
-                                Column(children: WorkoutList,),
+
+                                ListView.builder(
+                                  itemCount: WorkoutCardList.length,
+                                  itemBuilder: _BuildWorkoutCards,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                ),
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                                     margin: EdgeInsets.all(8.0),

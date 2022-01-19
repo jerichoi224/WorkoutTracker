@@ -15,9 +15,8 @@ class RoutineEntry {
   *       sets:
   *       [
   *         {
-  *           metric: XX
-  *           count:  XX
-  *           prev:   XX
+  *           metric:     XX,
+  *           count:      XX,
   *         },
   *         ...
   *       ]
