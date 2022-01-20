@@ -6,12 +6,12 @@ import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/db/database_helpers.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 
-class AddRoutineEntryWidget extends StatefulWidget {
+class AddSessionEntryWidget extends StatefulWidget {
   DatabaseHelper dbHelper;
 
-  AddRoutineEntryWidget({Key key, this.dbHelper}) : super(key: key);
+  AddSessionEntryWidget({Key key, this.dbHelper}) : super(key: key);
   @override
-  State createState() => _AddRoutineEntryState();
+  State createState() => _AddSessionEntryState();
 }
 
 extension StringExtension on String {
@@ -20,7 +20,7 @@ extension StringExtension on String {
   }
 }
 
-class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
+class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   String caption;
   final RoutineNameController = TextEditingController();
 
@@ -36,26 +36,31 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
   Widget AddButton(String caption, Function method)
   {
     return ListTile(
-        title: new Row(
-            mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally,
-            children: <Widget>[
-              new Icon(
-                  Icons.add,
-                color: Colors.black38
-              ),
-              new Flexible(
-                child: new Text(caption,
-                  style: TextStyle(
+      title: new Row(
+        mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally,
+        children: <Widget>[
+          new Icon(
+              Icons.add,
+              color: Colors.black38
+          ),
+          new Flexible(
+              child: new Text(caption,
+                style: TextStyle(
                     color: Colors.black38
-                  ),
-                )
-            )
-          ],
-        ),
+                ),
+              )
+          )
+        ],
+      ),
       onTap: () => {
         method()
       },
     );
+  }
+
+  void AddSet(int cardIndex) {
+    WorkoutCardList[cardIndex].addSet(0, 0);
+    setState(() {});
   }
 
   void removeWorkout(int ind){
@@ -66,19 +71,20 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
 
   void AddWorkout() async {
     // start the SecondScreen and wait for it to finish with a result
-      final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => WorkoutListWidget(dbHelper: widget.dbHelper),
-      ));
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WorkoutListWidget(dbHelper: widget.dbHelper),
+        ));
 
-      if(result.runtimeType == WorkoutEntry)
-      {
-        WorkoutEntry workoutEntry = result as WorkoutEntry;
-        WorkoutCard newCard = new WorkoutCard(workoutEntry);
-        WorkoutCardList.add(newCard);
-        setState(() {});
-      }
+    if(result.runtimeType == WorkoutEntry)
+    {
+      WorkoutEntry workoutEntry = result as WorkoutEntry;
+      WorkoutCard newCard = new WorkoutCard(workoutEntry);
+      WorkoutCardList.add(newCard);
+      AddSet(WorkoutCardList.length - 1);
+      setState(() {});
+    }
   }
 
   Widget _BuildWorkoutCards(BuildContext context, int index) {
@@ -112,8 +118,83 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                   ,
                 ),
               ),
+              ListView.builder(
+                itemCount: WorkoutCardList[index].numSets,
+                itemBuilder: (BuildContext context, int ind) {
+                  return _BuildSets(context, ind, index);
+                },
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+              ),
+              AddButton("Add Set", (){AddSet(index);})
             ]
         )
+    );
+  }
+
+  Widget _BuildSets(BuildContext context, int index, int cardInd) {
+    return ListTile(
+      title: new Row(
+        children: <Widget>[
+          new Container(
+            width: 75,
+            height: 40,
+            child: new TextField(
+              cursorColor: Colors.black54,
+              maxLength: 5,
+              keyboardType: TextInputType.number,
+              controller: WorkoutCardList[cardInd].metricController[index],
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    // width: 0.0 produces a thin "hairline" border
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    borderSide: BorderSide.none,
+                    //borderSide: const BorderSide(),
+                  ),
+                  counterText: "",
+                  fillColor: Color.fromRGBO(240, 240, 240, 1),
+                  filled: true
+              ),
+            ),
+          ),
+          if(WorkoutCardList[cardInd].entry.metric != MetricType.none) new Text(" " + WorkoutCardList[cardInd].entry.metric.name),
+          if(WorkoutCardList[cardInd].entry.metric == MetricType.kg || WorkoutCardList[cardInd].entry.metric == MetricType.none)
+            new Text(" × "),
+          if(WorkoutCardList[cardInd].entry.metric == MetricType.kg || WorkoutCardList[cardInd].entry.metric == MetricType.none)
+            new Container(
+              width: 75,
+              height: 40,
+              child: new TextField(
+                cursorColor: Colors.black54,
+                maxLength: 5,
+                keyboardType: TextInputType.number,
+                controller: WorkoutCardList[cardInd].countController[index],
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      // width: 0.0 produces a thin "hairline" border
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      borderSide: BorderSide.none,
+                      //borderSide: const BorderSide(),
+                    ),
+                    counterText: "",
+                    fillColor: Color.fromRGBO(240, 240, 240, 1),
+                    filled: true
+                ),
+              ),
+            ),
+        ],
+      ),
+      trailing: new Container(
+        child: new IconButton(
+            icon: new Icon(Icons.close),
+            onPressed:(){
+              WorkoutCardList[cardInd].remove(index);
+              setState(() {
+              });
+            }
+        )
+        ,
+      ),
     );
   }
 

@@ -31,7 +31,7 @@ class WorkoutEntry {
       columnMetric: metric.name,
       columnCaption: caption,
       columnDescription: description,
-      columnPreviousSessionJson: prevSessionJson
+      columnPreviousSessionJson: prevSessionJson,
     };
     if (id != null) {
       map[columnId] = id;
