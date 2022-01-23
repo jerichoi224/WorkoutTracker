@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/db/database_helpers.dart';
 import 'package:workout_tracker/widgets/Workout/AddWorkoutEntryWidget.dart';
-import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
+import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
 import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/objectbox.g.dart';
 
 class WorkoutListWidget extends StatefulWidget {
-  DatabaseHelper dbHelper;
-  WorkoutListWidget({Key key, this.dbHelper}) : super(key: key);
+  final Box<WorkoutEntry> workoutBox;
+  WorkoutListWidget({Key? key, required this.workoutBox}) : super(key: key);
 
   @override
   State createState() => _WorkoutListState();
 }
 
 class _WorkoutListState extends State<WorkoutListWidget> {
-  List<WorkoutEntry> WorkoutList;
+  List<WorkoutEntry> WorkoutList = [];
   TextEditingController searchTextController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "";
@@ -22,17 +22,12 @@ class _WorkoutListState extends State<WorkoutListWidget> {
   void initState() {
     super.initState();
 
-    WorkoutList = [];
     updateWorkoutList();
   }
 
   void updateWorkoutList()
   {
-    widget.dbHelper.queryAllWorkout().then((entries){
-      setState(() {
-        WorkoutList = entries;
-      });
-    });
+    WorkoutList = widget.workoutBox.getAll();
   }
 
   // Navigate to AddWorkout screen
@@ -42,7 +37,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddWorkoutEntryWidget(dbHelper: widget.dbHelper),
+          builder: (context) => AddWorkoutEntryWidget(workoutBox: widget.workoutBox),
         ));
 
     if(result)
@@ -68,7 +63,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     for(WorkoutEntry i in WorkoutList){
       if(searchTextController.text.isNotEmpty) {
         if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
-            &&!i.part.name.toLowerCase().contains(searchTextController.text.toLowerCase())
+            &&!i.part.toLowerCase().contains(searchTextController.text.toLowerCase())
         // && !i.type.name.toLowerCase().contains(searchTextController.text.toLowerCase())
         )
           continue;
@@ -112,12 +107,12 @@ class _WorkoutListState extends State<WorkoutListWidget> {
                                 style: TextStyle(color: Colors.black)
                             ),
                             TextSpan(
-                                text: " (" + i.part.name + ")",
+                                text: " (" + i.part + ")",
                                 style: TextStyle(color: Colors.black54)),
                           ],
                         ),
                       ),
-                      subtitle: Text(i.type.name),
+                      subtitle: Text(i.type),
                   )
               )
           )
@@ -195,7 +190,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
 
   void _startSearch() {
     ModalRoute.of(context)
-        .addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
+        ?.addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
 
     setState(() {
       _isSearching = true;

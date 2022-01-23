@@ -3,9 +3,9 @@ import 'package:workout_tracker/dbModels/ColumnNames.dart';
 
 // data model class
 class RoutineEntry {
-  int id;
-  String caption;
-  String routineJson;
+  late int id;
+  late String caption;
+  late String routineJson;
   /*
   * {
   *   routine: [
@@ -29,7 +29,7 @@ class RoutineEntry {
   RoutineEntry();
 
   // convenience constructor to create a Word object
-  RoutineEntry.fromMap(Map<String, dynamic> map) {
+  RoutineEntry.fromMap(Map<dynamic, dynamic> map) {
     id = map[columnId];
     caption = map[columnCaption];
     routineJson = map[columnRoutineJson];

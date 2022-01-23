@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'package:flutter/services.dart';
-
-import 'package:workout_tracker/db/database_helpers.dart';
 import 'package:workout_tracker/widgets/DashboardWidget.dart';
 import 'package:workout_tracker/widgets/CalendarWidget.dart';
 import 'package:workout_tracker/widgets/Routine/RoutineWidget.dart';
@@ -13,7 +9,7 @@ import 'package:workout_tracker/widgets/SettingsWidget.dart';
 class HomeWidget extends StatefulWidget {
   final BuildContext parentCtx;
 
-  HomeWidget({Key key, this.parentCtx});
+  HomeWidget({Key? key, required this.parentCtx});
 
   @override
   State createState() => _HomeState();
@@ -21,7 +17,7 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeState extends State<HomeWidget>{
-  DatabaseHelper dbHelper = DatabaseHelper.instance;
+//  DatabaseHelper dbHelper = DatabaseHelper();
   final pageController = PageController(initialPage: 2);
   int _currentIndex = 2;
   bool ready = false;
@@ -32,8 +28,8 @@ class _HomeState extends State<HomeWidget>{
   }
 
   List<Widget> _children() => [
-    WorkoutWidget(dbHelper: dbHelper),
-    RoutineWidget(dbHelper: dbHelper),
+    WorkoutWidget(),
+    RoutineWidget(),
     DashboardWidget(),
     CalendarWidget(),
     SettingsWidget(),
@@ -140,7 +136,7 @@ class _HomeState extends State<HomeWidget>{
   void onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
-      pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      pageController.animateToPage(_currentIndex, duration: Duration(milliseconds: 500), curve: Curves.ease);
     });
   }
 }

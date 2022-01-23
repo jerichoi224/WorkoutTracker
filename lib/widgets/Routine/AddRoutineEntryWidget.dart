@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/class/WorkoutCard.dart';
-import 'package:workout_tracker/dbModels/RoutineEntry.dart';
-import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
-import 'package:workout_tracker/util/typedef.dart';
-import 'package:workout_tracker/db/database_helpers.dart';
+import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 
-class AddRoutineEntryWidget extends StatefulWidget {
-  DatabaseHelper dbHelper;
+import 'package:workout_tracker/objectbox.g.dart';
 
-  AddRoutineEntryWidget({Key key, this.dbHelper}) : super(key: key);
+class AddRoutineEntryWidget extends StatefulWidget {
+//  DatabaseHelper dbHelper;
+
+  AddRoutineEntryWidget({Key? key}) : super(key: key);
   @override
   State createState() => _AddRoutineEntryState();
 }
@@ -21,16 +20,19 @@ extension StringExtension on String {
 }
 
 class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
-  String caption;
-  final RoutineNameController = TextEditingController();
+  late final store;
+  late final workoutEntryBox;
 
+  String caption = "";
+  final RoutineNameController = TextEditingController();
   List<WorkoutEntry> WorkoutEntryList = [];
   List<WorkoutCard> WorkoutCardList = [];
 
   @override
   void initState() {
-    caption = "";
     super.initState();
+    store = openStore();
+    workoutEntryBox = store.box<WorkoutEntry>();
   }
 
   Widget AddButton(String caption, Function method)
@@ -69,7 +71,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
       final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => WorkoutListWidget(dbHelper: widget.dbHelper),
+        builder: (context) => WorkoutListWidget(workoutBox: workoutEntryBox,),
       ));
 
       if(result.runtimeType == WorkoutEntry)
@@ -214,12 +216,12 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                                   return;
                                                 }
-
+                                                /*
                                                 RoutineEntry newEntry = new RoutineEntry();
                                                 newEntry.caption = RoutineNameController.text;
                                                 newEntry.routineJson = "";
                                                 widget.dbHelper.insertRoutineEntry(newEntry);
-
+                                                */
                                                 Navigator.pop(context, false);
                                               },
                                               title: Text("Add Routine",
@@ -239,5 +241,10 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
             )
         )
     );
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    store.close();
   }
 }

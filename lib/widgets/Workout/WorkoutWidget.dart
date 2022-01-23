@@ -1,49 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/db/database_helpers.dart';
 import 'package:workout_tracker/widgets/Workout/EditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/widgets/Workout/AddWorkoutEntryWidget.dart';
-import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
+import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
 import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/objectbox.g.dart';
 
 class WorkoutWidget extends StatefulWidget {
-  DatabaseHelper dbHelper;
-  WorkoutWidget({Key key, this.dbHelper}) : super(key: key);
+  WorkoutWidget({Key? key}) : super(key: key);
 
   @override
   State createState() => _WorkoutState();
 }
 
 class _WorkoutState extends State<WorkoutWidget> {
-  List<WorkoutEntry> WorkoutList;
+  final store = openStore();
+  late final workoutEntryBox;
+
+  List<WorkoutEntry> WorkoutList = [];
   TextEditingController searchTextController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "";
 
   void initState() {
     super.initState();
-
-    WorkoutList = [];
+    workoutEntryBox = store.box<WorkoutEntry>();
     updateWorkoutList();
   }
 
   void updateWorkoutList()
   {
-    widget.dbHelper.queryAllWorkout().then((entries){
-      setState(() {
-        WorkoutList = entries;
-      });
-    });
+//    WorkoutList = workoutEntryBox.getAll();
   }
 
   // Navigate to AddWorkout screen
   void _AddWorkoutEntry(BuildContext context) async {
-    // start the SecondScreen and wait for it to finish with a result
-
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddWorkoutEntryWidget(dbHelper: widget.dbHelper),
+          builder: (context) => AddWorkoutEntryWidget(workoutBox: workoutEntryBox),
         ));
 
     if(result)
@@ -72,8 +67,7 @@ class _WorkoutState extends State<WorkoutWidget> {
         }
         // Delete
         else if(selectedIndex == 1){
-          widget.dbHelper.deleteWorkout(i.id);
-          WorkoutList.remove(i);
+          workoutEntryBox.remove(i.id);
           setState(() {
           });
         }
@@ -82,11 +76,11 @@ class _WorkoutState extends State<WorkoutWidget> {
   }
 
   void _openEditWidget(WorkoutEntry workoutEntry) async {
-    // start the SecondScreen and wait for it to finish with a result
+    // start the SecondScreen and wait for it to finish with a   result
      bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EditWorkoutEntryWidget(dbHelper: widget.dbHelper, entry: workoutEntry),
+          builder: (context) => EditWorkoutEntryWidget(workoutBox: workoutEntryBox, entry: workoutEntry),
         )
     );
 
@@ -103,16 +97,29 @@ class _WorkoutState extends State<WorkoutWidget> {
   }
 
   List<Widget> workoutList(){
-    List<Widget> WorkoutWidgetList = [];
+    List<Widget> workoutWidgetList = [];
     int tmp = 0;
     String firstChar = "";
+
+    if(WorkoutList.length == 0)
+      return List.from(
+          [
+            Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+              child: Text(
+                "No Workout Found.",
+                style: TextStyle(fontSize: 14),
+              ),
+            )
+          ]);
 
     WorkoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
     for(WorkoutEntry i in WorkoutList){
       if(searchTextController.text.isNotEmpty) {
         if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
-           &&!i.part.name.toLowerCase().contains(searchTextController.text.toLowerCase())
+           &&!i.part.toLowerCase().contains(searchTextController.text.toLowerCase())
         // && !i.type.name.toLowerCase().contains(searchTextController.text.toLowerCase())
         )
           continue;
@@ -120,7 +127,7 @@ class _WorkoutState extends State<WorkoutWidget> {
       // If alphabet changes, add caption
       if(firstChar != i.caption[0].toUpperCase()){
         firstChar = i.caption[0].toUpperCase();
-        WorkoutWidgetList.add(
+        workoutWidgetList.add(
             Padding(
                 padding: EdgeInsets.fromLTRB(15, 7, 0, 0),
                 child: Text(getFirstchar(firstChar),
@@ -133,7 +140,7 @@ class _WorkoutState extends State<WorkoutWidget> {
             )
         );
       }
-      WorkoutWidgetList.add(
+      workoutWidgetList.add(
           new Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
@@ -152,29 +159,19 @@ class _WorkoutState extends State<WorkoutWidget> {
                             style: TextStyle(color: Colors.black)
                           ),
                         TextSpan(
-                            text: " (" + i.part.name + ")",
+                            text: " (" + i.part + ")",
                             style: TextStyle(color: Colors.black54)),
                       ],
                     ),
                   ),
-                  subtitle: Text(i.type.name),
+                  subtitle: Text(i.type),
                     trailing: _popUpMenuButton(i)
               )
           )
         )
       );
     }
-    return WorkoutWidgetList.length > 0 ? WorkoutWidgetList : List.from(
-        [
-          Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: Text(
-                "No Workout Found.",
-              style: TextStyle(fontSize: 14),
-            ),
-          )
-        ]);
+    return workoutWidgetList;
   }
 
   Widget _buildSearchField() {
@@ -236,7 +233,7 @@ class _WorkoutState extends State<WorkoutWidget> {
 
   void _startSearch() {
     ModalRoute.of(context)
-        .addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
+        ?.addLocalHistoryEntry(LocalHistoryEntry(onRemove: _stopSearching));
 
     setState(() {
       _isSearching = true;
@@ -285,7 +282,10 @@ class _WorkoutState extends State<WorkoutWidget> {
               ),
               SliverList(
                 delegate: SliverChildListDelegate(
-                    workoutList()
+                  [
+
+                  ]
+                  //  workoutList()
                 ),
               ),
             ],
@@ -294,4 +294,9 @@ class _WorkoutState extends State<WorkoutWidget> {
     );
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    store.close();
+  }
 }

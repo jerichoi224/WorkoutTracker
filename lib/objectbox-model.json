@@ -1,0 +1,167 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "3:6349373929477905858",
+      "lastPropertyId": "3:7566590590164589054",
+      "name": "SetItem",
+      "flags": 2,
+      "properties": [
+        {
+          "id": "1:8308774796900781441",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8345639757594749507",
+          "name": "metricValue",
+          "type": 6
+        },
+        {
+          "id": "3:7566590590164589054",
+          "name": "countValue",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:3781393106579796184",
+      "lastPropertyId": "10:596407192099789693",
+      "name": "WorkoutEntry",
+      "flags": 2,
+      "properties": [
+        {
+          "id": "1:1789044328783338726",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "3:5136492222937364875",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "6:3802314350490831935",
+          "name": "caption",
+          "type": 9
+        },
+        {
+          "id": "7:8660973223122060033",
+          "name": "prevSessionId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "2:1332689487264034509",
+          "relationTarget": "SessionItem"
+        },
+        {
+          "id": "8:8664091358710413773",
+          "name": "metric",
+          "type": 9
+        },
+        {
+          "id": "9:1620244117553902582",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "10:596407192099789693",
+          "name": "part",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:2106140805026109026",
+      "lastPropertyId": "2:2207648410912630680",
+      "name": "SessionItem",
+      "flags": 2,
+      "properties": [
+        {
+          "id": "1:2565150483499850926",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2207648410912630680",
+          "name": "time",
+          "type": 6
+        }
+      ],
+      "relations": [
+        {
+          "id": "1:7177883577583130157",
+          "name": "sets",
+          "targetId": "3:6349373929477905858"
+        }
+      ]
+    },
+    {
+      "id": "6:2659339368501590805",
+      "lastPropertyId": "4:3781991211420081365",
+      "name": "RoutineEntry",
+      "flags": 2,
+      "properties": [
+        {
+          "id": "1:5832932175597938606",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:492210282316528568",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:4758389869014186524",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "4:3781991211420081365",
+          "name": "parts",
+          "type": 30
+        }
+      ],
+      "relations": [
+        {
+          "id": "2:2888247885336091349",
+          "name": "workoutList",
+          "targetId": "4:3781393106579796184"
+        }
+      ]
+    }
+  ],
+  "lastEntityId": "6:2659339368501590805",
+  "lastIndexId": "2:1332689487264034509",
+  "lastRelationId": "2:2888247885336091349",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    3737160477377805400,
+    3214364996229660332
+  ],
+  "retiredIndexUids": [
+    7135608505005199690
+  ],
+  "retiredPropertyUids": [
+    6987834240152858428,
+    8166532937300263511,
+    4299233684867096687,
+    8937478955789243757,
+    404051633199124960,
+    151218328208462529,
+    6122815529505620157,
+    3678274702609055183
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

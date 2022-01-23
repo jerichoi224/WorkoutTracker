@@ -1,23 +1,18 @@
 // Class used in Routines. A Single Class is a Single Workout Entry in a routine.
 import 'package:flutter/widgets.dart';
-import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
+import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
 class WorkoutCard {
-  WorkoutEntry entry;
-  int numSets;
-  List<double> metricList;
-  List<double> countList;
-  List<TextEditingController> metricController;
-  List<TextEditingController> countController;
+  late WorkoutEntry entry;
+  int numSets = 0;
+  List<double> metricList = [];
+  List<double> countList = [];
+  List<TextEditingController> metricController = [];
+  List<TextEditingController> countController = [];
 
   WorkoutCard(WorkoutEntry workoutEntry)
   {
-    metricList = [];
-    countList = [];
-    metricController = [];
-    countController = [];
     entry = workoutEntry;
-    numSets = 0;
   }
 
   void addSet(double metric, double count)
@@ -49,5 +44,6 @@ class WorkoutCard {
       set["metric"] = metricList[i];
       set["count"] = countList[i];
     }
+    return retMap;
   }
 }

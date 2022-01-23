@@ -2,18 +2,18 @@ import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/dbModels/ColumnNames.dart';
 // data model class
 class WorkoutEntry {
-  int id;
-  MetricType metric;
-  WorkoutType type;
-  PartType part;
-  String caption;
-  String description;
-  String prevSessionJson;
+  int id = 0;
+  late MetricType metric;
+  late WorkoutType type;
+  late PartType part;
+  late String caption;
+  late String description;
+  late String prevSessionJson;
 
   WorkoutEntry();
 
   // convenience constructor to create a Word object
-  WorkoutEntry.fromMap(Map<String, dynamic> map) {
+  WorkoutEntry.fromMap(Map<dynamic, dynamic> map) {
     id = map[columnId];
     caption = map[columnCaption];
     description = map[columnDescription];

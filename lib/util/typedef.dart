@@ -14,7 +14,6 @@ enum WorkoutType {
   machine,
   barbell,
   dumbbell,
-  laps,
   cardio,
   other,
 }

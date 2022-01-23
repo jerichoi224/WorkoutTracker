@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
+import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/typedef.dart';
-import 'package:workout_tracker/db/database_helpers.dart';
+import 'package:workout_tracker/objectbox.g.dart';
 
 class EditWorkoutEntryWidget extends StatefulWidget {
   final WorkoutEntry entry;
-  DatabaseHelper dbHelper;
+  final Box<WorkoutEntry> workoutBox;
 
-  EditWorkoutEntryWidget({Key key, this.dbHelper, this.entry}) : super(key: key);
+  EditWorkoutEntryWidget({Key? key,required this.workoutBox, required this.entry}) : super(key: key);
 
   @override
   State createState() => _EditWorkoutState();
@@ -16,13 +16,13 @@ class EditWorkoutEntryWidget extends StatefulWidget {
 class _EditWorkoutState extends State<EditWorkoutEntryWidget> {
   final workoutNameController = TextEditingController();
   final descriptionController = TextEditingController();
-  String part, type, metric;
+  late String part, type, metric;
 
   void initState() {
     super.initState();
-    part = widget.entry.part.name;
-    type = widget.entry.type.name;
-    metric = widget.entry.metric.name;
+    part = widget.entry.part;
+    type = widget.entry.type;
+    metric = widget.entry.metric;
     workoutNameController.text = widget.entry.caption;
     descriptionController.text = widget.entry.description;
   }
@@ -102,7 +102,7 @@ class _EditWorkoutState extends State<EditWorkoutEntryWidget> {
                                               iconSize: 24,
                                               elevation: 16,
                                               onChanged: (value){
-                                                setState(() {part = value;});
+                                                setState(() {part = value!;});
                                               },
                                               underline: Container(
                                                 height: 2,
@@ -137,7 +137,7 @@ class _EditWorkoutState extends State<EditWorkoutEntryWidget> {
                                               iconSize: 24,
                                               elevation: 16,
                                               onChanged: (value){
-                                                setState(() {type = value;});
+                                                setState(() {type = value!;});
                                               },
                                               underline: Container(
                                                 height: 2,
@@ -172,7 +172,7 @@ class _EditWorkoutState extends State<EditWorkoutEntryWidget> {
                                               iconSize: 24,
                                               elevation: 16,
                                               onChanged: (value){
-                                                setState(() {metric = value;});
+                                                setState(() {metric = value!;});
                                               },
                                               underline: Container(
                                                 height: 2,
@@ -254,12 +254,12 @@ class _EditWorkoutState extends State<EditWorkoutEntryWidget> {
                                             }
 
                                             widget.entry.caption = workoutNameController.text;
-                                            widget.entry.type = WorkoutType.values.firstWhere((e) => e.name == type);
-                                            widget.entry.part = PartType.values.firstWhere((e) => e.name == part);
-                                            widget.entry.metric = MetricType.values.firstWhere((e) => e.name == metric);
+                                            widget.entry.type = type;
+                                            widget.entry.part = part;
+                                            widget.entry.metric = metric;
                                             widget.entry.description = descriptionController.text;
 
-                                            widget.dbHelper.updateWorkout(widget.entry);
+                                            widget.workoutBox.put(widget.entry);
                                             Navigator.pop(context, true);
                                           },
                                           title: Text("Save Changes",

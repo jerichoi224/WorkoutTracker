@@ -4,7 +4,7 @@ import 'package:workout_tracker/dbModels/RoutineEntry.dart';
 class EditRoutineEntryWidget extends StatefulWidget {
   final RoutineEntry entry;
 
-  EditRoutineEntryWidget({Key key, this.entry}) : super(key: key);
+  EditRoutineEntryWidget({Key ?key, required this.entry}) : super(key: key);
 
   @override
   State createState() => _EditRoutineState();

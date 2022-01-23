@@ -1,31 +1,22 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/db/database_helpers.dart';
 import 'package:workout_tracker/dbModels/RoutineEntry.dart';
 import 'package:workout_tracker/widgets/Routine/AddRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/Routine/EditRoutineEntryWidget.dart';
 
 class RoutineWidget extends StatefulWidget {
-  DatabaseHelper dbHelper;
-  RoutineWidget({Key key, this.dbHelper}) : super(key: key);
+  RoutineWidget({Key? key}) : super(key: key);
 
   @override
   State createState() => _RoutineState();
 }
 
 class _RoutineState extends State<RoutineWidget>{
-  List<RoutineEntry> RoutineList;
+  List<RoutineEntry> RoutineList = [];
 
   void initState() {
     super.initState();
-
-    RoutineList = [];
-    widget.dbHelper.queryAllRoutine().then((entries){
-      setState(() {
-        RoutineList = entries;
-      });
-    });
   }
 
   // Navigate to AddWorkout screen
@@ -35,14 +26,8 @@ class _RoutineState extends State<RoutineWidget>{
     final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddRoutineEntryWidget(dbHelper: widget.dbHelper),
+          builder: (context) => AddRoutineEntryWidget(),
         ));
-
-    widget.dbHelper.queryAllRoutine().then((entries){
-      setState(() {
-        RoutineList = entries;
-      });
-    });
   }
 
   Widget _popUpMenuButton(RoutineEntry i) {
@@ -66,7 +51,6 @@ class _RoutineState extends State<RoutineWidget>{
         }
         // Delete
         else if(selectedIndex == 1){
-          widget.dbHelper.deleteWorkout(i.id);
           RoutineList.remove(i);
           setState(() {
           });
@@ -85,7 +69,6 @@ class _RoutineState extends State<RoutineWidget>{
     );
 
     if(modifiedEntry != null){
-      widget.dbHelper.updateRoutine(modifiedEntry);
       setState(() {});
     }
   }

@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget{
         home: MainApp(),
         routes: <String, WidgetBuilder>{
           '/home': (BuildContext context) => new HomeWidget(parentCtx: context),
-          '/splash': (BuildContext context) => new SplashWidget(),
+          '/splash': (BuildContext context) => new InstructionWidget(),
         }
     );
   }

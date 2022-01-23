@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/typedef.dart';
-import 'package:workout_tracker/db/database_helpers.dart';
-import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
+import 'package:workout_tracker/objectbox.g.dart';
 
 class AddWorkoutEntryWidget extends StatefulWidget {
-  DatabaseHelper dbHelper;
+  final Box<WorkoutEntry> workoutBox;
 
-  AddWorkoutEntryWidget({Key key, this.dbHelper}) : super(key: key);
+  AddWorkoutEntryWidget({Key? key, required this.workoutBox}) : super(key: key);
   @override
   State createState() => _AddWorkoutEntryState();
 }
@@ -18,7 +18,7 @@ extension StringExtension on String {
 }
 
 class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
-  String part, type, metric, caption;
+  late String part, type, metric, caption;
   final workoutNameController = TextEditingController();
   final descriptionController = TextEditingController();
 
@@ -110,7 +110,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                   iconSize: 24,
                                                   elevation: 16,
                                                   onChanged: (value){
-                                                    setState(() {part = value;});
+                                                    setState(() {part = value!;});
                                                     },
                                                   underline: Container(
                                                     height: 2,
@@ -145,7 +145,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                   iconSize: 24,
                                                   elevation: 16,
                                                   onChanged: (value){
-                                                    setState(() {type = value;});
+                                                    setState(() {type = value!;});
                                                   },
                                                   underline: Container(
                                                     height: 2,
@@ -180,7 +180,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                   iconSize: 24,
                                                   elevation: 16,
                                                   onChanged: (value){
-                                                    setState(() {metric = value;});
+                                                    setState(() {metric = value!;});
                                                   },
                                                   underline: Container(
                                                     height: 2,
@@ -263,11 +263,11 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
 
                                                 WorkoutEntry newEntry = new WorkoutEntry();
                                                 newEntry.caption = workoutNameController.text;
-                                                newEntry.type = WorkoutType.values.firstWhere((e) => e.name == type);
-                                                newEntry.part = PartType.values.firstWhere((e) => e.name == part);
-                                                newEntry.metric = MetricType.values.firstWhere((e) => e.name == metric);
+                                                newEntry.type = type;
+                                                newEntry.part = part;
+                                                newEntry.metric = metric;
                                                 newEntry.description = descriptionController.text;
-                                                widget.dbHelper.insertWorkoutEntry(newEntry);
+                                                widget.workoutBox.put(newEntry);
 
                                                 Navigator.pop(context, true);
                                               },
