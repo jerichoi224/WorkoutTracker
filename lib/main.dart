@@ -1,10 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/HomeWidget.dart';
 import 'package:workout_tracker/widgets/InstructionWidget.dart';
 
-void main() => runApp(MyApp());
+
+late ObjectBox objectbox;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  objectbox = await ObjectBox.create();
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget{
 
@@ -19,7 +28,7 @@ class MyApp extends StatelessWidget{
         ),
         home: MainApp(),
         routes: <String, WidgetBuilder>{
-          '/home': (BuildContext context) => new HomeWidget(parentCtx: context),
+          '/home': (BuildContext context) => new HomeWidget(parentCtx: context, objectbox: objectbox),
           '/splash': (BuildContext context) => new InstructionWidget(),
         }
     );

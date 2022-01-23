@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:workout_tracker/widgets/DashboardWidget.dart';
 import 'package:workout_tracker/widgets/CalendarWidget.dart';
 import 'package:workout_tracker/widgets/Routine/RoutineWidget.dart';
@@ -8,8 +7,8 @@ import 'package:workout_tracker/widgets/SettingsWidget.dart';
 
 class HomeWidget extends StatefulWidget {
   final BuildContext parentCtx;
-
-  HomeWidget({Key? key, required this.parentCtx});
+  late final objectbox;
+  HomeWidget({Key? key, required this.parentCtx, required this.objectbox});
 
   @override
   State createState() => _HomeState();
@@ -17,6 +16,7 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeState extends State<HomeWidget>{
+  final List<Widget> screens = [];
 //  DatabaseHelper dbHelper = DatabaseHelper();
   final pageController = PageController(initialPage: 2);
   int _currentIndex = 2;
@@ -28,8 +28,8 @@ class _HomeState extends State<HomeWidget>{
   }
 
   List<Widget> _children() => [
-    WorkoutWidget(),
-    RoutineWidget(),
+    WorkoutWidget(objectbox: widget.objectbox),
+    RoutineWidget(objectbox: widget.objectbox),
     DashboardWidget(),
     CalendarWidget(),
     SettingsWidget(),
@@ -61,15 +61,7 @@ class _HomeState extends State<HomeWidget>{
   @override
   Widget build(BuildContext context){
     final List<Widget> children = _children();
-
-    // Minimum Splash Screen
-    if(!ready) {
-      new Timer(new Duration(milliseconds: 500), () {
-        ready = true;
-        setState(() {});
-      });
-    }
-
+    ready = true;
     // While Data is loading, show empty screen
     if(!ready) {
       return Scaffold(
@@ -81,7 +73,7 @@ class _HomeState extends State<HomeWidget>{
                   padding: EdgeInsets.all(15),
                   child: Center(
                       child:
-                      Text("HI")
+                      Text("Loading data")
                       /*Image(
                         image: AssetImage('assets/my_icon.png'),
                         width: 150,
@@ -91,7 +83,6 @@ class _HomeState extends State<HomeWidget>{
               ])
       );
     }
-
     // App Loads
     return Scaffold(
       body: PageView(

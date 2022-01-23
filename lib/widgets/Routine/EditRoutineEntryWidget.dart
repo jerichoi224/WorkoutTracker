@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/dbModels/RoutineEntry.dart';
+import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 
 class EditRoutineEntryWidget extends StatefulWidget {
   final RoutineEntry entry;

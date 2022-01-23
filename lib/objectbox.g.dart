@@ -21,7 +21,7 @@ final _entities = <ModelEntity>[
       id: const IdUid(3, 6349373929477905858),
       name: 'SetItem',
       lastPropertyId: const IdUid(3, 7566590590164589054),
-      flags: 2,
+      flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
             id: const IdUid(1, 8308774796900781441),
@@ -45,7 +45,7 @@ final _entities = <ModelEntity>[
       id: const IdUid(4, 3781393106579796184),
       name: 'WorkoutEntry',
       lastPropertyId: const IdUid(10, 596407192099789693),
-      flags: 2,
+      flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
             id: const IdUid(1, 1789044328783338726),
@@ -91,7 +91,7 @@ final _entities = <ModelEntity>[
       id: const IdUid(5, 2106140805026109026),
       name: 'SessionItem',
       lastPropertyId: const IdUid(2, 2207648410912630680),
-      flags: 2,
+      flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
             id: const IdUid(1, 2565150483499850926),
@@ -115,7 +115,7 @@ final _entities = <ModelEntity>[
       id: const IdUid(6, 2659339368501590805),
       name: 'RoutineEntry',
       lastPropertyId: const IdUid(4, 3781991211420081365),
-      flags: 2,
+      flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
             id: const IdUid(1, 5832932175597938606),

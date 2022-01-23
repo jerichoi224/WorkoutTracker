@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Workout/AddWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
@@ -6,8 +7,8 @@ import 'package:workout_tracker/util/languageTool.dart';
 import 'package:workout_tracker/objectbox.g.dart';
 
 class WorkoutListWidget extends StatefulWidget {
-  final Box<WorkoutEntry> workoutBox;
-  WorkoutListWidget({Key? key, required this.workoutBox}) : super(key: key);
+  late ObjectBox objectbox;
+  WorkoutListWidget({Key? key, required this.objectbox}) : super(key: key);
 
   @override
   State createState() => _WorkoutListState();
@@ -21,13 +22,13 @@ class _WorkoutListState extends State<WorkoutListWidget> {
 
   void initState() {
     super.initState();
-
     updateWorkoutList();
   }
 
   void updateWorkoutList()
   {
-    WorkoutList = widget.workoutBox.getAll();
+    WorkoutList = widget.objectbox.workoutBox.getAll();
+    setState(() {});
   }
 
   // Navigate to AddWorkout screen
@@ -37,7 +38,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddWorkoutEntryWidget(workoutBox: widget.workoutBox),
+          builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox),
         ));
 
     if(result)
@@ -55,7 +56,6 @@ class _WorkoutListState extends State<WorkoutListWidget> {
 
   List<Widget> workoutList(){
     List<Widget> WorkoutWidgetList = [];
-    int tmp = 0;
     String firstChar = "";
 
     WorkoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));

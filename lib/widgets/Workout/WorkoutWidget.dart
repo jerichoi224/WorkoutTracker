@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Workout/EditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/widgets/Workout/AddWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
-
 import 'package:workout_tracker/util/languageTool.dart';
-import 'package:workout_tracker/objectbox.g.dart';
 
 class WorkoutWidget extends StatefulWidget {
-  WorkoutWidget({Key? key}) : super(key: key);
+  late ObjectBox objectbox;
+  WorkoutWidget({Key? key, required this.objectbox}) : super(key: key);
 
   @override
   State createState() => _WorkoutState();
 }
 
 class _WorkoutState extends State<WorkoutWidget> {
-  final store = openStore();
-  late final workoutEntryBox;
-
   List<WorkoutEntry> WorkoutList = [];
   TextEditingController searchTextController = TextEditingController();
   bool _isSearching = false;
@@ -24,13 +21,13 @@ class _WorkoutState extends State<WorkoutWidget> {
 
   void initState() {
     super.initState();
-    workoutEntryBox = store.box<WorkoutEntry>();
     updateWorkoutList();
   }
 
   void updateWorkoutList()
   {
-//    WorkoutList = workoutEntryBox.getAll();
+    WorkoutList = widget.objectbox.workoutBox.getAll();
+    setState(() {});
   }
 
   // Navigate to AddWorkout screen
@@ -38,7 +35,7 @@ class _WorkoutState extends State<WorkoutWidget> {
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddWorkoutEntryWidget(workoutBox: workoutEntryBox),
+          builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox),
         ));
 
     if(result)
@@ -67,9 +64,8 @@ class _WorkoutState extends State<WorkoutWidget> {
         }
         // Delete
         else if(selectedIndex == 1){
-          workoutEntryBox.remove(i.id);
-          setState(() {
-          });
+          widget.objectbox.workoutBox.remove(i.id);
+          updateWorkoutList();
         }
       },
     );
@@ -80,7 +76,7 @@ class _WorkoutState extends State<WorkoutWidget> {
      bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EditWorkoutEntryWidget(workoutBox: workoutEntryBox, entry: workoutEntry),
+          builder: (context) => EditWorkoutEntryWidget(workoutBox: widget.objectbox.workoutBox, entry: workoutEntry),
         )
     );
 
@@ -98,7 +94,6 @@ class _WorkoutState extends State<WorkoutWidget> {
 
   List<Widget> workoutList(){
     List<Widget> workoutWidgetList = [];
-    int tmp = 0;
     String firstChar = "";
 
     if(WorkoutList.length == 0)
@@ -206,8 +201,7 @@ class _WorkoutState extends State<WorkoutWidget> {
         IconButton(
           icon: const Icon(Icons.clear),
           onPressed: () {
-            if (searchTextController == null ||
-                searchTextController.text.isEmpty) {
+            if (searchTextController.text.isEmpty) {
               Navigator.pop(context);
               return;
             }
@@ -282,21 +276,13 @@ class _WorkoutState extends State<WorkoutWidget> {
               ),
               SliverList(
                 delegate: SliverChildListDelegate(
-                  [
-
-                  ]
-                  //  workoutList()
+                    workoutList()
+                  //
                 ),
               ),
             ],
           ),
         )
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    store.close();
   }
 }

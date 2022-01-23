@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
-import 'package:workout_tracker/objectbox.g.dart';
 
 class AddWorkoutEntryWidget extends StatefulWidget {
-  final Box<WorkoutEntry> workoutBox;
-
-  AddWorkoutEntryWidget({Key? key, required this.workoutBox}) : super(key: key);
+  late ObjectBox objectbox;
+  AddWorkoutEntryWidget({Key? key, required this.objectbox}) : super(key: key);
   @override
   State createState() => _AddWorkoutEntryState();
 }
@@ -267,7 +266,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                 newEntry.part = part;
                                                 newEntry.metric = metric;
                                                 newEntry.description = descriptionController.text;
-                                                widget.workoutBox.put(newEntry);
+                                                widget.objectbox.workoutBox.put(newEntry);
 
                                                 Navigator.pop(context, true);
                                               },

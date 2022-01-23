@@ -3,7 +3,6 @@ import 'package:workout_tracker/dbModels/session_item_model.dart';
 import 'package:workout_tracker/util/typedef.dart';
 
 @Entity()
-@Sync()
 class WorkoutEntry {
   int id = 0;
   String metric = MetricType.kg.name;

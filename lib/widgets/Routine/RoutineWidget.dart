@@ -1,12 +1,12 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/dbModels/RoutineEntry.dart';
+import 'package:workout_tracker/dbModels/routine_entry_model.dart';
+import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Routine/AddRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/Routine/EditRoutineEntryWidget.dart';
 
 class RoutineWidget extends StatefulWidget {
-  RoutineWidget({Key? key}) : super(key: key);
+  late ObjectBox objectbox;
+  RoutineWidget({Key? key, required this.objectbox}) : super(key: key);
 
   @override
   State createState() => _RoutineState();
@@ -14,20 +14,27 @@ class RoutineWidget extends StatefulWidget {
 
 class _RoutineState extends State<RoutineWidget>{
   List<RoutineEntry> RoutineList = [];
-
   void initState() {
     super.initState();
+    updateRoutineList();
+  }
+
+  void updateRoutineList()
+  {
+    RoutineList = widget.objectbox.routineBox.getAll();
+    setState(() {});
   }
 
   // Navigate to AddWorkout screen
   void _AddRoutineEntry(BuildContext context) async {
     // start the SecondScreen and wait for it to finish with a result
-
-    final result = await Navigator.push(
+    bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddRoutineEntryWidget(),
+          builder: (context) => AddRoutineEntryWidget(objectbox: widget.objectbox),
         ));
+    if(result)
+      updateRoutineList();
   }
 
   Widget _popUpMenuButton(RoutineEntry i) {
@@ -51,52 +58,47 @@ class _RoutineState extends State<RoutineWidget>{
         }
         // Delete
         else if(selectedIndex == 1){
-          RoutineList.remove(i);
-          setState(() {
-          });
+          widget.objectbox.routineBox.remove(i.id);
+          updateRoutineList();
         }
       },
     );
   }
 
-  void _openEditWidget(RoutineEntry workoutEntry) async {
+  void _openEditWidget(RoutineEntry routineEntry) async {
     // start the SecondScreen and wait for it to finish with a result
     final RoutineEntry modifiedEntry = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EditRoutineEntryWidget(entry: workoutEntry),
+          builder: (context) => EditRoutineEntryWidget(entry: routineEntry),
         )
     );
 
     if(modifiedEntry != null){
-      setState(() {});
+      updateRoutineList();
     }
   }
 
   List<Widget> routineList(){
     List<Widget> RoutineWidgetList = [];
-    int tmp = 0;
-    String firstChar = "";
 
-    RoutineList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
+    if(RoutineList.length == 0)
+      return List.from(
+          [
+            Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+              child: Text(
+                "No Routine Found.",
+                style: TextStyle(fontSize: 14),
+              ),
+            )
+          ]);
+
+    RoutineList.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     for(RoutineEntry i in RoutineList){
       // If alphabet changes, add caption
-      if(firstChar != i.caption[0].toUpperCase()){
-        firstChar = i.caption[0].toUpperCase();
-        RoutineWidgetList.add(
-            Padding(
-                padding: EdgeInsets.fromLTRB(15, 7, 0, 0),
-                child: Text((firstChar),
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54
-                  ),
-                )
-            )
-        );
-      }
       RoutineWidgetList.add(
           new Card(
               shape: RoundedRectangleBorder(
@@ -114,7 +116,7 @@ class _RoutineState extends State<RoutineWidget>{
                         text: TextSpan(
                           children: <TextSpan>[
                             TextSpan(
-                                text: i.caption,
+                                text: i.name,
                                 style: TextStyle(color: Colors.black)
                             ),
                             TextSpan(
@@ -130,17 +132,7 @@ class _RoutineState extends State<RoutineWidget>{
           )
       );
     }
-    return RoutineWidgetList.length > 0 ? RoutineWidgetList : List.from(
-        [
-          Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: Text(
-              "No Routine Found.",
-              style: TextStyle(fontSize: 14),
-            ),
-          )
-        ]);
+    return RoutineWidgetList;
   }
 
   List<Widget> _buildActions() {

@@ -3,12 +3,14 @@ import 'package:workout_tracker/class/WorkoutCard.dart';
 import 'package:workout_tracker/dbModels/RoutineEntry.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/objectbox.g.dart';
+import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 
 class AddSessionEntryWidget extends StatefulWidget {
+  late ObjectBox objectbox;
+  AddSessionEntryWidget({Key? key, required this.objectbox}) : super(key: key);
 
-  AddSessionEntryWidget({Key? key}) : super(key: key);
   @override
   State createState() => _AddSessionEntryState();
 }
@@ -32,7 +34,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   @override
   void initState() {
     super.initState();
-    workoutEntryBox = store.box<WorkoutEntry>();
+//    workoutEntryBox = store.box<WorkoutEntry>();
 
   }
 
@@ -77,7 +79,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WorkoutListWidget(workoutBox: workoutEntryBox,),
+          builder: (context) => WorkoutListWidget(objectbox: widget.objectbox,),
         ));
 
     if(result.runtimeType == WorkoutEntry)
@@ -327,6 +329,6 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   @override
   void dispose() {
     super.dispose();
-    store?.close();
+  //  store?.close();
   }
 }
