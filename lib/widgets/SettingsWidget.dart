@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
 class SettingsWidget extends StatefulWidget {
-  SettingsWidget({Key key}) : super(key: key);
+  SettingsWidget({Key? key}) : super(key: key);
 
   @override
   State createState() => _SettingsState();
 }
 
 class _SettingsState extends State<SettingsWidget> {
-   bool bToggle;
+   bool bToggle = false;
 
   @override
   void initState() {
-    bToggle = false;
     super.initState();
   }
 

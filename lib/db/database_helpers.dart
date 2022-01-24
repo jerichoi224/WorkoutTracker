@@ -18,16 +18,26 @@ class DatabaseHelper {
   // Increment this version when you need to change the schema.
   static final _databaseVersion = 1;
 
+  /*
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
-  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+*/
+
+  DatabaseHelper(){
+    init();
+  }
   // Only allow a single open connection to the database.
-  static Database _database;
+  static late Database _database;
   Future<Database> get database async {
     if (_database != null) return _database;
     _database = await _initDatabase();
     return _database;
+  }
+
+  void init() async {
+    _database = await _initDatabase();
   }
 
   // open the database

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/class/WorkoutCard.dart';
 import 'package:workout_tracker/dbModels/RoutineEntry.dart';
-import 'package:workout_tracker/dbModels/WorkoutEntry.dart';
+import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/objectbox.g.dart';
+import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
-import 'package:workout_tracker/db/database_helpers.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 
 class AddSessionEntryWidget extends StatefulWidget {
-  DatabaseHelper dbHelper;
+  late ObjectBox objectbox;
+  AddSessionEntryWidget({Key? key, required this.objectbox}) : super(key: key);
 
-  AddSessionEntryWidget({Key key, this.dbHelper}) : super(key: key);
   @override
   State createState() => _AddSessionEntryState();
 }
@@ -21,16 +22,20 @@ extension StringExtension on String {
 }
 
 class _AddSessionEntryState extends State<AddSessionEntryWidget> {
-  String caption;
+  String caption = "";
   final RoutineNameController = TextEditingController();
+
+  final store = openStore();
+  late final workoutEntryBox;
 
   List<WorkoutEntry> WorkoutEntryList = [];
   List<WorkoutCard> WorkoutCardList = [];
 
   @override
   void initState() {
-    caption = "";
     super.initState();
+//    workoutEntryBox = store.box<WorkoutEntry>();
+
   }
 
   Widget AddButton(String caption, Function method)
@@ -74,7 +79,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WorkoutListWidget(dbHelper: widget.dbHelper),
+          builder: (context) => WorkoutListWidget(objectbox: widget.objectbox, list: [],),
         ));
 
     if(result.runtimeType == WorkoutEntry)
@@ -157,10 +162,10 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               ),
             ),
           ),
-          if(WorkoutCardList[cardInd].entry.metric != MetricType.none) new Text(" " + WorkoutCardList[cardInd].entry.metric.name),
-          if(WorkoutCardList[cardInd].entry.metric == MetricType.kg || WorkoutCardList[cardInd].entry.metric == MetricType.none)
+          if(WorkoutCardList[cardInd].entry.metric != MetricType.none.name) new Text(" " + WorkoutCardList[cardInd].entry.metric),
+          if(WorkoutCardList[cardInd].entry.metric == MetricType.kg.name || WorkoutCardList[cardInd].entry.metric == MetricType.none.name)
             new Text(" × "),
-          if(WorkoutCardList[cardInd].entry.metric == MetricType.kg || WorkoutCardList[cardInd].entry.metric == MetricType.none)
+          if(WorkoutCardList[cardInd].entry.metric == MetricType.kg.name || WorkoutCardList[cardInd].entry.metric == MetricType.none.name)
             new Container(
               width: 75,
               height: 40,
@@ -299,7 +304,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                 RoutineEntry newEntry = new RoutineEntry();
                                                 newEntry.caption = RoutineNameController.text;
                                                 newEntry.routineJson = "";
-                                                widget.dbHelper.insertRoutineEntry(newEntry);
+//                                                widget.dbHelper.insertRoutineEntry(newEntry);
 
                                                 Navigator.pop(context, false);
                                               },
@@ -320,5 +325,10 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
             )
         )
     );
+  }
+  @override
+  void dispose() {
+    super.dispose();
+  //  store?.close();
   }
 }

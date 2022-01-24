@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SplashWidget extends StatefulWidget {
-  final Map<String, double> data;
-  final dateController = TextEditingController();
-  final amountController = TextEditingController();
-  SplashWidget({Key key, this.data}) : super(key: key);
+class InstructionWidget extends StatefulWidget {
+  InstructionWidget({Key? key}) : super(key: key);
 
   @override
-  State createState() => _SplashState();
+  State createState() => _InstructionState();
 }
 
-class _SplashState extends State<SplashWidget>{
+class _InstructionState extends State<InstructionWidget>{
   final pageController = PageController(initialPage: 0);
   int _currentIndex = 0;
 
@@ -139,7 +136,6 @@ class _SplashState extends State<SplashWidget>{
                         children: <Widget>[
                           Flexible(
                               child: TextField(
-                                controller: widget.amountController,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Enter Daily Limit',
