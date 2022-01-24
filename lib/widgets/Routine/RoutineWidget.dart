@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
-import 'package:workout_tracker/widgets/Routine/AddRoutineEntryWidget.dart';
-import 'package:workout_tracker/widgets/Routine/EditRoutineEntryWidget.dart';
+import 'package:workout_tracker/widgets/Routine/AddEditRoutineEntryWidget.dart';
 
 class RoutineWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -31,7 +30,7 @@ class _RoutineState extends State<RoutineWidget>{
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddRoutineEntryWidget(objectbox: widget.objectbox),
+          builder: (context) => AddRoutineEntryWidget(objectbox: widget.objectbox, edit: false, id: 0),
         ));
     if(result)
       updateRoutineList();
@@ -67,16 +66,13 @@ class _RoutineState extends State<RoutineWidget>{
 
   void _openEditWidget(RoutineEntry routineEntry) async {
     // start the SecondScreen and wait for it to finish with a result
-    final RoutineEntry modifiedEntry = await Navigator.push(
+    bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EditRoutineEntryWidget(entry: routineEntry),
-        )
-    );
-
-    if(modifiedEntry != null){
+          builder: (context) => AddRoutineEntryWidget(objectbox: widget.objectbox, edit: true, id: routineEntry.id),
+        ));
+    if(result)
       updateRoutineList();
-    }
   }
 
   List<Widget> routineList(){
@@ -107,26 +103,42 @@ class _RoutineState extends State<RoutineWidget>{
               color: Colors.white,
               child: new InkWell(
                   borderRadius: BorderRadius.circular(10.0),
-                  onTap: () {
-                    print("tapped");
-                  },
-                  child: ListTile(
-                      dense: true,
-                      title: RichText(
-                        text: TextSpan(
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: i.name,
-                                style: TextStyle(color: Colors.black)
-                            ),
-                            TextSpan(
-                                text: " ("  + ")",
-                                style: TextStyle(color: Colors.black54)),
-                          ],
+                  onTap: () {},
+                  child: SizedBox(
+                      height: 47 + i.workoutList.length * 15.5,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.fromLTRB(10, 7, 0, 0),
+                        dense: true,
+                        title: RichText(
+                          text: TextSpan(
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: i.name,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      height: 1.2
+                                  )
+                              ),
+                              TextSpan(
+                                  text: i.parts.length == 0 ? " " : " ("  + i.parts.join(", ") + ")",
+                                  style: TextStyle(color: Colors.black54)),
+                              TextSpan(
+                                  text: "\n",
+                                  style: TextStyle(color: Colors.black54)),
+                              TextSpan(
+                                  text: i.workoutList.length == 0 ? " " : i.workoutList.map((element) => "\t- " + element.caption).join("\n"),
+                                  style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 12,
+                                      height: 1.4
+                                  )
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      subtitle: Text(""),
-                      trailing: _popUpMenuButton(i)
+                        trailing: _popUpMenuButton(i)
+                    )
                   )
               )
           )

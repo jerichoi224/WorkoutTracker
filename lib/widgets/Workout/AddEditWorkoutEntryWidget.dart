@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 
 class AddWorkoutEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
-  AddWorkoutEntryWidget({Key? key, required this.objectbox}) : super(key: key);
+  late bool edit;
+  late int id;
+  AddWorkoutEntryWidget({Key? key, required this.objectbox, required this.edit, required this.id}) : super(key: key);
   @override
   State createState() => _AddWorkoutEntryState();
 }
@@ -17,17 +20,33 @@ extension StringExtension on String {
 }
 
 class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
+  late WorkoutEntry? newEntry;
+
   late String part, type, metric, caption;
   final workoutNameController = TextEditingController();
   final descriptionController = TextEditingController();
 
   @override
   void initState() {
-    part = PartType.other.name;
-    type = WorkoutType.other.name;
-    metric = MetricType.kg.name;
-    caption = "";
     super.initState();
+
+    if(widget.edit)
+      {
+        newEntry = widget.objectbox.workoutBox.get(widget.id);
+        part = newEntry!.part;
+        type = newEntry!.type;
+        metric = newEntry!.metric;
+        workoutNameController.text = newEntry!.caption;
+        descriptionController.text = newEntry!.description;
+      }
+    else{
+      newEntry = new WorkoutEntry();
+      part = PartType.other.name;
+      type = WorkoutType.other.name;
+      metric = MetricType.kg.name;
+      caption = "";
+
+    }
   }
 
   @override
@@ -43,7 +62,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
             },
             child: new Scaffold(
                 appBar: AppBar(
-                  title: Text("Add Workout"),
+                  title: Text(widget.edit? "Edit Workout" : "Add Workout"),
                   backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
@@ -209,7 +228,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Description",
+                                    child: Text("Note",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -232,7 +251,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                         controller: descriptionController,
                                                         decoration: InputDecoration(
                                                           border:InputBorder.none,
-                                                          hintText: "(Optional)",
+                                                          hintText: "Add Note",
                                                         ),
                                                       )
                                                   )
@@ -260,17 +279,15 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                   return;
                                                 }
 
-                                                WorkoutEntry newEntry = new WorkoutEntry();
-                                                newEntry.caption = workoutNameController.text;
-                                                newEntry.type = type;
-                                                newEntry.part = part;
-                                                newEntry.metric = metric;
-                                                newEntry.description = descriptionController.text;
-                                                widget.objectbox.workoutBox.put(newEntry);
-
+                                                newEntry!.caption = workoutNameController.text;
+                                                newEntry!.type = type;
+                                                newEntry!.part = part;
+                                                newEntry!.metric = metric;
+                                                newEntry!.description = descriptionController.text;
+                                                widget.objectbox.workoutBox.put(newEntry!);
                                                 Navigator.pop(context, true);
                                               },
-                                              title: Text("Add Workout",
+                                              title: Text(widget.edit ? "Save Changes" : "Add Workout",
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                 ),

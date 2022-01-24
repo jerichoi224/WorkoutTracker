@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/objectbox.dart';
-import 'package:workout_tracker/widgets/Workout/AddWorkoutEntryWidget.dart';
+import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
 import 'package:workout_tracker/util/languageTool.dart';
@@ -8,7 +8,8 @@ import 'package:workout_tracker/objectbox.g.dart';
 
 class WorkoutListWidget extends StatefulWidget {
   late ObjectBox objectbox;
-  WorkoutListWidget({Key? key, required this.objectbox}) : super(key: key);
+  late List<WorkoutEntry> list;
+  WorkoutListWidget({Key? key, required this.objectbox, required this.list}) : super(key: key);
 
   @override
   State createState() => _WorkoutListState();
@@ -38,7 +39,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox),
+          builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox, edit: false, id: 0),
         ));
 
     if(result)
@@ -68,6 +69,9 @@ class _WorkoutListState extends State<WorkoutListWidget> {
         )
           continue;
       }
+      // Skip if already added
+      if(widget.list.any((element) => element.caption == i.caption))
+        continue;
       // If alphabet changes, add caption
       if(firstChar != i.caption[0].toUpperCase()){
         firstChar = i.caption[0].toUpperCase();

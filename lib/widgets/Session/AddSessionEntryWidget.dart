@@ -79,7 +79,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WorkoutListWidget(objectbox: widget.objectbox,),
+          builder: (context) => WorkoutListWidget(objectbox: widget.objectbox, list: [],),
         ));
 
     if(result.runtimeType == WorkoutEntry)

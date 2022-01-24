@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/objectbox.dart';
-import 'package:workout_tracker/widgets/Workout/EditWorkoutEntryWidget.dart';
-import 'package:workout_tracker/widgets/Workout/AddWorkoutEntryWidget.dart';
+import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/languageTool.dart';
 
@@ -35,7 +34,7 @@ class _WorkoutState extends State<WorkoutWidget> {
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox),
+          builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox, edit:false, id:0),
         ));
 
     if(result)
@@ -73,12 +72,11 @@ class _WorkoutState extends State<WorkoutWidget> {
 
   void _openEditWidget(WorkoutEntry workoutEntry) async {
     // start the SecondScreen and wait for it to finish with a   result
-     bool result = await Navigator.push(
+    bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EditWorkoutEntryWidget(workoutBox: widget.objectbox.workoutBox, entry: workoutEntry),
-        )
-    );
+          builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox, edit:true, id:workoutEntry.id),
+        ));
 
     if(result)
       updateWorkoutList();
