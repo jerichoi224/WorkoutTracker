@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/class/WorkoutCard.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
-import 'package:workout_tracker/objectbox.g.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
+import 'package:workout_tracker/widgets/UIComponents.dart';
 
 class AddRoutineEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -25,14 +25,13 @@ extension StringExtension on String {
 
 class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
   String caption = "";
-  final RoutineNameController = TextEditingController();
+  final routineNameController = TextEditingController();
   final descriptionController = TextEditingController();
 
   late RoutineEntry? newEntry;
 
   List<String> partList = [];
   List<WorkoutEntry> WorkoutEntryList = [];
-  List<WorkoutCard> WorkoutCardList = [];
 
   @override
   void initState() {
@@ -41,14 +40,17 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
     {
       newEntry = widget.objectbox.routineBox.get(widget.id);
       caption = newEntry!.name;
-      RoutineNameController.text = caption;
+      routineNameController.text = caption;
       descriptionController.text = newEntry!.description;
       partList = newEntry!.parts;
-      for(WorkoutEntry i in newEntry!.workoutList) {
-        WorkoutEntryList.add(i);
-        WorkoutCard newCard = new WorkoutCard(i);
-        WorkoutCardList.add(newCard);
+      for(String i in newEntry!.workoutIds) {
+        WorkoutEntry? tmp = widget.objectbox.workoutBox.get(int.parse(i));
+        if(tmp != null)
+          {
+            WorkoutEntryList.add(tmp);
+          }
       }
+
     }
     else
       newEntry = new RoutineEntry();
@@ -81,12 +83,11 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
   }
 
   void removeWorkout(int ind){
-    WorkoutCardList.removeAt(ind);
     WorkoutEntryList.removeAt(ind);
     setState(() {});
   }
 
-  void AddWorkout() async {
+  void addWorkout() async {
     // start the SecondScreen and wait for it to finish with a result
       final result = await Navigator.push(
       context,
@@ -97,14 +98,15 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
       if(result.runtimeType == WorkoutEntry)
       {
         WorkoutEntry workoutEntry = result as WorkoutEntry;
-        WorkoutCard newCard = new WorkoutCard(workoutEntry);
-        WorkoutCardList.add(newCard);
         WorkoutEntryList.add(workoutEntry);
+        for(String part in workoutEntry.partList)
+          if(!partList.contains(part))
+            partList.add(part);
         setState(() {});
       }
   }
 
-  Widget _BuildWorkoutCards(BuildContext context, int index) {
+  Widget buildWorkoutCards(BuildContext context, int index) {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         margin: EdgeInsets.all(6.0),
@@ -114,7 +116,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                 title: new Row(
                   children: <Widget>[
                     new Flexible(
-                        child: new Text(WorkoutCardList[index].entry.caption.capitalize(),
+                        child: new Text(WorkoutEntryList[index].caption.capitalize(),
                           style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold
@@ -127,9 +129,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                   child: new IconButton(
                       icon: new Icon(Icons.close),
                       onPressed:(){
-                        WorkoutCardList.removeAt(index);
-                        setState(() {
-                        });
+                        removeWorkout(index);
                       }
                   )
                   ,
@@ -154,7 +154,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                   padding: const EdgeInsets.all(8.0),
                   child: Wrap(
                       alignment: WrapAlignment.start,
-                      children: SelectPartList(setState)
+                      children: selectPartList(setState)
                   ),
                 ),
                 actions: [
@@ -172,71 +172,41 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
     );
   }
 
-  List<Widget> SelectPartList(setDialogState)
+  List<Widget> selectPartList(setDialogState)
   {
-    List<Widget> taglist = [];
+    List<Widget> tagList = [];
 
     for(int i = 0; i < PartType.values.length; i++)
       {
         PartType p = PartType.values[i];
-        taglist.add(tag(p.name, () => {partList.add(p.name)}, Colors.amberAccent, true, setDialogState));
+        tagList.add(
+            tag(p.name,
+                (){
+                  if(partList.contains(p.name))
+                    partList.remove(p.name);
+                  else
+                    partList.add(p.name);
+                  setState(() {});
+                  setDialogState((){});
+                } ,
+                partList.contains(p.name) ? Colors.amber : Colors.black12)
+        );
       }
 
-    return taglist;
+    return tagList;
   }
 
-  List<Widget> SelectedTagList()
+  // List of Tags in partList
+  List<Widget> selectedTagList()
   {
-    List<Widget> taglist = [];
+    List<Widget> tagList = [];
 
     for(int i = 0; i < partList.length; i++)
-      taglist.add(tag(partList[i], (){}, Colors.amberAccent, false, (){}));
+      tagList.add(tag(partList[i], _openTagPopup, Colors.amberAccent));
 
-    partList.length == 0 ?
-      taglist.add(tag(" + Add Part  ", _openTagPopup, Color.fromRGBO(230, 230, 230, 0.8), false, (){})):
-      taglist.add(tag("Edit Parts", _openTagPopup, Color.fromRGBO(255, 255, 255, 0), false, (){}));
-    return taglist;
-  }
-
-  Widget tag(String caption, onTap, color, inDialog, setDialogState) {
-    return Stack(
-          children: [
-            SizedBox(
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  vertical: 5.0,
-                  horizontal: 5.0,
-                ),
-                child: InkWell(
-                  onTap: inDialog ? () {
-                    if(partList.contains(caption))
-                      partList.remove(caption);
-                    else
-                      partList.add(caption);
-                    setState(() {});
-                    setDialogState((){});
-                  } : onTap,
-                  borderRadius: BorderRadius.circular(20),
-                  child:Container(
-                    padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
-                    decoration: BoxDecoration(
-                      color: !inDialog ? color :
-                            partList.contains(caption) ?
-                            Colors.amber : Colors.amberAccent,
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Text(caption,
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 15.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
+    if(partList.length == 0)
+      tagList.add(tag(" + Add Part  ", _openTagPopup, Color.fromRGBO(230, 230, 230, 0.8)));
+    return tagList;
   }
 
   @override
@@ -281,7 +251,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                                 children: <Widget>[
                                                   new Flexible(
                                                       child: new TextField(
-                                                        controller: RoutineNameController,
+                                                        controller: routineNameController,
                                                         decoration: InputDecoration(
                                                           border:InputBorder.none,
                                                           hintText: "Enter Name",
@@ -303,9 +273,37 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                       ),
                                     )
                                 ),
-                                Wrap(
-                                  alignment: WrapAlignment.start,
-                                  children: SelectedTagList()
+                                Container(
+                                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                  child: Wrap(
+                                      alignment: WrapAlignment.start,
+                                      children: selectedTagList()
+                                  ),
+                                ),
+                                Container(
+                                    padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                                    child: Text("Routine Details",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey
+                                      ),
+                                    )
+                                ),
+
+                                ListView.builder(
+                                  itemCount: WorkoutEntryList.length,
+                                  itemBuilder: buildWorkoutCards,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                ),
+                                Card(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                                    margin: EdgeInsets.all(8.0),
+                                    child: Column(
+                                        children: <Widget>[
+                                          AddButton("Add Workout", addWorkout)
+                                        ]
+                                    )
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
@@ -342,31 +340,6 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                         ]
                                     )
                                 ),
-                                Container(
-                                    padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Routine Details",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey
-                                      ),
-                                    )
-                                ),
-
-                                ListView.builder(
-                                  itemCount: WorkoutCardList.length,
-                                  itemBuilder: _BuildWorkoutCards,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                ),
-                                Card(
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.all(8.0),
-                                    child: Column(
-                                        children: <Widget>[
-                                          AddButton("Add Workout", AddWorkout)
-                                        ]
-                                    )
-                                ),
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                                     margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
@@ -376,7 +349,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                         children: <Widget>[
                                           ListTile(
                                               onTap:(){
-                                                if(RoutineNameController.text.isEmpty) {
+                                                if(routineNameController.text.isEmpty) {
                                                   final snackBar = SnackBar(
                                                     content: const Text('Please enter name for new routine'),
                                                   );
@@ -384,13 +357,14 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                                   return;
                                                 }
-                                                newEntry!.name = RoutineNameController.text;
+                                                newEntry!.name = routineNameController.text;
                                                 newEntry!.description = descriptionController.text;
-                                                newEntry!.workoutList.clear();
+                                                newEntry!.workoutIds.clear();
                                                 for(WorkoutEntry i in WorkoutEntryList)
-                                                  newEntry!.workoutList.add(i);
+                                                  newEntry!.workoutIds.add(i.id.toString());
                                                 newEntry!.parts = partList;
                                                 widget.objectbox.routineBox.put(newEntry!);
+                                                widget.objectbox.routineList = widget.objectbox.routineBox.getAll();
                                                 Navigator.pop(context, true);
                                               },
                                               title: Text(widget.edit ? "Save Changes" : "Add Routine",

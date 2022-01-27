@@ -30,8 +30,8 @@ class _HomeState extends State<HomeWidget>{
   List<Widget> _children() => [
     WorkoutWidget(objectbox: widget.objectbox),
     RoutineWidget(objectbox: widget.objectbox),
-    DashboardWidget(),
-    CalendarWidget(),
+    DashboardWidget(objectbox: widget.objectbox),
+    CalendarWidget(objectbox: widget.objectbox),
     SettingsWidget(),
   ];
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
-import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
+import 'package:workout_tracker/widgets/UIComponents.dart';
 
 class AddWorkoutEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -22,9 +22,10 @@ extension StringExtension on String {
 class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
   late WorkoutEntry? newEntry;
 
-  late String part, type, metric, caption;
+  late String type, metric, caption;
   final workoutNameController = TextEditingController();
   final descriptionController = TextEditingController();
+  List<String> partList = [];
 
   @override
   void initState() {
@@ -33,7 +34,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
     if(widget.edit)
       {
         newEntry = widget.objectbox.workoutBox.get(widget.id);
-        part = newEntry!.part;
+        partList = newEntry!.partList;
         type = newEntry!.type;
         metric = newEntry!.metric;
         workoutNameController.text = newEntry!.caption;
@@ -41,12 +42,82 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
       }
     else{
       newEntry = new WorkoutEntry();
-      part = PartType.other.name;
+      partList = [];
       type = WorkoutType.other.name;
       metric = MetricType.kg.name;
       caption = "";
 
     }
+  }
+
+
+  List<Widget> selectPartList(setDialogState)
+  {
+    List<Widget> tagList = [];
+
+    for(int i = 0; i < PartType.values.length; i++)
+    {
+      PartType p = PartType.values[i];
+      tagList.add(
+          tag(p.name,
+                  (){
+                if(partList.contains(p.name))
+                  partList.remove(p.name);
+                else
+                  partList.add(p.name);
+                setState(() {});
+                setDialogState((){});
+              } ,
+              partList.contains(p.name) ? Colors.amber : Colors.black12)
+      );
+    }
+
+    return tagList;
+  }
+
+  // List of Tags in partList
+  List<Widget> selectedTagList()
+  {
+    List<Widget> tagList = [];
+
+    for(int i = 0; i < partList.length; i++)
+      tagList.add(tag(partList[i], _openTagPopup, Colors.amberAccent));
+
+    if(partList.length == 0)
+      tagList.add(tag(" + Add Part  ", _openTagPopup, Color.fromRGBO(230, 230, 230, 0.8)));
+    return tagList;
+  }
+
+  void _openTagPopup()
+  {
+    showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  scrollable: false,
+                  title: Text('Choose Parts'),
+                  content: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                        alignment: WrapAlignment.start,
+                        children: selectPartList(setState)
+                    ),
+                  ),
+                  actions: [
+                    ElevatedButton(
+                        child: Text("Close"),
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                        }
+                    )
+                  ],
+                );
+              }
+          );
+        }
+    );
   }
 
   @override
@@ -105,6 +176,22 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                     )
                                 ),
                                 Container(
+                                    padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                                    child: Text("Workout Part",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey
+                                      ),
+                                    )
+                                ),
+                                Container(
+                                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                  child: Wrap(
+                                      alignment: WrapAlignment.start,
+                                      children: selectedTagList()
+                                  ),
+                                ),
+                                Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
                                     child: Text("Workout Details",
                                       style: TextStyle(
@@ -118,41 +205,6 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                     margin: EdgeInsets.all(8.0),
                                     child: Column(
                                       children: <Widget>[
-                                        ListTile(
-                                            title: new Row(
-                                              children: <Widget>[
-                                                Text("Part"),
-                                                Spacer(),
-                                                DropdownButton<String>(
-                                                  value: part,
-                                                  iconSize: 24,
-                                                  elevation: 16,
-                                                  onChanged: (value){
-                                                    setState(() {part = value!;});
-                                                    },
-                                                  underline: Container(
-                                                    height: 2,
-                                                  ),
-                                                  selectedItemBuilder: (BuildContext context) {
-                                                    return PartType.values.map<Widget>((PartType value) {
-                                                      return Container(
-                                                          alignment: Alignment.centerRight,
-                                                          width: 100, // TODO: Find Proper Width
-                                                          child: Text(value.name.capitalize(), textAlign: TextAlign.end)
-                                                      );
-                                                    }).toList();
-                                                  },
-                                                  items: PartType.values
-                                                      .map<DropdownMenuItem<String>>((PartType value) {
-                                                    return DropdownMenuItem<String>(
-                                                      value: value.name,
-                                                      child: Text(value.name.capitalize()),
-                                                    );
-                                                  }).toList(),
-                                                )
-                                              ],
-                                            )
-                                        ), // Part Dropdown
                                         ListTile(
                                             title: new Row(
                                               children: <Widget>[
@@ -281,10 +333,13 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
 
                                                 newEntry!.caption = workoutNameController.text;
                                                 newEntry!.type = type;
-                                                newEntry!.part = part;
+                                                newEntry!.partList = partList;
                                                 newEntry!.metric = metric;
                                                 newEntry!.description = descriptionController.text;
                                                 widget.objectbox.workoutBox.put(newEntry!);
+                                                widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
+
+
                                                 Navigator.pop(context, true);
                                               },
                                               title: Text(widget.edit ? "Save Changes" : "Add Workout",

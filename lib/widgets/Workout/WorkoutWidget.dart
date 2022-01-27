@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
@@ -13,20 +14,12 @@ class WorkoutWidget extends StatefulWidget {
 }
 
 class _WorkoutState extends State<WorkoutWidget> {
-  List<WorkoutEntry> WorkoutList = [];
   TextEditingController searchTextController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "";
 
   void initState() {
     super.initState();
-    updateWorkoutList();
-  }
-
-  void updateWorkoutList()
-  {
-    WorkoutList = widget.objectbox.workoutBox.getAll();
-    setState(() {});
   }
 
   // Navigate to AddWorkout screen
@@ -37,9 +30,11 @@ class _WorkoutState extends State<WorkoutWidget> {
           builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox, edit:false, id:0),
         ));
 
+    print(widget.objectbox.workoutList.map((e) => e.caption));
     if(result)
-      updateWorkoutList();
-
+      {
+        setState(() {});
+      }
   }
 
   Widget _popUpMenuButton(WorkoutEntry i) {
@@ -63,8 +58,10 @@ class _WorkoutState extends State<WorkoutWidget> {
         }
         // Delete
         else if(selectedIndex == 1){
-          widget.objectbox.workoutBox.remove(i.id);
-          updateWorkoutList();
+          i.visible = false;
+          widget.objectbox.workoutBox.put(i);
+          widget.objectbox.workoutList.remove(i);
+          setState(() {});
         }
       },
     );
@@ -79,7 +76,7 @@ class _WorkoutState extends State<WorkoutWidget> {
         ));
 
     if(result)
-      updateWorkoutList();
+      setState(() {});
   }
 
   String getFirstchar(String s){
@@ -94,7 +91,7 @@ class _WorkoutState extends State<WorkoutWidget> {
     List<Widget> workoutWidgetList = [];
     String firstChar = "";
 
-    if(WorkoutList.length == 0)
+    if(widget.objectbox.workoutList.length == 0)
       return List.from(
           [
             Container(
@@ -107,12 +104,12 @@ class _WorkoutState extends State<WorkoutWidget> {
             )
           ]);
 
-    WorkoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
+    widget.objectbox.workoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
-    for(WorkoutEntry i in WorkoutList){
+    for(WorkoutEntry i in widget.objectbox.workoutList){
       if(searchTextController.text.isNotEmpty) {
         if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
-           &&!i.part.toLowerCase().contains(searchTextController.text.toLowerCase())
+           &&!i.partList.contains(searchTextController.text.toLowerCase())
         // && !i.type.name.toLowerCase().contains(searchTextController.text.toLowerCase())
         )
           continue;
@@ -152,7 +149,7 @@ class _WorkoutState extends State<WorkoutWidget> {
                             style: TextStyle(color: Colors.black)
                           ),
                         TextSpan(
-                            text: " (" + i.part + ")",
+                            text: i.partList.length == 0 ? " " : " ("  + i.partList.join(", ") + ")",
                             style: TextStyle(color: Colors.black54)),
                       ],
                     ),

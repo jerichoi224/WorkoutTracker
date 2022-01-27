@@ -4,7 +4,6 @@ import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
 import 'package:workout_tracker/util/languageTool.dart';
-import 'package:workout_tracker/objectbox.g.dart';
 
 class WorkoutListWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -23,13 +22,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
 
   void initState() {
     super.initState();
-    updateWorkoutList();
-  }
-
-  void updateWorkoutList()
-  {
-    WorkoutList = widget.objectbox.workoutBox.getAll();
-    setState(() {});
+    WorkoutList = widget.objectbox.workoutList;
   }
 
   // Navigate to AddWorkout screen
@@ -43,8 +36,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
         ));
 
     if(result)
-      updateWorkoutList();
-
+      setState(() {});
   }
 
   String getFirstchar(String s){
@@ -64,7 +56,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     for(WorkoutEntry i in WorkoutList){
       if(searchTextController.text.isNotEmpty) {
         if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
-            &&!i.part.toLowerCase().contains(searchTextController.text.toLowerCase())
+            &&!i.partList.contains(searchTextController.text.toLowerCase())
         // && !i.type.name.toLowerCase().contains(searchTextController.text.toLowerCase())
         )
           continue;
@@ -111,7 +103,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
                                 style: TextStyle(color: Colors.black)
                             ),
                             TextSpan(
-                                text: " (" + i.part + ")",
+                                text: i.partList.length == 0 ? " " : " ("  + i.partList.join(", ") + ")",
                                 style: TextStyle(color: Colors.black54)),
                           ],
                         ),
