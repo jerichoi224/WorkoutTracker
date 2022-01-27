@@ -1,20 +1,20 @@
 enum PartType {
   back,
-  chest,
-  leg,
   bicep,
-  tricep,
-  core,
-  shoulder,
   cardio,
+  chest,
+  core,
+  leg,
+  shoulder,
+  tricep,
   other,
 }
 
 enum WorkoutType {
-  machine,
   barbell,
   dumbbell,
   cardio,
+  machine,
   other,
 }
 

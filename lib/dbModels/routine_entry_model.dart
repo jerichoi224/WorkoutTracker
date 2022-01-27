@@ -1,5 +1,4 @@
 import 'package:objectbox/objectbox.dart';
-import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
 @Entity()
 class RoutineEntry {
@@ -7,5 +6,5 @@ class RoutineEntry {
   String name = "";
   List<String> parts = [];
   String description = "";
-  final workoutList = ToMany<WorkoutEntry>();
+  List<String> workoutIds = [];
 }

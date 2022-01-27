@@ -1,3 +1,5 @@
+import 'package:workout_tracker/dbModels/session_entry_model.dart';
+import 'package:workout_tracker/dbModels/session_item_model.dart';
 import 'package:workout_tracker/objectbox.g.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
@@ -11,10 +13,24 @@ class ObjectBox {
 
   late final Box<WorkoutEntry> workoutBox;
   late final Box<RoutineEntry> routineBox;
+  late final Box<SessionItem> sessionItemBox;
+  late final Box<SessionEntry> sessionBox;
+
+  List<WorkoutEntry> workoutList = [];
+  List<RoutineEntry> routineList = [];
+  List<SessionItem> itemList = [];
+  List<SessionEntry> sessionList = [];
 
   ObjectBox._create(this.store) {
     workoutBox = Box<WorkoutEntry>(store);
     routineBox = Box<RoutineEntry>(store);
+    sessionItemBox = Box<SessionItem>(store);
+    sessionBox = Box<SessionEntry>(store);
+
+    workoutList = workoutBox.getAll().where((element) => element.visible).toList();
+    routineList = routineBox.getAll();
+    itemList = sessionItemBox.getAll();
+    sessionList = sessionBox.getAll();
   }
 
   /// Create an instance of ObjectBox to use throughout the app.

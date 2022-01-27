@@ -4,7 +4,6 @@ import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
 import 'package:workout_tracker/util/languageTool.dart';
-import 'package:workout_tracker/objectbox.g.dart';
 
 class WorkoutListWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -16,20 +15,12 @@ class WorkoutListWidget extends StatefulWidget {
 }
 
 class _WorkoutListState extends State<WorkoutListWidget> {
-  List<WorkoutEntry> WorkoutList = [];
   TextEditingController searchTextController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "";
 
   void initState() {
     super.initState();
-    updateWorkoutList();
-  }
-
-  void updateWorkoutList()
-  {
-    WorkoutList = widget.objectbox.workoutBox.getAll();
-    setState(() {});
   }
 
   // Navigate to AddWorkout screen
@@ -41,10 +32,8 @@ class _WorkoutListState extends State<WorkoutListWidget> {
         MaterialPageRoute(
           builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox, edit: false, id: 0),
         ));
-
     if(result)
-      updateWorkoutList();
-
+      setState(() {});
   }
 
   String getFirstchar(String s){
@@ -59,12 +48,12 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     List<Widget> WorkoutWidgetList = [];
     String firstChar = "";
 
-    WorkoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
+    widget.objectbox.workoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
-    for(WorkoutEntry i in WorkoutList){
+    for(WorkoutEntry i in widget.objectbox.workoutList){
       if(searchTextController.text.isNotEmpty) {
         if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
-            &&!i.part.toLowerCase().contains(searchTextController.text.toLowerCase())
+            &&!i.partList.contains(searchTextController.text.toLowerCase())
         // && !i.type.name.toLowerCase().contains(searchTextController.text.toLowerCase())
         )
           continue;
@@ -111,7 +100,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
                                 style: TextStyle(color: Colors.black)
                             ),
                             TextSpan(
-                                text: " (" + i.part + ")",
+                                text: i.partList.length == 0 ? " " : " ("  + i.partList.join(", ") + ")",
                                 style: TextStyle(color: Colors.black54)),
                           ],
                         ),

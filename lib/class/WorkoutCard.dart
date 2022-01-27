@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
 class WorkoutCard {
+  int id = 0;
   late WorkoutEntry entry;
   int numSets = 0;
   List<double> metricList = [];
@@ -10,8 +11,9 @@ class WorkoutCard {
   List<TextEditingController> metricController = [];
   List<TextEditingController> countController = [];
 
-  WorkoutCard(WorkoutEntry workoutEntry)
+  WorkoutCard(WorkoutEntry workoutEntry, int id)
   {
+    this.id = id;
     entry = workoutEntry;
   }
 
