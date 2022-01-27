@@ -4,6 +4,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/widgets/Workout/ViewWorkoutWidget.dart';
 
 class WorkoutWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -79,6 +80,19 @@ class _WorkoutState extends State<WorkoutWidget> {
       setState(() {});
   }
 
+  void _openViewWidget(WorkoutEntry workoutEntry) async {
+    // start the SecondScreen and wait for it to finish with a   result
+    bool result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ViewWorkoutWidget(objectbox: widget.objectbox, id:workoutEntry.id),
+        ));
+    if(result.runtimeType == bool && result)
+      {
+          setState(() {});
+      }
+  }
+
   String getFirstchar(String s){
     if(isKorean(s))
     {
@@ -138,7 +152,7 @@ class _WorkoutState extends State<WorkoutWidget> {
               color: Colors.white,
               child: new InkWell(
                   borderRadius: BorderRadius.circular(10.0),
-                  onTap: () {},
+                  onTap: () {_openViewWidget(i);},
                 child: ListTile(
                   dense: true,
                   title: RichText(

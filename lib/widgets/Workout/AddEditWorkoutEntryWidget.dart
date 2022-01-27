@@ -338,8 +338,6 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                 newEntry!.description = descriptionController.text;
                                                 widget.objectbox.workoutBox.put(newEntry!);
                                                 widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
-
-
                                                 Navigator.pop(context, true);
                                               },
                                               title: Text(widget.edit ? "Save Changes" : "Add Workout",

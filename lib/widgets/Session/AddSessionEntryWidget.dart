@@ -466,7 +466,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                         widget.objectbox.workoutBox.put(workoutEntry);
                                                       }
                                                   }
-                                                widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().toList();
+                                                widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
                                                 widget.objectbox.sessionBox.put(sessionEntry!);
                                                 widget.objectbox.sessionList.add(sessionEntry!);
                                                 Navigator.pop(context, true);

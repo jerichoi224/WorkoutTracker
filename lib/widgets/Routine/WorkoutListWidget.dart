@@ -15,14 +15,12 @@ class WorkoutListWidget extends StatefulWidget {
 }
 
 class _WorkoutListState extends State<WorkoutListWidget> {
-  List<WorkoutEntry> WorkoutList = [];
   TextEditingController searchTextController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "";
 
   void initState() {
     super.initState();
-    WorkoutList = widget.objectbox.workoutList;
   }
 
   // Navigate to AddWorkout screen
@@ -34,7 +32,6 @@ class _WorkoutListState extends State<WorkoutListWidget> {
         MaterialPageRoute(
           builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox, edit: false, id: 0),
         ));
-
     if(result)
       setState(() {});
   }
@@ -51,9 +48,9 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     List<Widget> WorkoutWidgetList = [];
     String firstChar = "";
 
-    WorkoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
+    widget.objectbox.workoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
-    for(WorkoutEntry i in WorkoutList){
+    for(WorkoutEntry i in widget.objectbox.workoutList){
       if(searchTextController.text.isNotEmpty) {
         if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
             &&!i.partList.contains(searchTextController.text.toLowerCase())
