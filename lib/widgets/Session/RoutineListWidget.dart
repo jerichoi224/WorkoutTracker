@@ -14,11 +14,8 @@ class RoutineListWidget extends StatefulWidget {
 }
 
 class _RoutineListState extends State<RoutineListWidget> {
-  List<RoutineEntry> RoutineList = [];
-
   void initState() {
     super.initState();
-    RoutineList = widget.objectbox.routineList;
   }
 
   String workoutListToString(List<String> workoutIds) {
@@ -37,7 +34,7 @@ class _RoutineListState extends State<RoutineListWidget> {
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine:true, id:id),
+          builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine:true, edit:false, id:id),
         ));
     Navigator.pop(context, result);
   }
@@ -45,7 +42,7 @@ class _RoutineListState extends State<RoutineListWidget> {
   List<Widget> routineList(BuildContext context) {
     List<Widget> routineWidgetList = [];
 
-    if (RoutineList.length == 0)
+    if (widget.objectbox.routineList.length == 0)
       return List.from(
           [
             Container(
@@ -58,10 +55,10 @@ class _RoutineListState extends State<RoutineListWidget> {
             )
           ]);
 
-    RoutineList.sort((a, b) =>
+    widget.objectbox.routineList.sort((a, b) =>
         a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
-    for (RoutineEntry i in RoutineList) {
+    for (RoutineEntry i in widget.objectbox.routineList) {
       // If alphabet changes, add caption
       routineWidgetList.add(
           new Card(

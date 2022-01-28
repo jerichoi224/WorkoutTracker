@@ -61,28 +61,6 @@ class _SettingsState extends State<SettingsWidget> {
                          ],
                        )
                    ),
-                   Card(
-                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                       margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                       color: Theme.of(context).colorScheme.primary,
-                       child: Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: <Widget>[
-                             ListTile(
-                                 onTap:(){
-                                   Navigator.pop(context, false);
-                                   setState(() {});
-                                 },
-                                 title: Text("Save Setting",
-                                   style: TextStyle(
-                                     fontSize: 18,
-                                   ),
-                                   textAlign: TextAlign.center,
-                                 )
-                             )
-                           ]
-                       )
-                   ),// Save Button
                  ]),
                ),
              ],

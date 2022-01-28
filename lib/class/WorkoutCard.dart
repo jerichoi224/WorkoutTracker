@@ -7,7 +7,7 @@ class WorkoutCard {
   late WorkoutEntry entry;
   int numSets = 0;
   List<double> metricList = [];
-  List<double> countList = [];
+  List<int> countList = [];
   List<TextEditingController> metricController = [];
   List<TextEditingController> countController = [];
 
@@ -17,13 +17,20 @@ class WorkoutCard {
     entry = workoutEntry;
   }
 
-  void addSet(double metric, double count)
+  void addSet(double metric, int count)
   {
     numSets += 1;
     metricList.add(metric);
     countList.add(count);
-    metricController.add(new TextEditingController());
-    countController.add(new TextEditingController());
+    TextEditingController metricTextController = new TextEditingController();
+    TextEditingController countTextController = new TextEditingController();
+    if(metric != 0)
+      metricTextController.text  = metric.toString();
+    if(count != 0)
+      countTextController.text  = count.toString();
+
+    metricController.add(metricTextController);
+    countController.add(countTextController);
   }
 
   void remove(int ind)
@@ -42,7 +49,7 @@ class WorkoutCard {
 
     List<Map<String, Object>> sets = [];
     for (int i = 0; i < numSets; i++) {
-      Map<String, double> set = new Map();
+      Map<String, num> set = new Map();
       set["metric"] = metricList[i];
       set["count"] = countList[i];
     }

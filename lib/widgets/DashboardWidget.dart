@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/dbModels/session_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/widgets/Session/RoutineListWidget.dart';
@@ -63,7 +62,7 @@ class _DashboardState extends State<DashboardWidget>{
     bool result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine:false, id:0),
+          builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine:false, edit: false, id:0),
         ));
   }
 
@@ -75,7 +74,7 @@ class _DashboardState extends State<DashboardWidget>{
         MaterialPageRoute(
           builder: (context) => RoutineListWidget(objectbox: widget.objectbox),
         ));
-    if(result)
+    if(result.runtimeType == bool && result)
       setState(() {});
   }
 

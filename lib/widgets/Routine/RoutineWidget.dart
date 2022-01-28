@@ -3,6 +3,7 @@ import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Routine/AddEditRoutineEntryWidget.dart';
+import 'package:workout_tracker/widgets/Routine/ViewRoutineWidget.dart';
 import 'dart:math';
 
 class RoutineWidget extends StatefulWidget {
@@ -69,6 +70,19 @@ class _RoutineState extends State<RoutineWidget>{
       setState(() {});
   }
 
+  void _openViewWidget(int id) async {
+    // start the SecondScreen and wait for it to finish with a   result
+    bool result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ViewRoutineEntryWidget(objectbox: widget.objectbox, id:id),
+        ));
+    if(result.runtimeType == bool && result)
+    {
+      setState(() {});
+    }
+  }
+
   String workoutListToString(List<String> workoutIds)
   {
     List<String> workoutList = [];
@@ -111,7 +125,7 @@ class _RoutineState extends State<RoutineWidget>{
               color: Colors.white,
               child: new InkWell(
                   borderRadius: BorderRadius.circular(10.0),
-                  onTap: () {},
+                  onTap: () {_openViewWidget(i.id);},
                   child: SizedBox(
                       height: max(47 + i.workoutIds.length * 15, 55),
                       child: Row(

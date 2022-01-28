@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/session_entry_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -35,6 +36,20 @@ class _CalendarState extends State<CalendarWidget>{
     return s;
   }
 
+  void _openEditWidget(BuildContext context, int id) async {
+    // start the SecondScreen and wait for it to finish with a result
+    bool result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine:false, edit: true, id:id),
+        ));
+
+    if(result.runtimeType == bool && result)
+    {
+      setState(() {});
+    }
+  }
+
   Widget _popUpMenuButton(SessionEntry i) {
     return PopupMenuButton(
       icon: Icon(Icons.more_vert),
@@ -52,7 +67,7 @@ class _CalendarState extends State<CalendarWidget>{
       onSelected: (selectedIndex) {
         // Edit
         if(selectedIndex == 0){
-//          _openEditWidget(i);
+          _openEditWidget(context, i.id);
         }
         // Delete
         else if(selectedIndex == 1){

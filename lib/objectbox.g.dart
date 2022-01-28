@@ -32,7 +32,7 @@ final _entities = <ModelEntity>[
         ModelProperty(
             id: const IdUid(2, 8345639757594749507),
             name: 'metricValue',
-            type: 6,
+            type: 8,
             flags: 0),
         ModelProperty(
             id: const IdUid(3, 7566590590164589054),
@@ -270,7 +270,7 @@ ModelDefinition getObjectBoxModel() {
         objectToFB: (SetItem object, fb.Builder fbb) {
           fbb.startTable(4);
           fbb.addInt64(0, object.id);
-          fbb.addInt64(1, object.metricValue);
+          fbb.addFloat64(1, object.metricValue);
           fbb.addInt64(2, object.countValue);
           fbb.finish(fbb.endTable());
           return object.id;
@@ -281,7 +281,7 @@ ModelDefinition getObjectBoxModel() {
 
           final object = SetItem(
               metricValue:
-                  const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0),
+                  const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0),
               countValue:
                   const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0))
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
@@ -482,7 +482,7 @@ class SetItem_ {
 
   /// see [SetItem.metricValue]
   static final metricValue =
-      QueryIntegerProperty<SetItem>(_entities[0].properties[1]);
+      QueryDoubleProperty<SetItem>(_entities[0].properties[1]);
 
   /// see [SetItem.countValue]
   static final countValue =

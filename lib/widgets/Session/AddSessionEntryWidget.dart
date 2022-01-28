@@ -13,9 +13,9 @@ import 'package:intl/intl.dart';
 
 class AddSessionEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
-  late bool fromRoutine;
+  late bool fromRoutine, edit;
   late int id;
-  AddSessionEntryWidget({Key? key, required this.objectbox, required this.fromRoutine, required this.id}) : super(key: key);
+  AddSessionEntryWidget({Key? key, required this.objectbox, required this.fromRoutine, required this.edit, required this.id}) : super(key: key);
 
   @override
   State createState() => _AddSessionEntryState();
@@ -42,27 +42,46 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   int endTime = 0;
   int year = 0;
   int month = 0;
-  List<SessionItem> sessionItems= [];
 
 
   @override
   void initState() {
     super.initState();
-    sessionEntry = new SessionEntry();
-    DateTime now = new DateTime.now();
-    defaultName = dateFormatter.format(now) + " Workout";
-    startDate = timeFormatter.format(now);
-    startTime = now.millisecondsSinceEpoch;
-    if(widget.fromRoutine)
+    if(widget.edit)
       {
-        RoutineEntry routineEntry = widget.objectbox.routineList.firstWhere((element) => element.id == widget.id);
-        partList = routineEntry.parts;
-        for(String strId in routineEntry.workoutIds)
+        sessionEntry = widget.objectbox.sessionList.firstWhere((element) => element.id == widget.id);
+        sessionNameController.text = sessionEntry!.name;
+        startTime = sessionEntry!.startTime;
+        endTime = sessionEntry!.endTime;
+        startDate = dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
+        partList = sessionEntry!.parts;
+        for(SessionItem item in sessionEntry!.sets)
           {
-            int id = int.parse(strId);
-            addWorkoutToList(widget.objectbox.workoutList.firstWhere((element) => element.id == id));
+            addWorkoutToList(widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId), false);
+            for(SetItem setItem in item.sets)
+              {
+                AddSet(workoutCardList.length - 1, setItem.metricValue, setItem.countValue);
+              }
           }
       }
+    else {
+      sessionEntry = new SessionEntry();
+      DateTime now = new DateTime.now();
+      defaultName = dateFormatter.format(now) + " Workout";
+      startDate = timeFormatter.format(now);
+      startTime = now.millisecondsSinceEpoch;
+      if (widget.fromRoutine) {
+        RoutineEntry routineEntry = widget.objectbox.routineList.firstWhere((
+            element) => element.id == widget.id);
+        partList = routineEntry.parts;
+        for (String strId in routineEntry.workoutIds) {
+          int id = int.parse(strId);
+          addWorkoutToList(
+              widget.objectbox.workoutList.firstWhere((element) => element.id ==
+                  id), true);
+        }
+      }
+    }
   }
 
   List<Widget> selectPartList(setDialogState)
@@ -158,8 +177,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     );
   }
 
-  void AddSet(int cardIndex) {
-    workoutCardList[cardIndex].addSet(0, 0);
+  void AddSet(int cardIndex, double metric, int count) {
+    workoutCardList[cardIndex].addSet(metric, count);
     setState(() {});
   }
 
@@ -179,12 +198,12 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
 
     if(result.runtimeType == WorkoutEntry)
     {
-      addWorkoutToList(result as WorkoutEntry);
+      addWorkoutToList(result as WorkoutEntry, true);
       setState(() {});
     }
   }
 
-  void addWorkoutToList(WorkoutEntry workoutEntry)
+  void addWorkoutToList(WorkoutEntry workoutEntry, bool addSet)
   {
     WorkoutCard newCard = new WorkoutCard(workoutEntry, 0);
     workoutCardList.add(newCard);
@@ -192,7 +211,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     for(String part in workoutEntry.partList)
       if(!partList.contains(part))
         partList.add(part);
-    AddSet(workoutCardList.length - 1);
+    if(addSet)
+      AddSet(workoutCardList.length - 1, 0, 0);
   }
 
   Widget _BuildWorkoutCards(BuildContext context, int index) {
@@ -219,6 +239,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                       icon: new Icon(Icons.close),
                       onPressed:(){
                         workoutCardList.removeAt(index);
+                        workoutEntryList.removeAt(index);
                         setState(() {
                         });
                       }
@@ -234,17 +255,31 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
               ),
-              AddButton("Add Set", (){AddSet(index);})
+              AddButton("Add Set", (){AddSet(index, 0, 0);})
             ]
         )
     );
   }
 
   Widget _BuildSets(BuildContext context, int index, int cardInd) {
+    WorkoutEntry workoutEntry = workoutCardList[cardInd].entry;
+    String prev = " - " ;
+    if(workoutEntry.prevSessionId != 0)
+      {
+        SessionItem sessionItem = widget.objectbox.itemList.firstWhere((element) => element.id == workoutEntry.prevSessionId);
+        if(sessionItem.sets.length > index)
+          {
+            prev = sessionItem.sets[index].metricValue.toString();
+            if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
+              prev += " " + workoutCardList[cardInd].entry.metric;
+            if(workoutCardList[cardInd].entry.metric == MetricType.kg.name || workoutCardList[cardInd].entry.metric == MetricType.none.name)
+              prev += " × " + sessionItem.sets[index].countValue.toString();
+          }
+      }
     return ListTile(
       title: new Row(
         children: <Widget>[
-          new Text("10 × 10",
+          new Text(prev,
             style: TextStyle(
               color: Colors.black38
             ),
@@ -443,6 +478,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                 sessionEntry!.month = DateTime.fromMillisecondsSinceEpoch(startTime).month;
                                                 sessionEntry!.day = DateTime.fromMillisecondsSinceEpoch(startTime).day;
 
+                                                sessionEntry!.sets.clear();
                                                 for(WorkoutCard i in workoutCardList)
                                                   {
                                                     SessionItem item = new SessionItem();
@@ -451,7 +487,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                     for(int j = 0; j < i.numSets; j++)
                                                       {
                                                         item.sets.add(SetItem(
-                                                            metricValue: i.metricController[j].text.isNotEmpty ? int.parse(i.metricController[j].text) : 0,
+                                                            metricValue: i.metricController[j].text.isNotEmpty ? double.parse(i.metricController[j].text) : 0,
                                                             countValue: i.countController[j].text.isNotEmpty ? int.parse(i.countController[j].text) : 0
                                                         ));
                                                       }
@@ -468,7 +504,9 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                   }
                                                 widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
                                                 widget.objectbox.sessionBox.put(sessionEntry!);
-                                                widget.objectbox.sessionList.add(sessionEntry!);
+                                                if(!widget.edit)
+                                                  widget.objectbox.sessionList.add(sessionEntry!);
+                                                widget.objectbox.itemList = widget.objectbox.sessionItemBox.getAll();
                                                 Navigator.pop(context, true);
                                               },
                                               title: Text("Finish Session",
