@@ -64,6 +64,9 @@ class _DashboardState extends State<DashboardWidget>{
         MaterialPageRoute(
           builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine:false, edit: false, id:0),
         ));
+
+    if(result.runtimeType == bool && result)
+      setState(() {});
   }
 
   void startRoutineSession(BuildContext context) async {

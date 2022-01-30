@@ -3,6 +3,7 @@ import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
+import 'package:workout_tracker/util/languageTool.dart';
 
 class AddWorkoutEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -11,12 +12,6 @@ class AddWorkoutEntryWidget extends StatefulWidget {
   AddWorkoutEntryWidget({Key? key, required this.objectbox, required this.edit, required this.id}) : super(key: key);
   @override
   State createState() => _AddWorkoutEntryState();
-}
-
-extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
-  }
 }
 
 class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {

@@ -10,6 +10,7 @@ import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:intl/intl.dart';
+import 'package:collection/collection.dart';
 
 class AddSessionEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -266,14 +267,17 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     String prev = " - " ;
     if(workoutEntry.prevSessionId != 0)
       {
-        SessionItem sessionItem = widget.objectbox.itemList.firstWhere((element) => element.id == workoutEntry.prevSessionId);
-        if(sessionItem.sets.length > index)
+        SessionItem? sessionItem = widget.objectbox.itemList.firstWhereOrNull((element) => element.id == workoutEntry.prevSessionId);
+        if(sessionItem != null)
           {
-            prev = sessionItem.sets[index].metricValue.toString();
-            if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
-              prev += " " + workoutCardList[cardInd].entry.metric;
-            if(workoutCardList[cardInd].entry.metric == MetricType.kg.name || workoutCardList[cardInd].entry.metric == MetricType.none.name)
-              prev += " × " + sessionItem.sets[index].countValue.toString();
+            if(sessionItem.sets.length > index)
+            {
+              prev = sessionItem.sets[index].metricValue.toString();
+              if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
+                prev += " " + workoutCardList[cardInd].entry.metric;
+              if(workoutCardList[cardInd].entry.metric == MetricType.kg.name || workoutCardList[cardInd].entry.metric == MetricType.none.name)
+                prev += " × " + sessionItem.sets[index].countValue.toString();
+            }
           }
       }
     return ListTile(
@@ -348,6 +352,96 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     );
   }
 
+  // Save current session and pop screen.
+  saveSession()
+  {
+    if(sessionNameController.text.isEmpty)
+      sessionNameController.text = defaultName;
+    sessionEntry!.name = sessionNameController.text;
+    sessionEntry!.parts = partList;
+
+    sessionEntry!.startTime = startTime;
+    if(endTime == 0)
+      endTime = DateTime.now().millisecondsSinceEpoch;
+    sessionEntry!.endTime = endTime;
+    sessionEntry!.year = DateTime.fromMillisecondsSinceEpoch(startTime).year;
+    sessionEntry!.month = DateTime.fromMillisecondsSinceEpoch(startTime).month;
+    sessionEntry!.day = DateTime.fromMillisecondsSinceEpoch(startTime).day;
+
+    List<SessionItem> tempList = [];
+    for(WorkoutCard i in workoutCardList)
+    {
+      SessionItem item = new SessionItem();
+      item.workoutId = i.entry.id;
+      item.time = endTime;
+      for(int j = 0; j < i.numSets; j++)
+      {
+        item.sets.add(SetItem(
+            metricValue: i.metricController[j].text.isNotEmpty ? double.parse(i.metricController[j].text) : 0,
+            countValue: i.countController[j].text.isNotEmpty ? int.parse(i.countController[j].text) : 0
+        ));
+      }
+      tempList.add(item);
+      widget.objectbox.sessionItemBox.put(item);
+
+      WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
+
+      if(workoutEntry.prevSessionId == -1 || widget.objectbox.itemList.firstWhere((element) => element.id == workoutEntry.prevSessionId).time <= item.time)
+      {
+        workoutEntry.prevSessionId = item.id;
+        widget.objectbox.workoutBox.put(workoutEntry);
+      }
+    }
+
+    List<SessionItem> removeItems = [];
+    if(widget.edit)
+      {
+        // remove and remap previous session for the workouts.
+        // if the session being changed is the previous session for the workout
+        // look for the previous again.
+        for(SessionItem item in sessionEntry!.sets)
+        {
+          removeItems.add(item);
+        }
+      }
+    sessionEntry!.sets.clear();
+
+    // add the new session
+    for(SessionItem item in tempList)
+      sessionEntry!.sets.add(item);
+
+    // Add Session to DB
+    widget.objectbox.sessionBox.put(sessionEntry!);
+
+    // update list and previous session id for workout entries
+    for(SessionItem item in removeItems)
+    {
+        WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
+        widget.objectbox.sessionItemBox.remove(item.id);
+        widget.objectbox.itemList.remove(item);
+        if(workoutEntry.prevSessionId == item.id)
+        {
+          List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id).toList();
+          if(itemsForWorkout.length == 0)
+            workoutEntry.prevSessionId = -1;
+          else
+            {
+              itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
+              workoutEntry.prevSessionId = itemsForWorkout[0].id;
+            }
+
+          widget.objectbox.workoutBox.put(workoutEntry);
+        }
+    }
+
+    // update all lists that changed.
+    if(!widget.edit)
+      widget.objectbox.sessionList.add(sessionEntry!);
+    widget.objectbox.itemList = widget.objectbox.sessionItemBox.getAll();
+    print(widget.objectbox.itemList.length);
+    Navigator.pop(context, true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -370,7 +464,6 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                // System Values
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
                                     child: Text("Name",
@@ -464,51 +557,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
                                           ListTile(
-                                              onTap:(){
-                                                if(sessionNameController.text.isEmpty)
-                                                  sessionNameController.text = defaultName;
-                                                sessionEntry!.name = sessionNameController.text;
-                                                sessionEntry!.parts = partList;
-
-                                                sessionEntry!.startTime = startTime;
-                                                if(endTime == 0)
-                                                  endTime = DateTime.now().millisecondsSinceEpoch;
-                                                sessionEntry!.endTime = endTime;
-                                                sessionEntry!.year = DateTime.fromMillisecondsSinceEpoch(startTime).year;
-                                                sessionEntry!.month = DateTime.fromMillisecondsSinceEpoch(startTime).month;
-                                                sessionEntry!.day = DateTime.fromMillisecondsSinceEpoch(startTime).day;
-
-                                                sessionEntry!.sets.clear();
-                                                for(WorkoutCard i in workoutCardList)
-                                                  {
-                                                    SessionItem item = new SessionItem();
-                                                    item.workoutId = i.entry.id;
-                                                    item.time = endTime;
-                                                    for(int j = 0; j < i.numSets; j++)
-                                                      {
-                                                        item.sets.add(SetItem(
-                                                            metricValue: i.metricController[j].text.isNotEmpty ? double.parse(i.metricController[j].text) : 0,
-                                                            countValue: i.countController[j].text.isNotEmpty ? int.parse(i.countController[j].text) : 0
-                                                        ));
-                                                      }
-                                                    sessionEntry!.sets.add(item);
-                                                    widget.objectbox.sessionItemBox.put(item);
-
-                                                    WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
-
-                                                    if(workoutEntry.prevSessionId == 0 || widget.objectbox.itemList.firstWhere((element) => element.id == workoutEntry.prevSessionId).time < item.time)
-                                                      {
-                                                        workoutEntry.prevSessionId = item.id;
-                                                        widget.objectbox.workoutBox.put(workoutEntry);
-                                                      }
-                                                  }
-                                                widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
-                                                widget.objectbox.sessionBox.put(sessionEntry!);
-                                                if(!widget.edit)
-                                                  widget.objectbox.sessionList.add(sessionEntry!);
-                                                widget.objectbox.itemList = widget.objectbox.sessionItemBox.getAll();
-                                                Navigator.pop(context, true);
-                                              },
+                                              onTap:(){saveSession();},
                                               title: Text("Finish Session",
                                                 style: TextStyle(
                                                   fontSize: 18,

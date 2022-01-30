@@ -9,7 +9,7 @@ class WorkoutEntry {
   List<String> partList = [];
   String caption = "";
   String description = "";
-  int prevSessionId = 0;
+  int prevSessionId = -1;
   bool visible = true;
 
   WorkoutEntry();

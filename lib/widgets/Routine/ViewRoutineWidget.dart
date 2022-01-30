@@ -4,6 +4,7 @@ import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Routine/AddEditRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
+import 'package:workout_tracker/util/languageTool.dart';
 
 class ViewRoutineEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -65,9 +66,6 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
 
     for(int i = 0; i < routineEntry!.parts.length; i++)
       tagList.add(tag(routineEntry!.parts[i], (){}, Color.fromRGBO(210, 210, 210, 0.8)));
-
-    if(partList.length == 0)
-      tagList.add(tag(" None ", (){}, Color.fromRGBO(230, 230, 230, 0.8)));
     return tagList;
   }
 
@@ -129,7 +127,6 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                // System Values
                                 Container(
                                     padding: EdgeInsets.fromLTRB(15, 15, 0, 0),
                                     child: Text(routineEntry!.name,
@@ -140,13 +137,14 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
                                       ),
                                     )
                                 ),
-                                Container(
-                                  margin: EdgeInsets.fromLTRB(20, 5, 10, 0),
-                                  child: Wrap(
-                                      alignment: WrapAlignment.start,
-                                      children: selectedTagList()
-                                  ),
-                                ),
+                                if(routineEntry!.parts.length > 0)
+                                    Container(
+                                    margin: EdgeInsets.fromLTRB(20, 5, 10, 0),
+                                     child: Wrap(
+                                        alignment: WrapAlignment.start,
+                                        children: selectedTagList()
+                                     ),
+                                   ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
                                     child: Text("Routine Details",
@@ -207,7 +205,7 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
                                           ),
                                         ]
                                     )
-                                ),
+                                 ),
                               ],
                             )
                         )

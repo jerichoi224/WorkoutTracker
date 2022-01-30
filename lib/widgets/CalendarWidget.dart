@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/session_entry_model.dart';
+import 'package:workout_tracker/dbModels/session_item_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:workout_tracker/widgets/Session/ViewSessionEntryWidget.dart';
 
 class CalendarWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -50,6 +52,36 @@ class _CalendarState extends State<CalendarWidget>{
     }
   }
 
+  void _deleteSession(SessionEntry entry)
+  {
+    // update list and previous session id for workout entries
+    for(SessionItem item in entry.sets)
+    {
+      WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
+      widget.objectbox.sessionItemBox.remove(item.id);
+      widget.objectbox.itemList.remove(item);
+
+      if(workoutEntry.prevSessionId == item.id)
+      {
+        List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id).toList();
+        if(itemsForWorkout.length == 0)
+          workoutEntry.prevSessionId = -1;
+        else
+        {
+          itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
+          workoutEntry.prevSessionId = itemsForWorkout[0].id;
+        }
+
+        widget.objectbox.workoutBox.put(workoutEntry);
+      }
+    }
+
+    widget.objectbox.sessionList.remove(entry);
+    widget.objectbox.sessionBox.remove(entry.id);
+    sessionsToday = _getEventsForDay(DateTime.now());
+    setState(() {});
+  }
+
   Widget _popUpMenuButton(SessionEntry i) {
     return PopupMenuButton(
       icon: Icon(Icons.more_vert),
@@ -71,10 +103,7 @@ class _CalendarState extends State<CalendarWidget>{
         }
         // Delete
         else if(selectedIndex == 1){
-          widget.objectbox.sessionBox.remove(i.id);
-          widget.objectbox.sessionList.remove(i);
-          sessionsToday = _getEventsForDay(DateTime.now());
-          setState(() {});
+          _deleteSession(i);
         }
       },
     );
@@ -91,6 +120,19 @@ class _CalendarState extends State<CalendarWidget>{
     return text;
   }
 
+  void _openViewWidget(SessionEntry sessionEntry) async {
+    // start the SecondScreen and wait for it to finish with a   result
+    bool result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ViewSessionEntryWidget(objectbox: widget.objectbox, id:sessionEntry.id),
+        ));
+    if(result.runtimeType == bool && result)
+    {
+      setState(() {});
+    }
+  }
+
   Widget buildSessionCards(BuildContext context, int index) {
     SessionEntry sessionEntry = sessionsToday[index];
     return Card(
@@ -100,7 +142,7 @@ class _CalendarState extends State<CalendarWidget>{
         color: Colors.white,
         child: new InkWell(
             borderRadius: BorderRadius.circular(10.0),
-            onTap: () {},
+            onTap: () {_openViewWidget(sessionEntry);},
             child: SizedBox(
                 height: 70,
                 child: Row(
@@ -188,6 +230,7 @@ class _CalendarState extends State<CalendarWidget>{
                 delegate: SliverChildListDelegate(
                   [
                     TableCalendar(
+                      availableGestures: AvailableGestures.none,
                       firstDay: DateTime.utc(2010, 10, 16),
                       lastDay: DateTime.utc(2030, 3, 14),
                       focusedDay: _focusedDay,

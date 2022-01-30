@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/class/WorkoutCard.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
+import 'package:workout_tracker/util/languageTool.dart';
 
 class AddRoutineEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -15,12 +15,6 @@ class AddRoutineEntryWidget extends StatefulWidget {
 
   @override
   State createState() => _AddRoutineEntryState();
-}
-
-extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
-  }
 }
 
 class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {

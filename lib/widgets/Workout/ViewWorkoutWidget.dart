@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
-import 'package:workout_tracker/util/typedef.dart';
+import 'package:workout_tracker/util/languageTool.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 class ViewWorkoutWidget extends StatefulWidget {
@@ -33,9 +33,6 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
 
     for(int i = 0; i < workoutEntry!.partList.length; i++)
       tagList.add(tag(workoutEntry!.partList[i], (){}, Color.fromRGBO(210, 210, 210, 0.8)));
-
-    if(workoutEntry!.partList.length == 0)
-      tagList.add(tag(" None ", (){}, Color.fromRGBO(230, 230, 230, 0.8)));
     return tagList;
   }
 
@@ -108,13 +105,14 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                       ),
                                     )
                                 ),
-                                Container(
-                                  margin: EdgeInsets.fromLTRB(20, 5, 10, 0),
-                                  child: Wrap(
-                                      alignment: WrapAlignment.start,
-                                      children: selectedTagList()
+                                if(workoutEntry!.partList.length > 0)
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(20, 5, 10, 0),
+                                    child: Wrap(
+                                        alignment: WrapAlignment.start,
+                                        children: selectedTagList()
+                                    ),
                                   ),
-                                ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
                                     child: Text("Workout Details",
