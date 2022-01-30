@@ -179,12 +179,14 @@ class _RoutineState extends State<RoutineWidget>{
 
   List<Widget> _buildActions() {
     return <Widget>[
+      /*
       IconButton(
         icon: const Icon(Icons.filter_list_rounded),
         onPressed: (){
 
         },
       ),
+       */
       IconButton(
           icon: Icon(Icons.add),
           onPressed: () {

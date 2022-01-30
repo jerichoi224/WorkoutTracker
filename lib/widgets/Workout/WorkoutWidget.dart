@@ -31,7 +31,6 @@ class _WorkoutState extends State<WorkoutWidget> {
           builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox, edit:false, id:0),
         ));
 
-    print(widget.objectbox.workoutList.map((e) => e.caption));
     if(result)
       {
         setState(() {});

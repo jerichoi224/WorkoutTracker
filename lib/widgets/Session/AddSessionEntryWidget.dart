@@ -31,10 +31,12 @@ extension StringExtension on String {
 class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   String defaultName = "";
   String startDate = "";
+  String endDate = "";
   final timeFormatter = new DateFormat('yyyy/MM/dd HH:mm');
   final dateFormatter = new DateFormat('yyyy/MM/dd');
   List<WorkoutEntry> workoutEntryList = [];
   List<WorkoutCard> workoutCardList = [];
+  bool setTime = false;
 
   late SessionEntry? sessionEntry;
   final sessionNameController = TextEditingController();
@@ -50,11 +52,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     super.initState();
     if(widget.edit)
       {
+        setTime = true;
         sessionEntry = widget.objectbox.sessionList.firstWhere((element) => element.id == widget.id);
         sessionNameController.text = sessionEntry!.name;
         startTime = sessionEntry!.startTime;
         endTime = sessionEntry!.endTime;
-        startDate = dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
+        startDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
+        endDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
         partList = sessionEntry!.parts;
         for(SessionItem item in sessionEntry!.sets)
           {
@@ -70,7 +74,9 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       DateTime now = new DateTime.now();
       defaultName = dateFormatter.format(now) + " Workout";
       startDate = timeFormatter.format(now);
+      endDate = timeFormatter.format(now);
       startTime = now.millisecondsSinceEpoch;
+      endTime = now.millisecondsSinceEpoch;
       if (widget.fromRoutine) {
         RoutineEntry routineEntry = widget.objectbox.routineList.firstWhere((
             element) => element.id == widget.id);
@@ -355,6 +361,14 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   // Save current session and pop screen.
   saveSession()
   {
+    if(endTime < startTime) {
+      final snackBar = SnackBar(
+        content: const Text('End Time must be after Start Time'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    }
+
     if(sessionNameController.text.isEmpty)
       sessionNameController.text = defaultName;
     sessionEntry!.name = sessionNameController.text;
@@ -369,29 +383,64 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     sessionEntry!.day = DateTime.fromMillisecondsSinceEpoch(startTime).day;
 
     List<SessionItem> tempList = [];
-    for(WorkoutCard i in workoutCardList)
+    for(WorkoutCard cardItem in workoutCardList)
     {
+      if(cardItem.numSets == 0)
+        continue;
+
+      // remove invalid sets
+      for(int i = cardItem.numSets - 1; i >=0; i--)
+        {
+          if(cardItem.metricController[i].text.isEmpty && cardItem.countController[i].text.isEmpty)
+            cardItem.remove(i);
+          else if((cardItem.entry.metric == MetricType.km.name || cardItem.entry.metric == MetricType.floor.name) && cardItem.metricController[i].text.isEmpty)
+            cardItem.remove(i);
+          else if (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[i].text.isEmpty)
+            cardItem.remove(i);
+        }
+
+      bool skip = true;
+      for(int i = 0; i < cardItem.numSets; i++) {
+        if ((cardItem.metricController[i].text.isNotEmpty && cardItem.countController[i].text.isNotEmpty) ||
+            ((cardItem.entry.metric == MetricType.km.name || cardItem.entry.metric == MetricType.floor.name) && cardItem.metricController[i].text.isNotEmpty) ||
+            (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[i].text.isNotEmpty)
+        )
+        {
+          skip = false;
+          break;
+        }
+      }
+      if(skip)
+        continue;
+
       SessionItem item = new SessionItem();
-      item.workoutId = i.entry.id;
+      item.workoutId = cardItem.entry.id;
       item.time = endTime;
-      item.metric = i.entry.metric;
-      for(int j = 0; j < i.numSets; j++)
+      item.metric = cardItem.entry.metric;
+      for(int j = 0; j < cardItem.numSets; j++)
       {
         item.sets.add(SetItem(
-            metricValue: i.metricController[j].text.isNotEmpty ? double.parse(i.metricController[j].text) : 0,
-            countValue: i.countController[j].text.isNotEmpty ? int.parse(i.countController[j].text) : 0
+            metricValue: cardItem.metricController[j].text.isNotEmpty ? double.parse(cardItem.metricController[j].text) : 0,
+            countValue: cardItem.countController[j].text.isNotEmpty ? int.parse(cardItem.countController[j].text) : 0
         ));
       }
       tempList.add(item);
       widget.objectbox.sessionItemBox.put(item);
 
       WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
-
       if(workoutEntry.prevSessionId == -1 || widget.objectbox.itemList.firstWhere((element) => element.id == workoutEntry.prevSessionId).time <= item.time)
       {
         workoutEntry.prevSessionId = item.id;
         widget.objectbox.workoutBox.put(workoutEntry);
       }
+    }
+    if(tempList.length == 0)
+    {
+      final snackBar = SnackBar(
+        content: const Text('Please add a valid Workout'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
     }
 
     List<SessionItem> removeItems = [];
@@ -441,6 +490,50 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     widget.objectbox.itemList = widget.objectbox.sessionItemBox.getAll();
     print(widget.objectbox.itemList.length);
     Navigator.pop(context, true);
+  }
+
+  Widget _popUpMenuButton() {
+    return PopupMenuButton(
+      icon: Icon(Icons.more_vert),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          child: Text("Set Time Manually"),
+          value: 0,
+        ),
+      ],
+
+      onSelected: (selectedIndex) {
+        if(selectedIndex == 0){
+          setState(() {
+            setTime = true;
+          });
+        }
+      },
+    );
+  }
+
+  Future<int> _selectDate(BuildContext context, int time) async {
+    DateTime original = DateTime.fromMillisecondsSinceEpoch(time);
+    DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: original,
+        firstDate: DateTime(2000, 1),
+        lastDate: DateTime(2101)
+    );
+    if(pickedDate == null)
+      return 0;
+
+    TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(original),
+        );
+    if(pickedTime == null)
+      return 0;
+
+    print(pickedTime.toString());
+    DateTime picked = new DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
+
+    return picked.millisecondsSinceEpoch;
   }
 
   @override
@@ -493,19 +586,50 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                           ),
                                                         ),
                                                       )
-                                                  )
+                                                  ),
+                                                  if(!setTime)
+                                                    _popUpMenuButton()
                                                 ],
                                               )
                                           ),
                                           ListTile(
+                                            title: new Row(
+                                              children: <Widget>[
+                                                Text("Start Time"),
+                                                Expanded(child: Container()),
+                                                InkWell(
+                                                  onTap: () async {
+                                                    int newTime = await _selectDate(context, startTime);
+                                                    if(newTime != 0)
+                                                      setState(() {
+                                                        startTime = newTime;
+                                                        startDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
+                                                      });
+                                                  },
+                                                  child: Text(startDate),
+                                                )
+                                              ],
+                                            )
+                                          ),
+                                          if(setTime)
+                                            ListTile(
                                               title: new Row(
                                                 children: <Widget>[
-                                                  Text("Start Time:\t"),
+                                                  Text("End Time"),
                                                   Expanded(child: Container()),
-                                                  Text(startDate),
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      int newTime = await _selectDate(context, endTime);
+                                                      setState(() {
+                                                        endTime = newTime;
+                                                        endDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
+                                                      });
+                                                    },
+                                                    child: Text(endDate),
+                                                  )
                                                 ],
                                               )
-                                          ),
+                                            ),
                                         ]
                                     )
                                 ),
@@ -558,7 +682,9 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: <Widget>[
                                           ListTile(
-                                              onTap:(){saveSession();},
+                                              onTap:(){
+                                                saveSession();
+                                                },
                                               title: Text("Finish Session",
                                                 style: TextStyle(
                                                   fontSize: 18,

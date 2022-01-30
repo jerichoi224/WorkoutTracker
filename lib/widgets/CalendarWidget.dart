@@ -129,6 +129,7 @@ class _CalendarState extends State<CalendarWidget>{
         ));
     if(result.runtimeType == bool && result)
     {
+      sessionsToday = _getEventsForDay(DateTime.now());
       setState(() {});
     }
   }
@@ -221,7 +222,6 @@ class _CalendarState extends State<CalendarWidget>{
                 floating: false,
                 backgroundColor: Colors.amberAccent,
                 expandedHeight: 100.0,
-//                actions: _buildActions(),
                 flexibleSpace: const FlexibleSpaceBar(
                   title: Text('Calendar'),
                 ),

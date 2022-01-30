@@ -83,8 +83,6 @@ class _DashboardState extends State<DashboardWidget>{
 
   @override
   Widget build(BuildContext context) {
-    final double circleBorderWidth = 8.0;
-
     return GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
@@ -96,7 +94,6 @@ class _DashboardState extends State<DashboardWidget>{
                 floating: false,
                 backgroundColor: Colors.amberAccent,
                 expandedHeight: 100.0,
-//                actions: _buildActions(),
                 flexibleSpace: const FlexibleSpaceBar(
                   title: Text('Dashboard'),
                 ),
