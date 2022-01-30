@@ -374,6 +374,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       SessionItem item = new SessionItem();
       item.workoutId = i.entry.id;
       item.time = endTime;
+      item.metric = i.entry.metric;
       for(int j = 0; j < i.numSets; j++)
       {
         item.sets.add(SetItem(

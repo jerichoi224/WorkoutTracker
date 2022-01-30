@@ -94,7 +94,7 @@ final _entities = <ModelEntity>[
   ModelEntity(
       id: const IdUid(5, 2106140805026109026),
       name: 'SessionItem',
-      lastPropertyId: const IdUid(3, 5909040904623200500),
+      lastPropertyId: const IdUid(4, 7902241780122069535),
       flags: 0,
       properties: <ModelProperty>[
         ModelProperty(
@@ -111,6 +111,11 @@ final _entities = <ModelEntity>[
             id: const IdUid(3, 5909040904623200500),
             name: 'workoutId',
             type: 6,
+            flags: 0),
+        ModelProperty(
+            id: const IdUid(4, 7902241780122069535),
+            name: 'metric',
+            type: 9,
             flags: 0)
       ],
       relations: <ModelRelation>[
@@ -349,10 +354,12 @@ ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (SessionItem object, fb.Builder fbb) {
-          fbb.startTable(4);
+          final metricOffset = fbb.writeString(object.metric);
+          fbb.startTable(5);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.time);
           fbb.addInt64(2, object.workoutId);
+          fbb.addOffset(3, metricOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -364,7 +371,9 @@ ModelDefinition getObjectBoxModel() {
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
             ..time = const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0)
             ..workoutId =
-                const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0)
+            ..metric =
+                const fb.StringReader().vTableGet(buffer, rootOffset, 10, '');
           InternalToManyAccess.setRelInfo(
               object.sets,
               store,
@@ -537,6 +546,10 @@ class SessionItem_ {
   /// see [SessionItem.workoutId]
   static final workoutId =
       QueryIntegerProperty<SessionItem>(_entities[2].properties[2]);
+
+  /// see [SessionItem.metric]
+  static final metric =
+      QueryStringProperty<SessionItem>(_entities[2].properties[3]);
 
   /// see [SessionItem.sets]
   static final sets =

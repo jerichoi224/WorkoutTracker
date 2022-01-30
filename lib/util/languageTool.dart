@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:intl/intl.dart';
 
 bool isKorean(String text)
 {
@@ -16,6 +17,17 @@ extension StringExtension on String {
     return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
   }
 }
+
+extension DoubleExtension on double {
+  String toStringRemoveTrailingZero() {
+    NumberFormat formatter = NumberFormat();
+    formatter.minimumFractionDigits = 0;
+    formatter.maximumFractionDigits = 2;
+    return formatter.format(this);
+  }
+}
+
+
 
 String getKoreanFirstVowel(String text)
 {

@@ -78,7 +78,7 @@
     },
     {
       "id": "5:2106140805026109026",
-      "lastPropertyId": "3:5909040904623200500",
+      "lastPropertyId": "4:7902241780122069535",
       "name": "SessionItem",
       "properties": [
         {
@@ -96,6 +96,11 @@
           "id": "3:5909040904623200500",
           "name": "workoutId",
           "type": 6
+        },
+        {
+          "id": "4:7902241780122069535",
+          "name": "metric",
+          "type": 9
         }
       ],
       "relations": [

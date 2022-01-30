@@ -45,7 +45,11 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     startTime = sessionEntry!.startTime;
     endTime = sessionEntry!.endTime;
     partList = sessionEntry!.parts;
-    timeRange = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime)) + " - " + timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
+
+    int duration = (endTime - startTime)~/60000;
+    if(duration > 60)
+      timeRange += (duration ~/ 60).toString() + "hr ";
+    timeRange += (duration % 60).toString() + " min";
 
     for(SessionItem item in sessionEntry!.sets)
     {
@@ -230,12 +234,104 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     );
   }
 
-  String overViewText()
+  Widget overviewText()
   {
-    String overview = "";
-    overview += "Workout Count: " + sessionEntry!.sets.length.toString();
+    List<TableRow> overviewInfo = [];
+    TextStyle titleStyle = TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+        color: Colors.black87,
+        height: 1.5
+    );
+    TextStyle contentStyle = TextStyle(
+        fontSize: 14,
+        color: Colors.black87,
+        height: 1.5
+    );
 
-    return overview;
+    overviewInfo.add(TableRow(children: [
+      Text('Workout Count',
+          textAlign: TextAlign.left,
+          style: titleStyle
+
+      ),
+      Text(sessionEntry!.sets.length.toString(),
+          textAlign: TextAlign.left,
+          style: contentStyle
+      ),
+    ]));
+
+    double weight = 0;
+    double distance = 0;
+    double floors = 0;
+    for(SessionItem item in sessionEntry!.sets)
+      {
+        if(item.metric == MetricType.kg.name)
+          {
+            for(SetItem set in item.sets)
+              {
+                weight += set.countValue * set.metricValue;
+              }
+          }
+        else if(item.metric == MetricType.km.name)
+          {
+            for(SetItem set in item.sets)
+            {
+              distance += set.metricValue;
+            }
+          }
+        else if(item.metric == MetricType.floor.name)
+          {
+            for(SetItem set in item.sets)
+            {
+              floors += set.metricValue;
+            }
+          }
+      }
+
+    if(weight != 0)
+      overviewInfo.add(TableRow(children: [
+        Text('Total Weight',
+          textAlign: TextAlign.left,
+            style: titleStyle
+
+        ),
+        Text(weight.toStringRemoveTrailingZero() + "kg",
+          textAlign: TextAlign.left,
+            style: contentStyle
+        ),
+      ]));
+    if(distance != 0)
+      overviewInfo.add(TableRow(children: [
+        Text('Total Distance',
+            textAlign: TextAlign.left,
+            style: titleStyle
+        ),
+        Text(distance.toStringRemoveTrailingZero() + "km",
+            textAlign: TextAlign.left,
+            style: contentStyle
+        ),
+      ]));
+    if(floors != 0)
+      overviewInfo.add(TableRow(children: [
+        Text('Stairs',
+            textAlign: TextAlign.left,
+            style: titleStyle
+        ),
+        Text(floors.toStringRemoveTrailingZero() + " floors",
+            textAlign: TextAlign.left,
+            style: contentStyle
+        ),
+      ]));
+
+    return Table(
+      border: TableBorder(),
+      columnWidths: const <int, TableColumnWidth>{
+        0: FixedColumnWidth(110),
+        1: FlexColumnWidth(),
+      },
+      children: overviewInfo,
+    );
   }
 
   Widget _BuildSets(BuildContext context, int index, int cardInd) {
@@ -362,10 +458,31 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text(timeRange,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey
+                                    child: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(sessionEntry!.startTime)) + "\t",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey
+                                            ),
+                                          ),
+                                          WidgetSpan(
+                                            child: Icon(
+                                                Icons.timer,
+                                                size: 16,
+                                               color: Colors.grey,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: timeRange,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     )
                                 ),
@@ -395,13 +512,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
                                               title: new Row(
                                                 children: <Widget>[
                                                   new Flexible(
-                                                      child: new Text(
-                                                          overViewText(),
-                                                        style: TextStyle(
-                                                          color: Colors.black87,
-                                                          fontSize: 14
-                                                        ),
-                                                      )
+                                                    child: overviewText(),
                                                   )
                                                 ],
                                               )
