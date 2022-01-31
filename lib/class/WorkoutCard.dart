@@ -1,6 +1,7 @@
 // Class used in Routines. A Single Class is a Single Workout Entry in a routine.
 import 'package:flutter/widgets.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/util/languageTool.dart';
 
 class WorkoutCard {
   int id = 0;
@@ -25,7 +26,7 @@ class WorkoutCard {
     TextEditingController metricTextController = new TextEditingController();
     TextEditingController countTextController = new TextEditingController();
     if(metric != 0)
-      metricTextController.text  = metric.toString();
+      metricTextController.text  = metric.toStringRemoveTrailingZero();
     if(count != 0)
       countTextController.text  = count.toString();
 

@@ -324,21 +324,21 @@ ModelDefinition getObjectBoxModel() {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
 
-          final object = WorkoutEntry()
+          final object = WorkoutEntry(
+              metric:
+                  const fb.StringReader().vTableGet(buffer, rootOffset, 18, ''),
+              type:
+                  const fb.StringReader().vTableGet(buffer, rootOffset, 20, ''),
+              partList:
+                  const fb.ListReader<String>(fb.StringReader(), lazy: false)
+                      .vTableGet(buffer, rootOffset, 26, []),
+              caption:
+                  const fb.StringReader().vTableGet(buffer, rootOffset, 14, ''))
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
             ..description =
                 const fb.StringReader().vTableGet(buffer, rootOffset, 8, '')
-            ..caption =
-                const fb.StringReader().vTableGet(buffer, rootOffset, 14, '')
             ..prevSessionId =
                 const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0)
-            ..metric =
-                const fb.StringReader().vTableGet(buffer, rootOffset, 18, '')
-            ..type =
-                const fb.StringReader().vTableGet(buffer, rootOffset, 20, '')
-            ..partList =
-                const fb.ListReader<String>(fb.StringReader(), lazy: false)
-                    .vTableGet(buffer, rootOffset, 26, [])
             ..visible =
                 const fb.BoolReader().vTableGet(buffer, rootOffset, 28, false);
 

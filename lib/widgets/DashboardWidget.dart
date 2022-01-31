@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/widgets/Session/RoutineListWidget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardWidget extends StatefulWidget {
   late ObjectBox objectbox;
-
   DashboardWidget({Key? key, required this.objectbox}) : super(key: key);
 
   @override
@@ -13,9 +13,18 @@ class DashboardWidget extends StatefulWidget {
 }
 
 class _DashboardState extends State<DashboardWidget>{
+  String username = "";
 
   void initState() {
     super.initState();
+    getUsername();
+  }
+
+  getUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? getName = prefs.getString('username');
+    username = getName != null ? getName : "User";
+    setState(() {});
   }
 
   Widget profileCard()
@@ -135,7 +144,7 @@ class _DashboardState extends State<DashboardWidget>{
                                                   )
                                               ),
                                               TextSpan(
-                                                  text: "[UserName]\n",
+                                                  text: username + "\n",
                                                   style: TextStyle(
                                                       color: Colors.black87,
                                                       fontSize: 22,

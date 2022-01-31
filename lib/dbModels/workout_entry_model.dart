@@ -12,5 +12,11 @@ class WorkoutEntry {
   int prevSessionId = -1;
   bool visible = true;
 
-  WorkoutEntry();
+  WorkoutEntry(
+  {
+    required this.metric,
+    required this.type,
+    required this.partList,
+    required this.caption
+  });
 }

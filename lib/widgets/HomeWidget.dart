@@ -21,7 +21,7 @@ class _HomeState extends State<HomeWidget>{
   final pageController = PageController(initialPage: 2);
   int _currentIndex = 2;
   bool ready = false;
-
+  String? username = "";
   @override
   void initState(){
     super.initState();

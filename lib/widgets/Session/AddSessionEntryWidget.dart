@@ -11,6 +11,7 @@ import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
+import 'package:workout_tracker/util/languageTool.dart';
 
 class AddSessionEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -20,12 +21,6 @@ class AddSessionEntryWidget extends StatefulWidget {
 
   @override
   State createState() => _AddSessionEntryState();
-}
-
-extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
-  }
 }
 
 class _AddSessionEntryState extends State<AddSessionEntryWidget> {
@@ -278,7 +273,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
           {
             if(sessionItem.sets.length > index)
             {
-              prev = sessionItem.sets[index].metricValue.toString();
+              prev = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
               if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
                 prev += " " + workoutCardList[cardInd].entry.metric;
               if(workoutCardList[cardInd].entry.metric == MetricType.kg.name || workoutCardList[cardInd].entry.metric == MetricType.none.name)
@@ -399,6 +394,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
             cardItem.remove(i);
         }
 
+      // if there's an invalid WorkoutCard, skip it.
       bool skip = true;
       for(int i = 0; i < cardItem.numSets; i++) {
         if ((cardItem.metricController[i].text.isNotEmpty && cardItem.countController[i].text.isNotEmpty) ||
@@ -413,6 +409,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       if(skip)
         continue;
 
+      // Create SessionItem from WorkoutCard
       SessionItem item = new SessionItem();
       item.workoutId = cardItem.entry.id;
       item.time = endTime;
@@ -426,14 +423,23 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       }
       tempList.add(item);
       widget.objectbox.sessionItemBox.put(item);
+      widget.objectbox.itemList.add(item);
 
+      // update workout Entry Previous Session Ids.
       WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
-      if(workoutEntry.prevSessionId == -1 || widget.objectbox.itemList.firstWhere((element) => element.id == workoutEntry.prevSessionId).time <= item.time)
+      List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id).toList();
+
+      if(itemsForWorkout.length == 0)
+        workoutEntry.prevSessionId = -1;
+      else
       {
-        workoutEntry.prevSessionId = item.id;
-        widget.objectbox.workoutBox.put(workoutEntry);
+        itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
+        workoutEntry.prevSessionId = itemsForWorkout[0].id;
       }
+      widget.objectbox.workoutBox.put(workoutEntry);
     }
+
+    // if there's nothing to add return.
     if(tempList.length == 0)
     {
       final snackBar = SnackBar(
@@ -443,17 +449,18 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       return;
     }
 
+    // if editing, remove previous items.
     List<SessionItem> removeItems = [];
     if(widget.edit)
+    {
+      // remove and remap previous session for the workouts.
+      // if the session being changed is the previous session for the workout
+      // look for the previous again.
+      for(SessionItem item in sessionEntry!.sets)
       {
-        // remove and remap previous session for the workouts.
-        // if the session being changed is the previous session for the workout
-        // look for the previous again.
-        for(SessionItem item in sessionEntry!.sets)
-        {
-          removeItems.add(item);
-        }
+        removeItems.add(item);
       }
+    }
     sessionEntry!.sets.clear();
 
     // add the new session
@@ -466,29 +473,28 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     // update list and previous session id for workout entries
     for(SessionItem item in removeItems)
     {
-        WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
-        widget.objectbox.sessionItemBox.remove(item.id);
-        widget.objectbox.itemList.remove(item);
-        if(workoutEntry.prevSessionId == item.id)
-        {
-          List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id).toList();
-          if(itemsForWorkout.length == 0)
-            workoutEntry.prevSessionId = -1;
-          else
-            {
-              itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
-              workoutEntry.prevSessionId = itemsForWorkout[0].id;
-            }
-
-          widget.objectbox.workoutBox.put(workoutEntry);
-        }
+      WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
+      widget.objectbox.sessionItemBox.remove(item.id);
+      widget.objectbox.itemList.remove(item);
+      if(workoutEntry.prevSessionId == item.id || workoutEntry.prevSessionId == -1)
+      {
+        List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id && element.id != item.id).toList();
+        if(itemsForWorkout.length == 0)
+          workoutEntry.prevSessionId = -1;
+        else
+          {
+            itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
+            workoutEntry.prevSessionId = itemsForWorkout[0].id;
+          }
+        widget.objectbox.workoutBox.put(workoutEntry);
+      }
     }
 
     // update all lists that changed.
     if(!widget.edit)
       widget.objectbox.sessionList.add(sessionEntry!);
     widget.objectbox.itemList = widget.objectbox.sessionItemBox.getAll();
-    print(widget.objectbox.itemList.length);
+    print(widget.objectbox.sessionList.length);
     Navigator.pop(context, true);
   }
 
@@ -530,7 +536,6 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     if(pickedTime == null)
       return 0;
 
-    print(pickedTime.toString());
     DateTime picked = new DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
 
     return picked.millisecondsSinceEpoch;

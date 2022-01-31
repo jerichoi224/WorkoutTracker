@@ -4,6 +4,7 @@ import 'package:workout_tracker/dbModels/set_item_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
@@ -61,21 +62,24 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
 
 
   /// Create one series with sample hard coded data.
-  List<charts.Series<ChartData, int>> _createChartData() {
-    List<SessionItem> sessions = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry!.id).toList();
+  List<charts.Series<ChartData, DateTime>> _createChartData() {
+    sessions.sort((a, b) => b.time.compareTo(a.time));
 
+    /*
     if(sessions.length > 10)
       {
-        sessions.sort((a, b) => a.time.compareTo(b.time));
         sessions = sessions.sublist(0, 10);
       }
+    */
+    sessions = sessions.reversed.toList();
 
     List<ChartData> data= [];
+
     for(SessionItem sessionItem in sessions)
       {
         double max = -1;
         double sum = 0;
-        int date = sessionItem.time;
+        DateTime date = DateTime.fromMillisecondsSinceEpoch(sessionItem.time);
         for(SetItem setItem in sessionItem.sets)
           {
             if(max < setItem.metricValue)
@@ -84,12 +88,22 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
           }
         data.add(ChartData(date, max, sum/sessionItem.sets.length));
       }
+
+    data.insert(0, ChartData(data[0].date.subtract(Duration(days: 1)), null, null));
+    data.add(ChartData(data.last.date.add(Duration(days: 1)), null, null));
     return [
-      new charts.Series<ChartData, int>(
+      new charts.Series<ChartData, DateTime>(
         id: 'Max Weight',
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
         domainFn: (ChartData chartData, _) => chartData.date,
         measureFn: (ChartData chartData, _) => chartData.maxVal,
+        data: data,
+      ),
+      new charts.Series<ChartData, DateTime>(
+        id: 'Avg Weight',
+        colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
+        domainFn: (ChartData chartData, _) => chartData.date,
+        measureFn: (ChartData chartData, _) => chartData.avgVal,
         data: data,
       )
     ];
@@ -113,11 +127,6 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
           }
       ),
     ];
-  }
-
-  String _formatDate(num? date) {
-    final dateFormatter = new DateFormat('yyyy/MM/dd');
-    return dateFormatter.format(DateTime.fromMillisecondsSinceEpoch(date!.toInt()));
   }
 
   @override
@@ -244,26 +253,37 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                       ),
                                     )
                                   ),
-                                Container(
-                                    margin: const EdgeInsets.only(top: 10),
-                                    height: 200,
-                                    child: new charts.LineChart(
-                                      _createChartData(),
-                                      animate: false,
-                                      domainAxis: new charts.NumericAxisSpec(
-                                          tickProviderSpec: new charts.BasicNumericTickProviderSpec(
-                                            zeroBound: false,
+                                if(sessions.length > 0)
+                                  if(workoutEntry!.metric == MetricType.kg.name)
+                                    Container(
+                                        margin: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                        height: 200,
+                                        child: new charts.TimeSeriesChart(
+                                          _createChartData(),
+                                          animate: false,
+                                          dateTimeFactory: const charts.LocalDateTimeFactory(),
+                                          defaultRenderer: new charts.LineRendererConfig(includePoints: true),
+                                          domainAxis: new charts.DateTimeAxisSpec(
+                                            showAxisLine: false,
+                                            tickProviderSpec: charts.DayTickProviderSpec(increments: [5]),
                                           ),
-                                          tickFormatterSpec: charts.BasicNumericTickFormatterSpec(
-                                            _formatDate,
-                                          ),
-                                          renderSpec: charts.GridlineRendererSpec(
-                                            tickLengthPx: 0,
-                                            labelOffsetFromAxisPx: 12,
-                                          )
-                                      ),
-                                    ),
-                                )
+                                          behaviors: [
+                                            charts.LinePointHighlighter(
+                                              drawFollowLinesAcrossChart: true,
+                                              showHorizontalFollowLine: charts.LinePointHighlighterFollowLineType.all,
+                                            ),
+                                            new charts.SeriesLegend(
+                                              position: charts.BehaviorPosition.bottom,
+                                              outsideJustification: charts.OutsideJustification.middleDrawArea,
+                                              horizontalFirst: false,
+                                              desiredMaxRows: 2,
+                                              cellPadding: new EdgeInsets.only(right: 4.0, bottom: 4.0),
+                                              entryTextStyle: charts.TextStyleSpec(
+                                                  fontSize: 11),
+                                            )
+                                          ],
+                                        ),
+                                    )
                               ],
                             )
                         )
@@ -275,9 +295,9 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
 }
 
 class ChartData {
-  int date = 0;
-  double maxVal = 0;
-  double avgVal = 0;
+  DateTime date = DateTime.now();
+  double? maxVal = 0;
+  double? avgVal = 0;
 
   ChartData(this.date, this.maxVal, this.avgVal);
 }

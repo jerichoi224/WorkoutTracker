@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget{
         home: MainApp(),
         routes: <String, WidgetBuilder>{
           '/home': (BuildContext context) => new HomeWidget(parentCtx: context, objectbox: objectbox),
-          '/splash': (BuildContext context) => new InstructionWidget(),
+          '/splash': (BuildContext context) => new InstructionWidget(parentCtx: context, objectbox: objectbox),
         }
     );
   }
@@ -48,11 +48,9 @@ class _MainState extends State<MainApp> {
 
   Future checkFirstSeen() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool _seen = (prefs.getBool('seen') ?? false);
+    bool firstTime = (prefs.getBool('firstTime') ?? true);
 
-    // TODO: Implement Instruction screen properly
-    _seen = true;
-    if (_seen) {
+    if (!firstTime) {
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
     } else {
       Navigator.of(context).pushNamedAndRemoveUntil('/splash', (Route<dynamic> route) => false);
@@ -64,7 +62,11 @@ class _MainState extends State<MainApp> {
       checkFirstSeen();
     });
     return Scaffold(
-        body: new Container()
+      body: Center(
+        child: Container(
+          child:Text("Splash")
+        )
+      )
     );
   }
 }
