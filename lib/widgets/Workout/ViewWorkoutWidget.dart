@@ -7,8 +7,7 @@ import 'package:workout_tracker/util/languageTool.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ViewWorkoutWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -60,21 +59,11 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
       }
   }
 
-
-  /// Create one series with sample hard coded data.
-  List<charts.Series<ChartData, DateTime>> _createChartData() {
+  List<LineSeries<WeightChartData, DateTime>> _createWeightChartData() {
     sessions.sort((a, b) => b.time.compareTo(a.time));
-
-    /*
-    if(sessions.length > 10)
-      {
-        sessions = sessions.sublist(0, 10);
-      }
-    */
     sessions = sessions.reversed.toList();
 
-    List<ChartData> data= [];
-
+    List<WeightChartData> data= [];
     for(SessionItem sessionItem in sessions)
       {
         double max = -1;
@@ -86,25 +75,88 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
               max = setItem.metricValue;
             sum += setItem.metricValue;
           }
-        data.add(ChartData(date, max, sum/sessionItem.sets.length));
+        data.add(WeightChartData(date, max, sum/sessionItem.sets.length));
       }
 
-    data.insert(0, ChartData(data[0].date.subtract(Duration(days: 1)), null, null));
-    data.add(ChartData(data.last.date.add(Duration(days: 1)), null, null));
-    return [
-      new charts.Series<ChartData, DateTime>(
-        id: 'Max Weight',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (ChartData chartData, _) => chartData.date,
-        measureFn: (ChartData chartData, _) => chartData.maxVal,
-        data: data,
+    return <LineSeries<WeightChartData, DateTime>>[
+      LineSeries<WeightChartData, DateTime>(
+        name: "Max Weight",
+        // Bind data source
+          dataSource: data,
+          xValueMapper: (WeightChartData dataPoint, _) => dataPoint.date,
+          yValueMapper: (WeightChartData dataPoint, _) => dataPoint.maxVal,
+          markerSettings: MarkerSettings(
+            isVisible: true,
+            height: 4,
+            width: 4,
+            shape: DataMarkerType.circle,
+            borderWidth: 1
+          ),
       ),
-      new charts.Series<ChartData, DateTime>(
-        id: 'Avg Weight',
-        colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-        domainFn: (ChartData chartData, _) => chartData.date,
-        measureFn: (ChartData chartData, _) => chartData.avgVal,
-        data: data,
+      LineSeries<WeightChartData, DateTime>(
+        // Bind data source
+          name: "Avg Weight",
+          dataSource:  data,
+          xValueMapper: (WeightChartData dataPoint, _) => dataPoint.date,
+          yValueMapper: (WeightChartData dataPoint, _) => dataPoint.avgVal,
+          markerSettings: MarkerSettings(
+              isVisible: true,
+              height: 4,
+              width: 4,
+              shape: DataMarkerType.circle,
+              borderWidth: 1
+          ),
+      )
+    ];
+  }
+
+  List<LineSeries<CountChartData, DateTime>> _createCountChartData() {
+    sessions.sort((a, b) => b.time.compareTo(a.time));
+    sessions = sessions.reversed.toList();
+
+    List<CountChartData> data= [];
+    for(SessionItem sessionItem in sessions)
+    {
+      double max = -1;
+      double sum = 0;
+      DateTime date = DateTime.fromMillisecondsSinceEpoch(sessionItem.time);
+      for(SetItem setItem in sessionItem.sets)
+      {
+        if(max < setItem.metricValue)
+          max = setItem.metricValue;
+        sum += setItem.metricValue;
+      }
+      data.add(CountChartData(date, max, sum));
+    }
+
+    return <LineSeries<CountChartData, DateTime>>[
+      LineSeries<CountChartData, DateTime>(
+        name: "Max count (" + workoutEntry!.metric + ")",
+        // Bind data source
+        dataSource: data,
+        xValueMapper: (CountChartData dataPoint, _) => dataPoint.date,
+        yValueMapper: (CountChartData dataPoint, _) => dataPoint.maxVal,
+        markerSettings: MarkerSettings(
+            isVisible: true,
+            height: 4,
+            width: 4,
+            shape: DataMarkerType.circle,
+            borderWidth: 1
+        ),
+      ),
+      LineSeries<CountChartData, DateTime>(
+        // Bind data source
+        name: "Total count (" + workoutEntry!.metric + ")",
+        dataSource:  data,
+        xValueMapper: (CountChartData dataPoint, _) => dataPoint.date,
+        yValueMapper: (CountChartData dataPoint, _) => dataPoint.totalVal,
+        markerSettings: MarkerSettings(
+            isVisible: true,
+            height: 4,
+            width: 4,
+            shape: DataMarkerType.circle,
+            borderWidth: 1
+        ),
       )
     ];
   }
@@ -256,33 +308,43 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                 if(sessions.length > 0)
                                   if(workoutEntry!.metric == MetricType.kg.name)
                                     Container(
-                                        margin: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                        height: 200,
-                                        child: new charts.TimeSeriesChart(
-                                          _createChartData(),
-                                          animate: false,
-                                          dateTimeFactory: const charts.LocalDateTimeFactory(),
-                                          defaultRenderer: new charts.LineRendererConfig(includePoints: true),
-                                          domainAxis: new charts.DateTimeAxisSpec(
-                                            showAxisLine: false,
-                                            tickProviderSpec: charts.DayTickProviderSpec(increments: [5]),
+                                      child: SfCartesianChart(
+                                          primaryXAxis: DateTimeAxis(
+                                              enableAutoIntervalOnZooming: true
                                           ),
-                                          behaviors: [
-                                            charts.LinePointHighlighter(
-                                              drawFollowLinesAcrossChart: true,
-                                              showHorizontalFollowLine: charts.LinePointHighlighterFollowLineType.all,
-                                            ),
-                                            new charts.SeriesLegend(
-                                              position: charts.BehaviorPosition.bottom,
-                                              outsideJustification: charts.OutsideJustification.middleDrawArea,
-                                              horizontalFirst: false,
-                                              desiredMaxRows: 2,
-                                              cellPadding: new EdgeInsets.only(right: 4.0, bottom: 4.0),
-                                              entryTextStyle: charts.TextStyleSpec(
-                                                  fontSize: 11),
-                                            )
-                                          ],
-                                        ),
+                                          legend: Legend(
+                                            isVisible: true,
+                                            position: LegendPosition.bottom
+                                          ),
+                                        margin: EdgeInsets.fromLTRB(15, 15, 15, 10),
+                                        tooltipBehavior: TooltipBehavior( enable: true),
+                                          series: _createWeightChartData(),
+                                          zoomPanBehavior: ZoomPanBehavior(
+                                            enablePinching: true,
+                                            zoomMode: ZoomMode.x,
+                                            enablePanning: true,
+                                          ),
+                                      )
+                                    )
+                                else if([MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(workoutEntry!.metric))
+                                    Container(
+                                        child: SfCartesianChart(
+                                          primaryXAxis: DateTimeAxis(
+                                              enableAutoIntervalOnZooming: true
+                                          ),
+                                          legend: Legend(
+                                              isVisible: true,
+                                              position: LegendPosition.bottom
+                                          ),
+                                          margin: EdgeInsets.fromLTRB(15, 15, 15, 10),
+                                          tooltipBehavior: TooltipBehavior( enable: true),
+                                          series: _createCountChartData(),
+                                          zoomPanBehavior: ZoomPanBehavior(
+                                            enablePinching: true,
+                                            zoomMode: ZoomMode.x,
+                                            enablePanning: true,
+                                          ),
+                                        )
                                     )
                               ],
                             )
@@ -294,10 +356,18 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
   }
 }
 
-class ChartData {
+class WeightChartData {
   DateTime date = DateTime.now();
   double? maxVal = 0;
   double? avgVal = 0;
 
-  ChartData(this.date, this.maxVal, this.avgVal);
+  WeightChartData(this.date, this.maxVal, this.avgVal);
+}
+
+class CountChartData {
+  DateTime date = DateTime.now();
+  double? maxVal = 0;
+  double? totalVal = 0;
+
+  CountChartData(this.date, this.maxVal, this.totalVal);
 }

@@ -27,7 +27,8 @@ extension DoubleExtension on double {
   }
 }
 
-
+final dateFormatter = new DateFormat('yy/MM/dd');
+final timeFormatter = new DateFormat('yyyy/MM/dd HH:mm');
 
 String getKoreanFirstVowel(String text)
 {

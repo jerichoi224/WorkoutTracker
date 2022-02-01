@@ -34,6 +34,8 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
   int year = 0;
   int month = 0;
 
+  bool modified = false;
+
   TextStyle titleStyle = TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.bold,
@@ -145,7 +147,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
           String setText = "\t\t\t" + set.metricValue.toStringRemoveTrailingZero();
           if(workoutEntry.metric != MetricType.none.name)
             setText += " " + workoutEntry.metric;
-          if(workoutEntry.metric == MetricType.kg.name || workoutEntry.metric == MetricType.none.name)
+          if(![MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutEntry.metric))
             setText += " × " + set.countValue.toString();
           detailsInfo.add(TableRow(children: [
             Text(setText,
@@ -281,6 +283,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
 
     if(result)
     {
+      modified = true;
       updateInfo();
     }
   }
@@ -289,7 +292,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async{
-          Navigator.pop(context, false);
+          Navigator.pop(context, modified);
           return true;
         },
         child: new GestureDetector(

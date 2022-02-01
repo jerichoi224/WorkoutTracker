@@ -3,7 +3,7 @@ import 'package:workout_tracker/widgets/DashboardWidget.dart';
 import 'package:workout_tracker/widgets/CalendarWidget.dart';
 import 'package:workout_tracker/widgets/Routine/RoutineWidget.dart';
 import 'package:workout_tracker/widgets/Workout/WorkoutWidget.dart';
-import 'package:workout_tracker/widgets/SettingsWidget.dart';
+import 'package:workout_tracker/widgets/Setting/SettingsWidget.dart';
 
 class HomeWidget extends StatefulWidget {
   final BuildContext parentCtx;

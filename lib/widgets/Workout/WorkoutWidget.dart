@@ -25,13 +25,13 @@ class _WorkoutState extends State<WorkoutWidget> {
 
   // Navigate to AddWorkout screen
   void _AddWorkoutEntry(BuildContext context) async {
-    bool result = await Navigator.push(
+    final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => AddWorkoutEntryWidget(objectbox: widget.objectbox, edit:false, id:0),
         ));
 
-    if(result)
+    if(result.runtimeType == bool && result)
       {
         setState(() {});
       }

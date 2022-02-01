@@ -27,8 +27,6 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   String defaultName = "";
   String startDate = "";
   String endDate = "";
-  final timeFormatter = new DateFormat('yyyy/MM/dd HH:mm');
-  final dateFormatter = new DateFormat('yyyy/MM/dd');
   List<WorkoutEntry> workoutEntryList = [];
   List<WorkoutCard> workoutCardList = [];
   bool setTime = false;
@@ -276,7 +274,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               prev = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
               if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
                 prev += " " + workoutCardList[cardInd].entry.metric;
-              if(workoutCardList[cardInd].entry.metric == MetricType.kg.name || workoutCardList[cardInd].entry.metric == MetricType.none.name)
+              if(![MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutCardList[cardInd].entry.metric))
                 prev += " × " + sessionItem.sets[index].countValue.toString();
             }
           }
@@ -313,30 +311,30 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
           ),
             if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
               new Text(" " + workoutCardList[cardInd].entry.metric),
-            if(workoutCardList[cardInd].entry.metric == MetricType.kg.name || workoutCardList[cardInd].entry.metric == MetricType.none.name)
+            if(![MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutCardList[cardInd].entry.metric))
               new Text(" × "),
-            if(workoutCardList[cardInd].entry.metric == MetricType.kg.name || workoutCardList[cardInd].entry.metric == MetricType.none.name)
-            new Container(
-              width: 65,
-              height: 40,
-              child: new TextField(
-                cursorColor: Colors.black54,
-                maxLength: 4,
-                keyboardType: TextInputType.number,
-                controller: workoutCardList[cardInd].countController[index],
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      // width: 0.0 produces a thin "hairline" border
-                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                      borderSide: BorderSide.none,
-                      //borderSide: const BorderSide(),
-                    ),
-                    counterText: "",
-                    fillColor: Color.fromRGBO(240, 240, 240, 1),
-                    filled: true
+            if(![MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutCardList[cardInd].entry.metric))
+              new Container(
+                width: 65,
+                height: 40,
+                child: new TextField(
+                  cursorColor: Colors.black54,
+                  maxLength: 4,
+                  keyboardType: TextInputType.number,
+                  controller: workoutCardList[cardInd].countController[index],
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        // width: 0.0 produces a thin "hairline" border
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        borderSide: BorderSide.none,
+                        //borderSide: const BorderSide(),
+                      ),
+                      counterText: "",
+                      fillColor: Color.fromRGBO(240, 240, 240, 1),
+                      filled: true
+                  ),
                 ),
               ),
-            ),
         ],
       ),
       trailing: new Container(
@@ -388,7 +386,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
         {
           if(cardItem.metricController[i].text.isEmpty && cardItem.countController[i].text.isEmpty)
             cardItem.remove(i);
-          else if((cardItem.entry.metric == MetricType.km.name || cardItem.entry.metric == MetricType.floor.name) && cardItem.metricController[i].text.isEmpty)
+          else if(![MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(cardItem.entry.metric)  && cardItem.metricController[i].text.isEmpty)
             cardItem.remove(i);
           else if (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[i].text.isEmpty)
             cardItem.remove(i);
@@ -398,7 +396,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       bool skip = true;
       for(int i = 0; i < cardItem.numSets; i++) {
         if ((cardItem.metricController[i].text.isNotEmpty && cardItem.countController[i].text.isNotEmpty) ||
-            ((cardItem.entry.metric == MetricType.km.name || cardItem.entry.metric == MetricType.floor.name) && cardItem.metricController[i].text.isNotEmpty) ||
+            ([MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(cardItem.entry.metric) && cardItem.metricController[i].text.isNotEmpty) ||
             (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[i].text.isNotEmpty)
         )
         {
@@ -433,7 +431,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
         workoutEntry.prevSessionId = -1;
       else
       {
-        itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
+        itemsForWorkout.sort((a, b) => b.time.compareTo(a.time));
         workoutEntry.prevSessionId = itemsForWorkout[0].id;
       }
       widget.objectbox.workoutBox.put(workoutEntry);
@@ -483,7 +481,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
           workoutEntry.prevSessionId = -1;
         else
           {
-            itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
+            itemsForWorkout.sort((a, b) => b.time.compareTo(a.time));
             workoutEntry.prevSessionId = itemsForWorkout[0].id;
           }
         widget.objectbox.workoutBox.put(workoutEntry);
@@ -625,7 +623,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                   InkWell(
                                                     onTap: () async {
                                                       int newTime = await _selectDate(context, endTime);
-                                                      setState(() {
+                                                      if(newTime != 0)
+                                                        setState(() {
                                                         endTime = newTime;
                                                         endDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
                                                       });

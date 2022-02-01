@@ -36,6 +36,10 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
         descriptionController.text = newEntry!.description;
       }
     else{
+      partList = [];
+      type = WorkoutType.other.name;
+      metric = MetricType.kg.name;
+      caption = "";
       newEntry = new WorkoutEntry(metric: metric, type: type, partList: partList, caption: caption);
     }
   }

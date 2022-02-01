@@ -22,5 +22,6 @@ enum MetricType {
   km,
   kg,
   floor,
+  reps,
   none,
 }
