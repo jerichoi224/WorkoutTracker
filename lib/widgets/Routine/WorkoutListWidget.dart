@@ -3,7 +3,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 
-import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/util/StringTool.dart';
 
 class WorkoutListWidget extends StatefulWidget {
   late ObjectBox objectbox;

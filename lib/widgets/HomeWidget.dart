@@ -32,7 +32,7 @@ class _HomeState extends State<HomeWidget>{
     RoutineWidget(objectbox: widget.objectbox),
     DashboardWidget(objectbox: widget.objectbox),
     CalendarWidget(objectbox: widget.objectbox),
-    SettingsWidget(),
+    SettingsWidget(objectbox: widget.objectbox),
   ];
 
   changePage(int index){
@@ -117,7 +117,7 @@ class _HomeState extends State<HomeWidget>{
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.settings),
-            title: new Text('Workout'),
+            title: new Text('Settings'),
           ),
         ],
       ),

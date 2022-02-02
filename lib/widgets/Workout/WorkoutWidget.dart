@@ -3,7 +3,7 @@ import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
-import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/util/StringTool.dart';
 import 'package:workout_tracker/widgets/Workout/ViewWorkoutWidget.dart';
 
 class WorkoutWidget extends StatefulWidget {
@@ -24,7 +24,7 @@ class _WorkoutState extends State<WorkoutWidget> {
   }
 
   // Navigate to AddWorkout screen
-  void _AddWorkoutEntry(BuildContext context) async {
+  void _addWorkoutEntry(BuildContext context) async {
     final result = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -227,7 +227,7 @@ class _WorkoutState extends State<WorkoutWidget> {
       IconButton(
           icon: Icon(Icons.add),
           onPressed: () {
-            _AddWorkoutEntry(context);
+            _addWorkoutEntry(context);
           }
       ),
     ];

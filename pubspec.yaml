@@ -33,6 +33,8 @@ dependencies:
   table_calendar: ^3.0.3
   flutter_spinkit: ^5.1.0
   syncfusion_flutter_charts: ^19.4.48
+  image_picker: ^0.8.4+5
+  image_cropper: ^1.4.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/initialWorkouts.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/util/objectbox.dart';
@@ -26,10 +26,9 @@ class _InstructionState extends State<InstructionWidget>{
   }
 
   finishSplash() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
       nextPage();
-      prefs.setBool('firstTime', false);
-      prefs.setString('username', userName.text);
+      objectbox.setPref('show_instruction', false);
+      objectbox.setPref('user_name', userName.text);
       addInitialWorkouts();
       await Future.delayed(const Duration(seconds: 2), (){});
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);

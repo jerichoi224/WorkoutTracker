@@ -5,7 +5,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
-import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/util/StringTool.dart';
 
 class AddRoutineEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;

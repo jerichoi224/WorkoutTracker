@@ -8,7 +8,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
-import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/util/StringTool.dart';
 import 'package:intl/intl.dart';
 
 class ViewSessionEntryWidget extends StatefulWidget {

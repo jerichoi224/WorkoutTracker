@@ -1,4 +1,6 @@
-import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 bool isKorean(String text)
@@ -43,4 +45,17 @@ String getKoreanFirstVowel(String text)
   int fn = (unicode / 588).toInt();
 
   return f[fn];
+}
+
+String base64toString(Uint8List data)
+{
+  return base64Encode(data);
+}
+
+Image imageFromBase64String(String base64String)
+{
+  return Image.memory(
+      base64Decode(base64String),
+      fit: BoxFit.fill
+  );
 }

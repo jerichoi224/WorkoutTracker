@@ -1,7 +1,7 @@
 // Class used in Routines. A Single Class is a Single Workout Entry in a routine.
 import 'package:flutter/widgets.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
-import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/util/StringTool.dart';
 
 class WorkoutCard {
   int id = 0;

@@ -11,7 +11,7 @@ import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
-import 'package:workout_tracker/util/languageTool.dart';
+import 'package:workout_tracker/util/StringTool.dart';
 
 class AddSessionEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -274,7 +274,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               prev = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
               if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
                 prev += " " + workoutCardList[cardInd].entry.metric;
-              if(![MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutCardList[cardInd].entry.metric))
+              if([MetricType.kg.name, MetricType.none.name].contains(workoutCardList[cardInd].entry.metric))
                 prev += " × " + sessionItem.sets[index].countValue.toString();
             }
           }
@@ -311,9 +311,9 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
           ),
             if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
               new Text(" " + workoutCardList[cardInd].entry.metric),
-            if(![MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutCardList[cardInd].entry.metric))
+            if([MetricType.kg.name, MetricType.none.name].contains(workoutCardList[cardInd].entry.metric))
               new Text(" × "),
-            if(![MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutCardList[cardInd].entry.metric))
+            if([MetricType.kg.name, MetricType.none.name].contains(workoutCardList[cardInd].entry.metric))
               new Container(
                 width: 65,
                 height: 40,

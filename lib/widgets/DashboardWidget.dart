@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/main.dart';
+import 'package:workout_tracker/util/StringTool.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/widgets/Session/RoutineListWidget.dart';
@@ -14,54 +16,87 @@ class DashboardWidget extends StatefulWidget {
 
 class _DashboardState extends State<DashboardWidget>{
   String username = "";
-
+  Image? img_file;
   void initState() {
     super.initState();
     getUsername();
+    getUserImage();
   }
 
   getUsername() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? getName = prefs.getString('username');
+    String? getName = widget.objectbox.getPref('user_name');
     username = getName != null ? getName : "User";
+    setState(() {});
+  }
+
+  getUserImage() async {
+    String? profileImage = widget.objectbox.getPref('profile_image');
+    if(profileImage == null)
+      return;
+
+    img_file = imageFromBase64String(profileImage);
     setState(() {});
   }
 
   Widget profileCard()
   {
-    return Container(
-        height: 120,
-        child: Card(
-          shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0)),
-          margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
-          color: Colors.white,
-          child: new InkWell(
-              borderRadius: BorderRadius.circular(10.0),
-              onTap: () {},
-              child: ListTile(
-                leading: SizedBox(
-                    height: 120,
-                    child: CircleAvatar(
-                      radius: 50.0,
-                      backgroundColor: Colors.brown.shade800,
-                      child: const Text('AH'),
-                    ),
-                ),
-                dense: true,
-                title: RichText(
-                  text: TextSpan(
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: "Name",
-                          style: TextStyle(color: Colors.black)
+    return Card(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0)),
+        margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
+        color: Colors.white,
+        child: new InkWell(
+            borderRadius: BorderRadius.circular(10.0),
+            onTap: () {},
+            child: SizedBox(
+                height: 100,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(10, 5, 5, 5),
+                      child: CircleAvatar(
+                        radius: 43,
+                        backgroundColor: Colors.amberAccent,
+                        child: CircleAvatar(
+                          radius: 40,
+                          child: ClipOval(
+                            child: (img_file != null)
+                                ? img_file
+                                : null,
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-                subtitle: Text("Description"),
+                    ),
+                    Container(
+                      margin: EdgeInsets.fromLTRB(15, 10, 0, 0),
+                      child:RichText(
+                        text: TextSpan(
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: "Welcome back,\n",
+                                style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 17,
+                                    height: 1.2
+                                )
+                            ),
+                            TextSpan(
+                                text: username + "\n",
+                                style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 22,
+                                    height: 1.2
+                                )
+                            ),
+                            // Workout Parts
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
             )
-          )
         )
     );
   }
@@ -110,57 +145,7 @@ class _DashboardState extends State<DashboardWidget>{
               SliverList(
                 delegate: SliverChildListDelegate(
                     [
-                      new Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                          margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
-                          color: Colors.white,
-                          child: new InkWell(
-                              borderRadius: BorderRadius.circular(10.0),
-                              onTap: () {},
-                              child: SizedBox(
-                                  height: 100,
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.fromLTRB(10, 5, 5, 5),
-                                        child: CircleAvatar(
-                                          backgroundColor: Colors.black26,
-                                          radius: 40,
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.fromLTRB(15, 10, 0, 0),
-                                        child:RichText(
-                                          text: TextSpan(
-                                            children: <TextSpan>[
-                                              TextSpan(
-                                                  text: "Welcome back,\n",
-                                                  style: TextStyle(
-                                                      color: Colors.black54,
-                                                      fontSize: 17,
-                                                      height: 1.2
-                                                  )
-                                              ),
-                                              TextSpan(
-                                                  text: username + "\n",
-                                                  style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 22,
-                                                      height: 1.2
-                                                  )
-                                              ),
-                                              // Workout Parts
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                              )
-                          )
-                      ),
+                      profileCard(),
                       Row(
                         children: [
                           Expanded(child: Card(

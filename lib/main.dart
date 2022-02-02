@@ -47,8 +47,7 @@ class _MainState extends State<MainApp> {
   }
 
   Future checkFirstSeen() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool firstTime = (prefs.getBool('firstTime') ?? true);
+    bool firstTime = (objectbox.getPref('show_instruction')) ?? true;
 
     if (!firstTime) {
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
