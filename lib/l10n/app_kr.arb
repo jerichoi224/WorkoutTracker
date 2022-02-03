@@ -57,6 +57,11 @@
   "workout_part": "운동 부위",
   "workout_details": "운동 정보",
   "workout_snackbar_msg": "운동의 이름을 입력해주세요.",
+  "workout_track_record": "운동 기록",
+  "workout_max_weight": "최대 무게",
+  "workout_avg_weight": "평균 무게",
+  "workout_max_count": "최대 횟수",
+  "workout_total_count": "총 횟수",
 
   "session_info": "운동 세션 정보",
   "session_choose_routine": "루틴 선택",

@@ -57,6 +57,11 @@
     "workout_part": "Workout Part",
     "workout_details": "Workout Details",
     "workout_snackbar_msg": "Please enter name for new workout",
+    "workout_track_record": "Track Record",
+    "workout_max_weight": "Max Weight",
+    "workout_avg_weight": "Avg Weight",
+    "workout_max_count": "Max Count",
+    "workout_total_count": "Total Count",
 
     "session_info": "Session Info",
     "session_choose_routine": "Choose Routine",

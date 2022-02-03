@@ -85,7 +85,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
 
     return <LineSeries<WeightChartData, DateTime>>[
       LineSeries<WeightChartData, DateTime>(
-        name: "Max Weight",
+        name: AppLocalizations.of(context)!.workout_max_weight,
         // Bind data source
           dataSource: data,
           xValueMapper: (WeightChartData dataPoint, _) => dataPoint.date,
@@ -100,7 +100,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
       ),
       LineSeries<WeightChartData, DateTime>(
         // Bind data source
-          name: "Avg Weight",
+          name: AppLocalizations.of(context)!.workout_avg_weight,
           dataSource:  data,
           xValueMapper: (WeightChartData dataPoint, _) => dataPoint.date,
           yValueMapper: (WeightChartData dataPoint, _) => dataPoint.avgVal,
@@ -139,7 +139,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
 
     return <LineSeries<CountChartData, DateTime>>[
       LineSeries<CountChartData, DateTime>(
-        name: "Max count (" + workoutEntry!.metric + ")",
+        name: AppLocalizations.of(context)!.workout_max_count + " (" + workoutEntry!.metric + ")",
         // Bind data source
         dataSource: data,
         xValueMapper: (CountChartData dataPoint, _) => dataPoint.date,
@@ -154,7 +154,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
       ),
       LineSeries<CountChartData, DateTime>(
         // Bind data source
-        name: "Total count (" + workoutEntry!.metric + ")",
+        name: AppLocalizations.of(context)!.workout_total_count + " (" + workoutEntry!.metric + ")",
         dataSource:  data,
         xValueMapper: (CountChartData dataPoint, _) => dataPoint.date,
         yValueMapper: (CountChartData dataPoint, _) => dataPoint.totalVal,
@@ -269,7 +269,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                 if(workoutEntry!.description.isNotEmpty)
                                   Container(
                                       padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                      child: Text("Note",
+                                      child: Text(AppLocalizations.of(context)!.note,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Colors.grey
@@ -306,7 +306,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                 if(sessions.length != 0)
                                   Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Track Record",
+                                    child: Text(AppLocalizations.of(context)!.workout_track_record,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
