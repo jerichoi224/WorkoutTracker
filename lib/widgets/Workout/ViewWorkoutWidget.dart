@@ -8,6 +8,7 @@ import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ViewWorkoutWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -201,7 +202,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
             },
             child: new Scaffold(
                 appBar: AppBar(
-                  title: Text("Workout Info"),
+                  title: Text(AppLocalizations.of(context)!.workout_details),
                   backgroundColor: Colors.amberAccent,
                   actions: _buildActions(),
                 ),
@@ -232,7 +233,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                   ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Workout Details",
+                                    child: Text(AppLocalizations.of(context)!.workout_details,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -247,7 +248,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                         ListTile(
                                             title: new Row(
                                               children: <Widget>[
-                                                Text("Type"),
+                                                Text(AppLocalizations.of(context)!.type),
                                                 Spacer(),
                                                 Text(workoutEntry!.type.capitalize()),
                                               ],
@@ -256,7 +257,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                         ListTile(
                                             title: new Row(
                                               children: <Widget>[
-                                                Text("Metric"),
+                                                Text(AppLocalizations.of(context)!.metric),
                                                 Spacer(),
                                                 Text(workoutEntry!.metric.capitalize()),
                                               ],

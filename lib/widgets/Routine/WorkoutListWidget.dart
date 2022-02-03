@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 
 class WorkoutListWidget extends StatefulWidget {
@@ -138,7 +138,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
               autofocus: true,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search),
-                hintText: "Search Workout",
+                hintText: AppLocalizations.of(context)!.workout_search,
                 border: InputBorder.none,
                 filled: true,
                 hintStyle: TextStyle(color: Colors.black12),
@@ -217,7 +217,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
             appBar: AppBar(
-              title: _isSearching ? _buildSearchField() : Text("Workout List"),
+              title: _isSearching ? _buildSearchField() : Text(AppLocalizations.of(context)!.workout_list),
               actions: _buildActions(),
               backgroundColor: Colors.amberAccent,
             ),

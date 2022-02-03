@@ -6,6 +6,7 @@ import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/util/StringTool.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddRoutineEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -134,7 +135,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
     );
   }
 
-  void _openTagPopup()
+  void _openTagPopup(BuildContext buildContext)
   {
     showDialog(
       context: context,
@@ -143,7 +144,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
             builder: (context, setState) {
               return AlertDialog(
                 scrollable: false,
-                title: Text('Choose Parts'),
+                title: Text(AppLocalizations.of(buildContext)!.choose_parts),
                 content: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Wrap(
@@ -153,7 +154,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                 ),
                 actions: [
                   ElevatedButton(
-                      child: Text("Close"),
+                      child: Text(AppLocalizations.of(buildContext)!.close),
                       onPressed: () {
                         Navigator.pop(dialogContext);
                       }
@@ -196,10 +197,10 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
     List<Widget> tagList = [];
 
     for(int i = 0; i < partList.length; i++)
-      tagList.add(tag(partList[i], _openTagPopup, Colors.amberAccent));
+      tagList.add(tag(partList[i], (){_openTagPopup(context);}, Colors.amberAccent));
 
     if(partList.length == 0)
-      tagList.add(tag(" + Add Part  ", _openTagPopup, Color.fromRGBO(230, 230, 230, 0.8)));
+      tagList.add(tag(" + " + AppLocalizations.of(context)!.add_part +"  ", (){_openTagPopup(context);}, Color.fromRGBO(230, 230, 230, 0.8)));
     return tagList;
   }
 
@@ -216,7 +217,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
             },
             child: new Scaffold(
                 appBar: AppBar(
-                  title: Text(widget.edit? "Edit Routine" : "Add Routine"),
+                  title: Text(widget.edit? AppLocalizations.of(context)!.routine_edit_routine : AppLocalizations.of(context)!.routine_add_routine),
                   backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
@@ -228,7 +229,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                 // System Values
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Routine Name",
+                                    child: Text(AppLocalizations.of(context)!.routine_name,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -248,7 +249,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                                         controller: routineNameController,
                                                         decoration: InputDecoration(
                                                           border:InputBorder.none,
-                                                          hintText: "Enter Name",
+                                                          hintText: AppLocalizations.of(context)!.enter_name,
                                                         ),
                                                       )
                                                   )
@@ -260,7 +261,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                                    child: Text("Workout Part",
+                                    child: Text(AppLocalizations.of(context)!.workout_part,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -276,7 +277,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Routine Details",
+                                    child: Text(AppLocalizations.of(context)!.routine_details,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -295,13 +296,13 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                     margin: EdgeInsets.all(8.0),
                                     child: Column(
                                         children: <Widget>[
-                                          AddButton("Add Workout", addWorkout)
+                                          AddButton(AppLocalizations.of(context)!.workout_add_workout, addWorkout)
                                         ]
                                     )
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Note",
+                                    child: Text(AppLocalizations.of(context)!.note,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -324,7 +325,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                                         controller: descriptionController,
                                                         decoration: InputDecoration(
                                                           border:InputBorder.none,
-                                                          hintText: "Add Note",
+                                                          hintText: AppLocalizations.of(context)!.add_note,
                                                         ),
                                                       )
                                                   )
@@ -336,7 +337,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                 ),
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 10),
                                     color: Theme.of(context).colorScheme.primary,
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,7 +346,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                               onTap:(){
                                                 if(routineNameController.text.isEmpty) {
                                                   final snackBar = SnackBar(
-                                                    content: const Text('Please enter name for new routine'),
+                                                    content: Text(AppLocalizations.of(context)!.routine_snackbar_msg),
                                                   );
 
                                                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -361,7 +362,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                                 widget.objectbox.routineList = widget.objectbox.routineBox.getAll();
                                                 Navigator.pop(context, true);
                                               },
-                                              title: Text(widget.edit ? "Save Changes" : "Add Routine",
+                                              title: Text(widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.routine_add_routine,
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                 ),

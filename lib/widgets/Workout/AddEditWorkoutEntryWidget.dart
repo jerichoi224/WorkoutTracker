@@ -4,6 +4,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/util/StringTool.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddWorkoutEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -75,14 +76,14 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
     List<Widget> tagList = [];
 
     for(int i = 0; i < partList.length; i++)
-      tagList.add(tag(partList[i], _openTagPopup, Colors.amberAccent));
+      tagList.add(tag(partList[i], (){_openTagPopup(context);}, Colors.amberAccent));
 
     if(partList.length == 0)
-      tagList.add(tag(" + Add Part  ", _openTagPopup, Color.fromRGBO(230, 230, 230, 0.8)));
+      tagList.add(tag(" + " + AppLocalizations.of(context)!.add_part + "  ", (){_openTagPopup(context);}, Color.fromRGBO(230, 230, 230, 0.8)));
     return tagList;
   }
 
-  void _openTagPopup()
+  void _openTagPopup(BuildContext buildContext)
   {
     showDialog(
         context: context,
@@ -91,7 +92,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
               builder: (context, setState) {
                 return AlertDialog(
                   scrollable: false,
-                  title: Text('Choose Parts'),
+                  title: Text(AppLocalizations.of(buildContext)!.choose_parts),
                   content: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Wrap(
@@ -101,7 +102,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                   ),
                   actions: [
                     ElevatedButton(
-                        child: Text("Close"),
+                        child: Text(AppLocalizations.of(buildContext)!.close),
                         onPressed: () {
                           Navigator.pop(dialogContext);
                         }
@@ -127,7 +128,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
             },
             child: new Scaffold(
                 appBar: AppBar(
-                  title: Text(widget.edit? "Edit Workout" : "Add Workout"),
+                  title: Text(widget.edit? AppLocalizations.of(context)!.workout_edit_workout : AppLocalizations.of(context)!.workout_add_workout),
                   backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
@@ -139,7 +140,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                 // System Values
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Workout Name",
+                                    child: Text(AppLocalizations.of(context)!.workout_name,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -159,7 +160,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                     controller: workoutNameController,
                                                     decoration: InputDecoration(
                                                         border:InputBorder.none,
-                                                        hintText: "Enter Name",
+                                                        hintText: AppLocalizations.of(context)!.enter_name,
                                                       ),
                                                     )
                                                 )
@@ -171,7 +172,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                                    child: Text("Workout Part",
+                                    child: Text(AppLocalizations.of(context)!.workout_part,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -187,7 +188,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Workout Details",
+                                    child: Text(AppLocalizations.of(context)!.workout_details,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -202,7 +203,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                         ListTile(
                                             title: new Row(
                                               children: <Widget>[
-                                                Text("Type"),
+                                                Text(AppLocalizations.of(context)!.type),
                                                 Spacer(),
                                                 DropdownButton<String>(
                                                   value: type,
@@ -237,7 +238,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                         ListTile(
                                             title: new Row(
                                               children: <Widget>[
-                                                Text("Metric"),
+                                                Text(AppLocalizations.of(context)!.metric),
                                                 Spacer(),
                                                 DropdownButton<String>(
                                                   value: metric,
@@ -274,7 +275,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Note",
+                                    child: Text(AppLocalizations.of(context)!.note,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -297,7 +298,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                         controller: descriptionController,
                                                         decoration: InputDecoration(
                                                           border:InputBorder.none,
-                                                          hintText: "Add Note",
+                                                          hintText: AppLocalizations.of(context)!.add_note,
                                                         ),
                                                       )
                                                   )
@@ -309,7 +310,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                 ),
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 10),
                                     color: Theme.of(context).colorScheme.primary,
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,7 +319,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                               onTap:(){
                                                 if(workoutNameController.text.isEmpty) {
                                                   final snackBar = SnackBar(
-                                                    content: const Text('Please enter name for new workout'),
+                                                    content: Text(AppLocalizations.of(context)!.workout_snackbar_msg),
                                                   );
 
                                                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -334,7 +335,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                 widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
                                                 Navigator.pop(context, true);
                                               },
-                                              title: Text(widget.edit ? "Save Changes" : "Add Workout",
+                                              title: Text(widget.edit ? "Save Changes" : AppLocalizations.of(context)!.workout_add_workout,
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                 ),

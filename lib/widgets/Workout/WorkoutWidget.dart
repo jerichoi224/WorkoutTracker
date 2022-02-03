@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 import 'package:workout_tracker/widgets/Workout/ViewWorkoutWidget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WorkoutWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -42,11 +42,11 @@ class _WorkoutState extends State<WorkoutWidget> {
       icon: Icon(Icons.more_vert),
       itemBuilder: (context) => [
         PopupMenuItem(
-          child: Text("Edit"),
+          child: Text(AppLocalizations.of(context)!.edit),
           value: 0,
         ),
         PopupMenuItem(
-          child: Text("Delete"),
+          child: Text(AppLocalizations.of(context)!.delete),
           value: 1,
         ),
       ],
@@ -111,7 +111,7 @@ class _WorkoutState extends State<WorkoutWidget> {
               alignment: Alignment.center,
               margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Text(
-                "No Workout Found.",
+              AppLocalizations.of(context)!.workout_not_found,
                 style: TextStyle(fontSize: 14),
               ),
             )
@@ -191,7 +191,7 @@ class _WorkoutState extends State<WorkoutWidget> {
           autofocus: true,
           decoration: InputDecoration(
             prefixIcon: Icon(Icons.search),
-            hintText: "Search Workout",
+            hintText: AppLocalizations.of(context)!.workout_search,
             border: InputBorder.none,
             filled: true,
             hintStyle: TextStyle(color: Colors.black12),
@@ -279,7 +279,7 @@ class _WorkoutState extends State<WorkoutWidget> {
                 actions: _buildActions(),
                 title: _isSearching ? _buildSearchField() : Container(),
                 flexibleSpace: FlexibleSpaceBar(
-                  title: _isSearching ? Container() : Text("Workout List"),
+                  title: _isSearching ? Container() : Text(AppLocalizations.of(context)!.workout_list),
                 ),
               ),
               SliverList(

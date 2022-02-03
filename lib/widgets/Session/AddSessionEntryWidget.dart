@@ -9,9 +9,9 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
-import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 import 'package:workout_tracker/util/StringTool.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddSessionEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -30,7 +30,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   List<WorkoutEntry> workoutEntryList = [];
   List<WorkoutCard> workoutCardList = [];
   bool setTime = false;
-
+  late RoutineEntry? routineEntry;
   late SessionEntry? sessionEntry;
   final sessionNameController = TextEditingController();
   List<String> partList = [];
@@ -65,16 +65,16 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     else {
       sessionEntry = new SessionEntry();
       DateTime now = new DateTime.now();
-      defaultName = dateFormatter.format(now) + " Workout";
+      defaultName = dateFormatter.format(now);
       startDate = timeFormatter.format(now);
       endDate = timeFormatter.format(now);
       startTime = now.millisecondsSinceEpoch;
       endTime = now.millisecondsSinceEpoch;
       if (widget.fromRoutine) {
-        RoutineEntry routineEntry = widget.objectbox.routineList.firstWhere((
+        routineEntry = widget.objectbox.routineList.firstWhere((
             element) => element.id == widget.id);
-        partList = routineEntry.parts;
-        for (String strId in routineEntry.workoutIds) {
+        partList = routineEntry!.parts;
+        for (String strId in routineEntry!.workoutIds) {
           int id = int.parse(strId);
           addWorkoutToList(
               widget.objectbox.workoutList.firstWhere((element) => element.id ==
@@ -113,14 +113,14 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     List<Widget> tagList = [];
 
     for(int i = 0; i < partList.length; i++)
-      tagList.add(tag(partList[i], _openTagPopup, Colors.amberAccent));
+      tagList.add(tag(partList[i], (){_openTagPopup(context);}, Colors.amberAccent));
 
     if(partList.length == 0)
-      tagList.add(tag(" + Add Part  ", _openTagPopup, Color.fromRGBO(230, 230, 230, 0.8)));
+      tagList.add(tag(" + " + AppLocalizations.of(context)!.add_part + "  ", (){_openTagPopup(context);}, Color.fromRGBO(230, 230, 230, 0.8)));
     return tagList;
   }
 
-  void _openTagPopup()
+  void _openTagPopup(BuildContext buildContext)
   {
     showDialog(
         context: context,
@@ -129,7 +129,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               builder: (context, setState) {
                 return AlertDialog(
                   scrollable: false,
-                  title: Text('Choose Parts'),
+                  title: Text(AppLocalizations.of(buildContext)!.choose_parts),
                   content: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Wrap(
@@ -139,7 +139,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   ),
                   actions: [
                     ElevatedButton(
-                        child: Text("Close"),
+                        child: Text(AppLocalizations.of(buildContext)!.close),
                         onPressed: () {
                           Navigator.pop(dialogContext);
                         }
@@ -255,7 +255,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
               ),
-              AddButton("Add Set", (){AddSet(index, 0, 0);})
+              AddButton(AppLocalizations.of(context)!.session_add_set, (){AddSet(index, 0, 0);})
             ]
         )
     );
@@ -356,14 +356,20 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   {
     if(endTime < startTime) {
       final snackBar = SnackBar(
-        content: const Text('End Time must be after Start Time'),
+        content: Text(AppLocalizations.of(context)!.session_time_msg),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
     }
 
     if(sessionNameController.text.isEmpty)
-      sessionNameController.text = defaultName;
+      {
+        if(widget.fromRoutine)
+          sessionNameController.text = defaultName + " " + routineEntry!.name;
+        else
+          sessionNameController.text = defaultName + " " + AppLocalizations.of(context)!.workout;
+
+      }
     sessionEntry!.name = sessionNameController.text;
     sessionEntry!.parts = partList;
 
@@ -441,7 +447,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     if(tempList.length == 0)
     {
       final snackBar = SnackBar(
-        content: const Text('Please add a valid Workout'),
+        content: Text(AppLocalizations.of(context)!.session_add_workout_msg),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
@@ -501,7 +507,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       icon: Icon(Icons.more_vert),
       itemBuilder: (context) => [
         PopupMenuItem(
-          child: Text("Set Time Manually"),
+          child: Text(AppLocalizations.of(context)!.session_set_time_manually),
           value: 0,
         ),
       ],
@@ -552,7 +558,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
             },
             child: new Scaffold(
                 appBar: AppBar(
-                  title: Text("Add Workout Session"),
+                  title: Text(widget.edit ? AppLocalizations.of(context)!.session_edit_session : AppLocalizations.of(context)!.session_add_session),
                   backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
@@ -563,7 +569,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                               children: <Widget>[
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Name",
+                                    child: Text(AppLocalizations.of(context)!.name,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -583,7 +589,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                         controller: sessionNameController,
                                                         decoration: InputDecoration(
                                                           border:InputBorder.none,
-                                                          hintText: defaultName,
+                                                          hintText: widget.fromRoutine ?  defaultName + " " + routineEntry!.name : defaultName + " " + AppLocalizations.of(context)!.workout,
                                                           hintStyle: TextStyle(
                                                             color: Colors.black26
                                                           ),
@@ -598,7 +604,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                           ListTile(
                                             title: new Row(
                                               children: <Widget>[
-                                                Text("Start Time"),
+                                                Text(AppLocalizations.of(context)!.session_start_time),
                                                 Expanded(child: Container()),
                                                 InkWell(
                                                   onTap: () async {
@@ -618,7 +624,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                             ListTile(
                                               title: new Row(
                                                 children: <Widget>[
-                                                  Text("End Time"),
+                                                  Text(AppLocalizations.of(context)!.session_end_time),
                                                   Expanded(child: Container()),
                                                   InkWell(
                                                     onTap: () async {
@@ -639,7 +645,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                                    child: Text("Workout Part",
+                                    child: Text(AppLocalizations.of(context)!.workout_part,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -655,7 +661,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Routine Details",
+                                    child: Text(AppLocalizations.of(context)!.routine_details,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -674,13 +680,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                     margin: EdgeInsets.all(8.0),
                                     child: Column(
                                         children: <Widget>[
-                                          AddButton("Add Workout", AddWorkout)
+                                          AddButton(AppLocalizations.of(context)!.workout_add_workout, AddWorkout)
                                         ]
                                     )
                                 ),
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 20),
                                     color: Theme.of(context).colorScheme.primary,
                                     child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -689,7 +695,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                               onTap:(){
                                                 saveSession();
                                                 },
-                                              title: Text("Finish Session",
+                                              title: Text(widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.session_finish_session,
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                 ),

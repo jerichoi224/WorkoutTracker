@@ -5,6 +5,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Routine/AddEditRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/util/StringTool.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ViewRoutineEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -117,7 +118,7 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
             },
             child: new Scaffold(
                 appBar: AppBar(
-                  title: Text("Routine Info"),
+                  title: Text(AppLocalizations.of(context)!.routine_details),
                   backgroundColor: Colors.amberAccent,
                   actions: _buildActions(),
                 ),
@@ -147,7 +148,7 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
                                    ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Routine Details",
+                                    child: Text(AppLocalizations.of(context)!.routine_details,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -171,7 +172,7 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
                                 if(routineEntry!.description.isNotEmpty)
                                   Container(
                                       padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                      child: Text("Note",
+                                      child: Text(AppLocalizations.of(context)!.note,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Colors.grey
@@ -196,7 +197,6 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
                                                         enabled: false,
                                                         decoration: InputDecoration(
                                                           border:InputBorder.none,
-                                                          hintText: "Add Note",
                                                         ),
                                                       )
                                                   )

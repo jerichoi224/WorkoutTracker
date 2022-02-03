@@ -6,6 +6,7 @@ import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:workout_tracker/widgets/Session/ViewSessionEntryWidget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CalendarWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -222,8 +223,8 @@ class _CalendarState extends State<CalendarWidget>{
                 floating: false,
                 backgroundColor: Colors.amberAccent,
                 expandedHeight: 100.0,
-                flexibleSpace: const FlexibleSpaceBar(
-                  title: Text('Calendar'),
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(AppLocalizations.of(context)!.workout_history),
                 ),
               ),
               SliverList(

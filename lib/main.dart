@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/HomeWidget.dart';
 import 'package:workout_tracker/widgets/InstructionWidget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 late ObjectBox objectbox;
@@ -12,10 +12,37 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   objectbox = await ObjectBox.create();
 
-  runApp(MyApp());
+  runApp(MaterialApp(home:MyApp()));
 }
 
-class MyApp extends StatelessWidget{
+class MyApp extends StatefulWidget {
+  MyApp({Key? key}) : super(key: key);
+
+  static void setLocale(BuildContext context, Locale newLocale) async {
+    _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    if(state != null)
+      state.changeLanguage(newLocale);
+  }
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale _locale = Locale.fromSubtags(languageCode: "en");
+
+  @override
+  void initState(){
+    super.initState();
+    String? locale = objectbox.getPref('locale');
+    _locale = locale != null ? Locale.fromSubtags(languageCode: locale) : Locale.fromSubtags(languageCode: "en");
+  }
+
+  changeLanguage(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +53,9 @@ class MyApp extends StatelessWidget{
           brightness: Brightness.light,
           primarySwatch: Colors.amber,
         ),
+        localizationsDelegates: [AppLocalizations.delegate, FallbackLocalizationDelegate()],
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: _locale,
         home: MainApp(),
         routes: <String, WidgetBuilder>{
           '/home': (BuildContext context) => new HomeWidget(parentCtx: context, objectbox: objectbox),
@@ -38,6 +68,8 @@ class MyApp extends StatelessWidget{
 class MainApp extends StatefulWidget {
   @override
   State createState() => _MainState();
+
+  static _MainState of(BuildContext context) => context.findAncestorStateOfType<_MainState>()!;
 }
 
 class _MainState extends State<MainApp> {
@@ -63,9 +95,18 @@ class _MainState extends State<MainApp> {
     return Scaffold(
       body: Center(
         child: Container(
-          child:Text("Splash")
+            child:Text(AppLocalizations.of(context)!.helloWorld)
         )
       )
     );
   }
+}
+
+class FallbackLocalizationDelegate extends LocalizationsDelegate<MaterialLocalizations> {
+  @override
+  bool isSupported(Locale locale) => true;
+  @override
+  Future<MaterialLocalizations> load(Locale locale) async => DefaultMaterialLocalizations();
+  @override
+  bool shouldReload(_) => false;
 }

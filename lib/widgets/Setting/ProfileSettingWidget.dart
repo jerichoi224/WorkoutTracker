@@ -5,6 +5,7 @@ import 'package:workout_tracker/util/StringTool.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfileSettingsWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -62,13 +63,13 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
         */
         ],
         androidUiSettings: AndroidUiSettings(
-            toolbarTitle: 'Crop Image',
+            toolbarTitle: AppLocalizations.of(context)!.settings_crop_image,
             toolbarColor: Colors.amberAccent,
             toolbarWidgetColor: Colors.black,
             initAspectRatio: CropAspectRatioPreset.square,
             lockAspectRatio: true),
         iosUiSettings: IOSUiSettings(
-          title: 'Crop Image',
+          title: AppLocalizations.of(context)!.settings_crop_image,
         ));
     if (croppedFile != null) {
       setState(() {
@@ -89,7 +90,7 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
   {
     if(nameController.text.trim().isEmpty) {
       final snackBar = SnackBar(
-        content: const Text('Please enter your name'),
+        content: Text(AppLocalizations.of(context)!.settings_name_msg),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
@@ -118,8 +119,8 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
                 floating: false,
                 backgroundColor: Color.fromRGBO(0, 0, 0, 0.05),
                 expandedHeight: 100.0,
-                flexibleSpace: const FlexibleSpaceBar(
-                  title: Text('Edit Profile'),
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(AppLocalizations.of(context)!.settings_edit_profile),
                 ),
               ),
               SliverList(
@@ -173,7 +174,7 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
                       ),
                       Container(
                           padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                          child: Text("Name",
+                          child: Text(AppLocalizations.of(context)!.name,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey
@@ -193,6 +194,7 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
                                             controller: nameController,
                                             decoration: InputDecoration(
                                               border:InputBorder.none,
+                                              hintText: AppLocalizations.of(context)!.enter_name
                                             ),
                                           )
                                       )
@@ -213,7 +215,7 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
                                     onTap:(){
                                       saveChanges();
                                     },
-                                    title: Text("Save Changes",
+                                    title: Text(AppLocalizations.of(context)!.save_changes,
                                       style: TextStyle(
                                         fontSize: 18,
                                       ),

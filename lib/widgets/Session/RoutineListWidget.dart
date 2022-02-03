@@ -4,6 +4,7 @@ import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'dart:math';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RoutineListWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -49,7 +50,7 @@ class _RoutineListState extends State<RoutineListWidget> {
               alignment: Alignment.center,
               margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Text(
-                "No Routine Found.",
+                AppLocalizations.of(context)!.routine_not_found,
                 style: TextStyle(fontSize: 14),
               ),
             )
@@ -129,7 +130,7 @@ class _RoutineListState extends State<RoutineListWidget> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
             appBar: AppBar(
-              title: Text("Choose Routine"),
+              title: Text(AppLocalizations.of(context)!.session_choose_routine),
               backgroundColor: Colors.amberAccent,
             ),
             body:

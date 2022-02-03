@@ -4,6 +4,7 @@ import 'package:workout_tracker/widgets/CalendarWidget.dart';
 import 'package:workout_tracker/widgets/Routine/RoutineWidget.dart';
 import 'package:workout_tracker/widgets/Workout/WorkoutWidget.dart';
 import 'package:workout_tracker/widgets/Setting/SettingsWidget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeWidget extends StatefulWidget {
   final BuildContext parentCtx;
@@ -22,6 +23,7 @@ class _HomeState extends State<HomeWidget>{
   int _currentIndex = 2;
   bool ready = false;
   String? username = "";
+
   @override
   void initState(){
     super.initState();
@@ -41,26 +43,8 @@ class _HomeState extends State<HomeWidget>{
     });
   }
 
-  Widget TitleText(){
-    switch(_currentIndex){
-      case 0:
-        return Text("Workout List");
-      case 1:
-        return Text("Routine List");
-      case 2:
-        return Text("Dashboard");
-      case 3:
-        return Text("Workout History");
-      case 4:
-        return Text("Settings");
-      default:
-        return Text("Workout Tracker");
-    }
-  }
-
   @override
   Widget build(BuildContext context){
-    final List<Widget> children = _children();
     ready = true;
     // While Data is loading, show empty screen
     if(!ready) {
@@ -91,7 +75,7 @@ class _HomeState extends State<HomeWidget>{
             changePage(index);
           },
           controller: pageController,
-          children: children
+          children: _children()
       ),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Theme.of(widget.parentCtx).colorScheme.secondary,
@@ -101,23 +85,23 @@ class _HomeState extends State<HomeWidget>{
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.fitness_center),
-            title: new Text('Workout'),
+            title: new Text(AppLocalizations.of(context)!.workout),
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.repeat),
-            title: new Text('Routine'),
+            title: new Text(AppLocalizations.of(context)!.routine),
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.insert_chart_outlined),
-            title: new Text('Dashboard'),
+            title: new Text(AppLocalizations.of(context)!.dashboard),
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.calendar_today),
-            title: new Text('Calendar'),
+            title: new Text(AppLocalizations.of(context)!.calendar),
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.settings),
-            title: new Text('Settings'),
+            title: new Text(AppLocalizations.of(context)!.settings),
           ),
         ],
       ),

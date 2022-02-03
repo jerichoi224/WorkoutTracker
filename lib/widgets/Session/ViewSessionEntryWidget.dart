@@ -10,6 +10,7 @@ import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ViewSessionEntryWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -66,7 +67,8 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     int duration = (endTime - startTime)~/60000;
     if(duration > 60)
       timeRange += (duration ~/ 60).toString() + "hr ";
-    timeRange += (duration % 60).toString() + " min";    setState(() {});
+    timeRange += (duration % 60).toString() + " min";
+    setState(() {});
   }
 
   List<Widget> selectPartList(setDialogState) {
@@ -147,7 +149,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
           String setText = "\t\t\t" + set.metricValue.toStringRemoveTrailingZero();
           if(workoutEntry.metric != MetricType.none.name)
             setText += " " + workoutEntry.metric;
-          if(![MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutEntry.metric))
+          if([MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutEntry.metric))
             setText += " × " + set.countValue.toString();
           detailsInfo.add(TableRow(children: [
             Text(setText,
@@ -173,7 +175,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     List<TableRow> overviewInfo = [];
 
     overviewInfo.add(TableRow(children: [
-      Text('Workout Count',
+      Text(AppLocalizations.of(context)!.session_workout_count,
           textAlign: TextAlign.left,
           style: titleStyle
 
@@ -214,7 +216,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
 
     if(weight != 0)
       overviewInfo.add(TableRow(children: [
-        Text('Total Weight',
+        Text(AppLocalizations.of(context)!.session_total_weight,
           textAlign: TextAlign.left,
             style: titleStyle
         ),
@@ -225,7 +227,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
       ]));
     if(distance != 0)
       overviewInfo.add(TableRow(children: [
-        Text('Total Distance',
+        Text(AppLocalizations.of(context)!.session_total_distance,
             textAlign: TextAlign.left,
             style: titleStyle
         ),
@@ -236,11 +238,11 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
       ]));
     if(floors != 0)
       overviewInfo.add(TableRow(children: [
-        Text('Stairs',
+        Text(AppLocalizations.of(context)!.session_stairs,
             textAlign: TextAlign.left,
             style: titleStyle
         ),
-        Text(floors.toStringRemoveTrailingZero() + " floors",
+        Text(floors.toStringRemoveTrailingZero() + " " + AppLocalizations.of(context)!.floors,
             textAlign: TextAlign.left,
             style: contentStyle
         ),
@@ -301,7 +303,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
             },
             child: new Scaffold(
                 appBar: AppBar(
-                  title: Text("Session Info"),
+                  title: Text(AppLocalizations.of(context)!.session_info),
                   actions: _buildActions(),
                   backgroundColor: Colors.amberAccent,
                 ),
@@ -361,7 +363,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
                                   ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Overview",
+                                    child: Text(AppLocalizations.of(context)!.dashboard_overview,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey
@@ -386,7 +388,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
                                 ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text("Routine Details",
+                                    child: Text(AppLocalizations.of(context)!.routine_details,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey

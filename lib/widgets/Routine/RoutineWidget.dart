@@ -5,6 +5,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Routine/AddEditRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/Routine/ViewRoutineWidget.dart';
 import 'dart:math';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RoutineWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -36,11 +37,11 @@ class _RoutineState extends State<RoutineWidget>{
       icon: Icon(Icons.more_vert),
       itemBuilder: (context) => [
         PopupMenuItem(
-          child: Text("Edit"),
+          child: Text(AppLocalizations.of(context)!.edit),
           value: 0,
         ),
         PopupMenuItem(
-          child: Text("Delete"),
+          child: Text(AppLocalizations.of(context)!.delete),
           value: 1,
         ),
       ],
@@ -107,7 +108,7 @@ class _RoutineState extends State<RoutineWidget>{
               alignment: Alignment.center,
               margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Text(
-                "No Routine Found.",
+                AppLocalizations.of(context)!.routine_not_found,
                 style: TextStyle(fontSize: 14),
               ),
             )
@@ -210,8 +211,8 @@ class _RoutineState extends State<RoutineWidget>{
                 backgroundColor: Colors.amberAccent,
                 expandedHeight: 100.0,
                 actions: _buildActions(),
-                flexibleSpace: const FlexibleSpaceBar(
-                  title: Text('Routine List'),
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(AppLocalizations.of(context)!.routine_list),
                 ),
               ),
               SliverList(

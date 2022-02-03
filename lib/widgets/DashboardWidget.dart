@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/widgets/Session/RoutineListWidget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DashboardWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -56,7 +55,7 @@ class _DashboardState extends State<DashboardWidget>{
                     Container(
                       margin: EdgeInsets.fromLTRB(10, 5, 5, 5),
                       child: CircleAvatar(
-                        radius: 43,
+                        radius: 42,
                         backgroundColor: Colors.amberAccent,
                         child: CircleAvatar(
                           radius: 40,
@@ -74,7 +73,7 @@ class _DashboardState extends State<DashboardWidget>{
                         text: TextSpan(
                           children: <TextSpan>[
                             TextSpan(
-                                text: "Welcome back,\n",
+                                text: AppLocalizations.of(context)!.dashboard_welcome_back + "\n",
                                 style: TextStyle(
                                     color: Colors.black54,
                                     fontSize: 17,
@@ -82,7 +81,7 @@ class _DashboardState extends State<DashboardWidget>{
                                 )
                             ),
                             TextSpan(
-                                text: username + "\n",
+                                text: username + AppLocalizations.of(context)!.dashboard_post_name + "\n",
                                 style: TextStyle(
                                     color: Colors.black87,
                                     fontSize: 22,
@@ -102,6 +101,9 @@ class _DashboardState extends State<DashboardWidget>{
   }
 
   void startNewSession(BuildContext context) async {
+    setState(() {
+
+    });
     // start the SecondScreen and wait for it to finish with a result
     bool result = await Navigator.push(
         context,
@@ -138,8 +140,8 @@ class _DashboardState extends State<DashboardWidget>{
                 floating: false,
                 backgroundColor: Colors.amberAccent,
                 expandedHeight: 100.0,
-                flexibleSpace: const FlexibleSpaceBar(
-                  title: Text('Dashboard'),
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(AppLocalizations.of(context)!.dashboard),
                 ),
               ),
               SliverList(
@@ -160,7 +162,7 @@ class _DashboardState extends State<DashboardWidget>{
                                 child: SizedBox(
                                   height: 50,
                                   child: Center(
-                                    child:Text("Start Workout",
+                                    child:Text(AppLocalizations.of(context)!.dashboard_start_workout,
                                       style: TextStyle(
                                         fontSize: 16,
                                       ),
@@ -184,7 +186,7 @@ class _DashboardState extends State<DashboardWidget>{
                                     child: SizedBox(
                                       height: 50,
                                       child: Center(
-                                          child:Text("Start Routine",
+                                          child:Text(AppLocalizations.of(context)!.dashboard_start_routine,
                                             style: TextStyle(
                                             fontSize: 16,
                                             ),
@@ -198,7 +200,7 @@ class _DashboardState extends State<DashboardWidget>{
                       ),
                       Container(
                           padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                          child: Text("Overview",
+                          child: Text(AppLocalizations.of(context)!.dashboard_overview,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey
@@ -225,7 +227,7 @@ class _DashboardState extends State<DashboardWidget>{
                                       text: TextSpan(
                                         children: <TextSpan>[
                                           TextSpan(
-                                              text: "Total Session Count: " + widget.objectbox.sessionList.length.toString(),
+                                              text: AppLocalizations.of(context)!.dashboard_total_session_count + widget.objectbox.sessionList.length.toString(),
                                               style: TextStyle(color: Colors.black)
                                           ),
                                         ],
