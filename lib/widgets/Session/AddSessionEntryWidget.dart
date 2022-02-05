@@ -386,7 +386,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     {
       if(cardItem.numSets == 0)
         continue;
-
+/*
       // remove invalid sets
       for(int i = cardItem.numSets - 1; i >=0; i--)
         {
@@ -397,7 +397,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
           else if (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[i].text.isEmpty)
             cardItem.remove(i);
         }
-
+*/
       // if there's an invalid WorkoutCard, skip it.
       bool skip = true;
       for(int i = 0; i < cardItem.numSets; i++) {
@@ -420,10 +420,14 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       item.metric = cardItem.entry.metric;
       for(int j = 0; j < cardItem.numSets; j++)
       {
-        item.sets.add(SetItem(
-            metricValue: cardItem.metricController[j].text.isNotEmpty ? double.parse(cardItem.metricController[j].text) : 0,
-            countValue: cardItem.countController[j].text.isNotEmpty ? int.parse(cardItem.countController[j].text) : 0
-        ));
+        if ((cardItem.metricController[j].text.isNotEmpty && cardItem.countController[j].text.isNotEmpty) ||
+            ([MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(cardItem.entry.metric) && cardItem.metricController[j].text.isNotEmpty) ||
+            (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[j].text.isNotEmpty)
+        )
+          item.sets.add(SetItem(
+              metricValue: cardItem.metricController[j].text.isNotEmpty ? double.parse(cardItem.metricController[j].text) : 0,
+              countValue: cardItem.countController[j].text.isNotEmpty ? int.parse(cardItem.countController[j].text) : 0
+          ));
       }
       tempList.add(item);
       widget.objectbox.sessionItemBox.put(item);

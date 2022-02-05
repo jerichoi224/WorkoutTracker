@@ -244,7 +244,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                   value: metric,
                                                   iconSize: 24,
                                                   elevation: 16,
-                                                  onChanged: (value){
+                                                  onChanged: widget.edit ? null : (value){
                                                     setState(() {metric = value!;});
                                                   },
                                                   underline: Container(

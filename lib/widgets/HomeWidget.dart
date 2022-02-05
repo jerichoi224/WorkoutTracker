@@ -85,23 +85,23 @@ class _HomeState extends State<HomeWidget>{
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.fitness_center),
-            title: new Text(AppLocalizations.of(context)!.workout),
+            label: AppLocalizations.of(context)!.workout,
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.repeat),
-            title: new Text(AppLocalizations.of(context)!.routine),
+            label: AppLocalizations.of(context)!.routine,
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.insert_chart_outlined),
-            title: new Text(AppLocalizations.of(context)!.dashboard),
+            label: AppLocalizations.of(context)!.dashboard,
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.calendar_today),
-            title: new Text(AppLocalizations.of(context)!.calendar),
+            label: AppLocalizations.of(context)!.calendar,
           ),
           BottomNavigationBarItem(
             icon: new Icon(Icons.settings),
-            title: new Text(AppLocalizations.of(context)!.settings),
+            label: AppLocalizations.of(context)!.settings,
           ),
         ],
       ),

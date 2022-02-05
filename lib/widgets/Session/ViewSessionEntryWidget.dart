@@ -149,7 +149,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
           String setText = "\t\t\t" + set.metricValue.toStringRemoveTrailingZero();
           if(workoutEntry.metric != MetricType.none.name)
             setText += " " + workoutEntry.metric;
-          if([MetricType.kg.name, MetricType.none.name, MetricType.reps.name].contains(workoutEntry.metric))
+          if([MetricType.kg.name, MetricType.none.name].contains(workoutEntry.metric))
             setText += " × " + set.countValue.toString();
           detailsInfo.add(TableRow(children: [
             Text(setText,
