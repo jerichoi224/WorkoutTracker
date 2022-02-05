@@ -20,7 +20,7 @@ class _SettingsState extends State<SettingsWidget> {
   @override
   void initState() {
     super.initState();
-    String? temp = objectbox.getPref("locale");
+    String? temp = widget.objectbox.getPref("locale");
     locale = temp != null ? temp : 'en';
   }
 
@@ -52,7 +52,6 @@ class _SettingsState extends State<SettingsWidget> {
 
    void setLanguage(String language)
    {
-     print(language);
      Locale newLocale = Locale(language, '');
      widget.objectbox.setPref("locale", language);
      MyApp.setLocale(context, newLocale);
@@ -72,7 +71,6 @@ class _SettingsState extends State<SettingsWidget> {
                floating: false,
                backgroundColor: Colors.amberAccent,
                expandedHeight: 100.0,
-//                actions: _buildActions(),
                flexibleSpace: FlexibleSpaceBar(
                  title: Text(AppLocalizations.of(context)!.settings),
                ),

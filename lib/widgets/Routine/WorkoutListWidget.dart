@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/objectbox.dart';
+import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -18,9 +19,12 @@ class _WorkoutListState extends State<WorkoutListWidget> {
   TextEditingController searchTextController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "";
+  String locale = "";
 
   void initState() {
     super.initState();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
   }
 
   // Navigate to AddWorkout screen
@@ -100,7 +104,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
                                 style: TextStyle(color: Colors.black)
                             ),
                             TextSpan(
-                                text: i.partList.length == 0 ? " " : " ("  + i.partList.join(", ") + ")",
+                                text: i.partList.length == 0 ? " " : " ("  + i.partList.map((e) => PartType.values.firstWhere((element) => element.name == e).toLanguageString(locale)).join(", ") + ")",
                                 style: TextStyle(color: Colors.black54)),
                           ],
                         ),

@@ -23,6 +23,12 @@
   "hour": "시간",
   "minute": "분",
   "floors": "층",
+  "next": "다음",
+  "start": "시작",
+  "credits": "저작권",
+  "llicense": "라이센스",
+  "image": "이미지",
+  "contact": "연락처",
 
   "helloWorld": "안녕하세요",
   "dashboard_start_workout": "운동 시작",
@@ -41,6 +47,8 @@
   "settings_edit_profile": "프로필 편집",
   "settings_crop_image": "이미지 자르기",
   "settings_name_msg": "이름을 입력해주세요.",
+  "settings_about_open_license": "라이센스 보기",
+  "settings_developer_info": "개발자 정보",
 
   "routine_not_found": "저장된 루틴이 없습니다.",
   "routine_add_routine": "루틴 추가",
@@ -77,6 +85,10 @@
   "session_workout_count": "운동 종류",
   "session_total_weight": "총 무게",
   "session_total_distance": "총 거리",
-  "session_stairs": "계단"
+  "session_stairs": "계단",
 
+  "instruction_select_language": "언어를 선택해주세요",
+  "instruction_ask_name_msg": "환영합니다.\n이름을 알려주세요",
+  "instruction_name_msg": "이름을 입력해주세요",
+  "instruction_creating_db": "데이터베이스를 만들고 있습니다.\n잠시만 기다려주세요."
 }

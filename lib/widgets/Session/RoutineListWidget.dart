@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
+import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'dart:math';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -15,8 +16,12 @@ class RoutineListWidget extends StatefulWidget {
 }
 
 class _RoutineListState extends State<RoutineListWidget> {
+  String locale = "";
+
   void initState() {
     super.initState();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
   }
 
   String workoutListToString(List<String> workoutIds) {
@@ -93,7 +98,7 @@ class _RoutineListState extends State<RoutineListWidget> {
                                   // Workout Parts
                                   TextSpan(
                                       text: i.parts.length == 0 ? " " : " (" +
-                                          i.parts.join(", ") + ")",
+                                          i.parts.map((e) => PartType.values.firstWhere((element) => element.name == e).toLanguageString(locale)).join(", ") + ")",
                                       style: TextStyle(color: Colors.black54)),
                                   TextSpan(
                                       text: "\n",

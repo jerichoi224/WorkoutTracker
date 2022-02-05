@@ -20,6 +20,7 @@ class ViewWorkoutWidget extends StatefulWidget {
 
 class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
   late WorkoutEntry? workoutEntry;
+  String locale = "";
 
   List<SessionItem> sessions = [];
 
@@ -27,6 +28,9 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
   void initState() {
     super.initState();
     updateInfo();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
+
     sessions = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry!.id).toList();
   }
 
@@ -41,7 +45,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
     List<Widget> tagList = [];
 
     for(int i = 0; i < workoutEntry!.partList.length; i++)
-      tagList.add(tag(workoutEntry!.partList[i], (){}, Color.fromRGBO(210, 210, 210, 0.8)));
+      tagList.add(tag(PartType.values.firstWhere((element) => element.name == workoutEntry!.partList[i]).toLanguageString(locale), (){}, Color.fromRGBO(210, 210, 210, 0.8)));
     return tagList;
   }
 

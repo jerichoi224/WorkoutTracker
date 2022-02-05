@@ -23,6 +23,12 @@
     "hour": "hr",
     "minute": "min",
     "floors": "floors",
+    "next": "Next",
+    "start": "Start",
+    "credits": "Credits",
+    "license": "License",
+    "image": "Images",
+    "contact": "Contact",
 
     "helloWorld": "Hello World!",
     "dashboard_start_workout": "Start Workout",
@@ -41,6 +47,8 @@
     "settings_edit_profile": "Edit Profile",
     "settings_crop_image": "Crop Image",
     "settings_name_msg": "Please enter your name",
+    "settings_about_open_license": "View License",
+    "settings_developer_info": "About Developer",
 
     "routine_not_found": "No Routine Found.",
     "routine_add_routine": "Add Routine",
@@ -77,6 +85,10 @@
     "session_workout_count": "Workout Count",
     "session_total_weight": "Total Weight",
     "session_total_distance": "Total Distance",
-    "session_stairs": "Stairs"
+    "session_stairs": "Stairs",
 
+    "instruction_select_language": "Select your langauge",
+    "instruction_ask_name_msg": "Welcome to Workout Tracker!\nWhat's your name?",
+    "instruction_name_msg": "Please enter your name",
+    "instruction_creating_db": "Creating Database.\nPlease Wait."
 }

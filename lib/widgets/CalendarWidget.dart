@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/session_entry_model.dart';
 import 'package:workout_tracker/dbModels/session_item_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -26,11 +27,14 @@ class _CalendarState extends State<CalendarWidget>{
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  String locale = "";
 
   List<SessionEntry> sessionsToday = [];
 
   void initState() {
     super.initState();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
     sessionsToday = _getEventsForDay(DateTime.now());
   }
 
@@ -165,7 +169,7 @@ class _CalendarState extends State<CalendarWidget>{
                             ),
                             // Workout Parts
                             TextSpan(
-                                text: sessionEntry.parts.length == 0 ? " " : " ("  + sessionEntry.parts.join(", ") + ")",
+                                text: sessionEntry.parts.length == 0 ? " " : " ("  + sessionEntry.parts.map((e) => PartType.values.firstWhere((element) => element.name == e).toLanguageString(locale)).join(", ") + ")",
                                 style: TextStyle(color: Colors.black54)),
                             TextSpan(
                                 text: "\n",

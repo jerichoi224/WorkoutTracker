@@ -38,11 +38,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   int endTime = 0;
   int year = 0;
   int month = 0;
-
+  String locale = "";
 
   @override
   void initState() {
     super.initState();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
     if(widget.edit)
       {
         setTime = true;
@@ -92,7 +94,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     {
       PartType p = PartType.values[i];
       tagList.add(
-          tag(p.name,
+          tag(p.toLanguageString(locale),
               (){
                   if(partList.contains(p.name))
                     partList.remove(p.name);
@@ -113,8 +115,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     List<Widget> tagList = [];
 
     for(int i = 0; i < partList.length; i++)
-      tagList.add(tag(partList[i], (){_openTagPopup(context);}, Colors.amberAccent));
-
+      tagList.add(tag(PartType.values.firstWhere((element) => element.name == partList[i]).toLanguageString(locale), (){_openTagPopup(context);}, Colors.amberAccent));
     if(partList.length == 0)
       tagList.add(tag(" + " + AppLocalizations.of(context)!.add_part + "  ", (){_openTagPopup(context);}, Color.fromRGBO(230, 230, 230, 0.8)));
     return tagList;
@@ -272,9 +273,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
             if(sessionItem.sets.length > index)
             {
               prev = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
-              if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
-                prev += " " + workoutCardList[cardInd].entry.metric;
-              if([MetricType.kg.name, MetricType.none.name].contains(workoutCardList[cardInd].entry.metric))
+              prev += " " + workoutCardList[cardInd].entry.metric;
+              if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
                 prev += " × " + sessionItem.sets[index].countValue.toString();
             }
           }
@@ -309,11 +309,10 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               ),
             ),
           ),
-            if(workoutCardList[cardInd].entry.metric != MetricType.none.name)
-              new Text(" " + workoutCardList[cardInd].entry.metric),
-            if([MetricType.kg.name, MetricType.none.name].contains(workoutCardList[cardInd].entry.metric))
+            new Text(" " + workoutCardList[cardInd].entry.metric),
+            if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
               new Text(" × "),
-            if([MetricType.kg.name, MetricType.none.name].contains(workoutCardList[cardInd].entry.metric))
+            if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
               new Container(
                 width: 65,
                 height: 40,

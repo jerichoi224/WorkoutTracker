@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/class/CupertinoLocalizationKrDelegate.dart';
+import 'package:workout_tracker/class/MaterialLocalizationKrDelegate.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/HomeWidget.dart';
 import 'package:workout_tracker/widgets/InstructionWidget.dart';
@@ -53,7 +55,7 @@ class _MyAppState extends State<MyApp> {
           brightness: Brightness.light,
           primarySwatch: Colors.amber,
         ),
-        localizationsDelegates: [AppLocalizations.delegate, FallbackLocalizationDelegate()],
+        localizationsDelegates: [AppLocalizations.delegate, MaterialLocalizationKrDelegate(), CupertinoLocalizationKrDelegate()],
         supportedLocales: AppLocalizations.supportedLocales,
         locale: _locale,
         home: MainApp(),

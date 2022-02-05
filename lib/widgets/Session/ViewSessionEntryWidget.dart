@@ -34,6 +34,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
   int endTime = 0;
   int year = 0;
   int month = 0;
+  String locale = "";
 
   bool modified = false;
 
@@ -52,6 +53,8 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
   @override
   void initState() {
     super.initState();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
     updateInfo();
   }
 
@@ -70,35 +73,14 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     timeRange += (duration % 60).toString() + " min";
     setState(() {});
   }
-
-  List<Widget> selectPartList(setDialogState) {
-    List<Widget> tagList = [];
-
-    for (int i = 0; i < PartType.values.length; i++) {
-      PartType p = PartType.values[i];
-      tagList.add(
-          tag(p.name,
-                  () {
-                if (partList.contains(p.name))
-                  partList.remove(p.name);
-                else
-                  partList.add(p.name);
-                setState(() {});
-                setDialogState(() {});
-              },
-              partList.contains(p.name) ? Colors.amber : Colors.black12)
-      );
-    }
-    return tagList;
-  }
-
   // List of Tags in partList
   List<Widget> selectedTagList()
   {
     List<Widget> tagList = [];
 
-    for(int i = 0; i < sessionEntry!.parts.length; i++)
-      tagList.add(tag(sessionEntry!.parts[i], (){}, Color.fromRGBO(210, 210, 210, 0.8)));
+    for(int i = 0; i < partList.length; i++)
+      tagList.add(tag(PartType.values.firstWhere((element) => element.name == partList[i]).toLanguageString(locale), (){}, Color.fromRGBO(210, 210, 210, 0.8)));
+
     return tagList;
   }
 
@@ -147,9 +129,8 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
       for(SetItem set in item.sets)
         {
           String setText = "\t\t\t" + set.metricValue.toStringRemoveTrailingZero();
-          if(workoutEntry.metric != MetricType.none.name)
-            setText += " " + workoutEntry.metric;
-          if([MetricType.kg.name, MetricType.none.name].contains(workoutEntry.metric))
+          setText += " " + workoutEntry.metric;
+          if([MetricType.kg.name].contains(workoutEntry.metric))
             setText += " × " + set.countValue.toString();
           detailsInfo.add(TableRow(children: [
             Text(setText,

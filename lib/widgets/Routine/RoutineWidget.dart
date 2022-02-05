@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
+import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/AddEditRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/Routine/ViewRoutineWidget.dart';
 import 'dart:math';
@@ -16,8 +17,12 @@ class RoutineWidget extends StatefulWidget {
 }
 
 class _RoutineState extends State<RoutineWidget>{
+  String locale = "";
+
   void initState() {
     super.initState();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
   }
 
   // Navigate to AddWorkout screen
@@ -147,7 +152,7 @@ class _RoutineState extends State<RoutineWidget>{
                                   ),
                                   // Workout Parts
                                   TextSpan(
-                                      text: i.parts.length == 0 ? " " : " ("  + i.parts.join(", ") + ")",
+                                      text: i.parts.length == 0 ? " " : " ("  + i.parts.map((e) => PartType.values.firstWhere((element) => element.name == e).toLanguageString(locale)).join(", ") + ")",
                                       style: TextStyle(color: Colors.black54)),
                                   TextSpan(
                                       text: "\n",

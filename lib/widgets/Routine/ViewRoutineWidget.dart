@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
+import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/AddEditRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/util/StringTool.dart';
@@ -18,6 +19,7 @@ class ViewRoutineEntryWidget extends StatefulWidget {
 
 class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
   late RoutineEntry? routineEntry;
+  String locale = "";
 
   List<String> partList = [];
   List<WorkoutEntry> WorkoutEntryList = [];
@@ -25,6 +27,8 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
   @override
   void initState() {
     super.initState();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
 
     routineEntry = widget.objectbox.routineBox.get(widget.id);
     partList = routineEntry!.parts;
@@ -65,8 +69,8 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
   {
     List<Widget> tagList = [];
 
-    for(int i = 0; i < routineEntry!.parts.length; i++)
-      tagList.add(tag(routineEntry!.parts[i], (){}, Color.fromRGBO(210, 210, 210, 0.8)));
+    for(int i = 0; i < partList.length; i++)
+      tagList.add(tag(PartType.values.firstWhere((element) => element.name == partList[i]).toLanguageString(locale), (){}, Color.fromRGBO(210, 210, 210, 0.8)));
     return tagList;
   }
 

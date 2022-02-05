@@ -24,6 +24,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
   final descriptionController = TextEditingController();
 
   late RoutineEntry? newEntry;
+  String locale = "";
 
   List<String> partList = [];
   List<WorkoutEntry> WorkoutEntryList = [];
@@ -31,6 +32,9 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
   @override
   void initState() {
     super.initState();
+    String? temp = widget.objectbox.getPref("locale");
+    locale = temp != null ? temp : 'en';
+
     if(widget.edit)
     {
       newEntry = widget.objectbox.routineBox.get(widget.id);
@@ -175,7 +179,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
       {
         PartType p = PartType.values[i];
         tagList.add(
-            tag(p.name,
+            tag(p.toLanguageString(locale),
                 (){
                   if(partList.contains(p.name))
                     partList.remove(p.name);
@@ -197,8 +201,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
     List<Widget> tagList = [];
 
     for(int i = 0; i < partList.length; i++)
-      tagList.add(tag(partList[i], (){_openTagPopup(context);}, Colors.amberAccent));
-
+      tagList.add(tag(PartType.values.firstWhere((element) => element.name == partList[i]).toLanguageString(locale), (){_openTagPopup(context);}, Colors.amberAccent));
     if(partList.length == 0)
       tagList.add(tag(" + " + AppLocalizations.of(context)!.add_part +"  ", (){_openTagPopup(context);}, Color.fromRGBO(230, 230, 230, 0.8)));
     return tagList;

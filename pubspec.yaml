@@ -36,6 +36,8 @@ dependencies:
   syncfusion_flutter_charts: ^19.4.48
   image_picker: ^0.8.4+5
   image_cropper: ^1.4.1
+  url_launcher: ^6.0.18
+  dropdown_button2: ^1.1.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -56,7 +58,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
+  assets:
+    - lib/assets/languages.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

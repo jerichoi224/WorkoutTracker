@@ -4,6 +4,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/widgets/Session/RoutineListWidget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:workout_tracker/widgets/Setting/ProfileSettingWidget.dart';
 
 class DashboardWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -20,12 +21,12 @@ class _DashboardState extends State<DashboardWidget>{
     super.initState();
     getUsername();
     getUserImage();
+    setState(() {});
   }
 
   getUsername() async {
     String? getName = widget.objectbox.getPref('user_name');
     username = getName != null ? getName : "User";
-    setState(() {});
   }
 
   getUserImage() async {
@@ -34,7 +35,6 @@ class _DashboardState extends State<DashboardWidget>{
       return;
 
     img_file = imageFromBase64String(profileImage);
-    setState(() {});
   }
 
   Widget profileCard()
@@ -46,7 +46,9 @@ class _DashboardState extends State<DashboardWidget>{
         color: Colors.white,
         child: new InkWell(
             borderRadius: BorderRadius.circular(10.0),
-            onTap: () {},
+            onTap: () {
+              openProfilePage(context);
+            },
             child: SizedBox(
                 height: 100,
                 child: Row(
@@ -126,6 +128,22 @@ class _DashboardState extends State<DashboardWidget>{
     if(result.runtimeType == bool && result)
       setState(() {});
   }
+
+  void openProfilePage(BuildContext context) async {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfileSettingsWidget(objectbox: widget.objectbox,),
+        ));
+
+    if(result.runtimeType == bool && result)
+    {
+      getUsername();
+      getUserImage();
+      setState(() {});
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
