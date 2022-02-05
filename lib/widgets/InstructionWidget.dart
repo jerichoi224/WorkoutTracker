@@ -77,7 +77,7 @@ class _InstructionState extends State<InstructionWidget>{
                   padding: EdgeInsets.all(15),
                   child: Center(
                     child: Image(
-                      image: AssetImage('lib/assets/languages.png'),
+                      image: AssetImage('assets/languages.png'),
                       width: 150,
                     )
                   ),
@@ -151,9 +151,11 @@ class _InstructionState extends State<InstructionWidget>{
                     ),
                   ),
                 ),
-                Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                    margin: EdgeInsets.fromLTRB(40, 10, 40, 10),
+                Container(
+                    width: 200,
+                    child: Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                    margin: EdgeInsets.fromLTRB(0, 25, 0, 10),
                     color: Colors.amber,
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -172,6 +174,7 @@ class _InstructionState extends State<InstructionWidget>{
                           )
                         ]
                     )
+                  )
                 )
               ],
             )
@@ -193,10 +196,10 @@ class _InstructionState extends State<InstructionWidget>{
                 Padding(
                   padding: EdgeInsets.all(15),
                   child: Center(
-                    /*child: Image(
-                    image: AssetImage('assets/my_icon.png'),
-                    width: 150,
-                  )*/
+                      child: Image(
+                      image: AssetImage('assets/my_icon.png'),
+                      width: 150,
+                    )
                   ),
                 ),
                 Padding(

@@ -95,10 +95,20 @@ class _MainState extends State<MainApp> {
       checkFirstSeen();
     });
     return Scaffold(
-      body: Center(
-        child: Container(
-            child:Text(AppLocalizations.of(context)!.helloWorld)
-        )
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(15),
+              child: Center(
+                child: Image(
+                image: AssetImage('assets/my_icon.png'),
+                width: 150,
+                )
+              ),
+            ),
+        ]
       )
     );
   }

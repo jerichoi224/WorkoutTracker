@@ -18,6 +18,24 @@ class _AboutSettingsState extends State<AboutSettingsWidget> {
   void openLicense(){
 
   }
+
+  Widget linkedUrl(String caption, String url){
+    return Container(
+      padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+      child:GestureDetector(
+        child: Text(
+            caption,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.blue
+            )
+        ),
+        onTap: () async {
+          if (await canLaunch(url)) launch(url);
+        },
+      )
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -118,12 +136,12 @@ class _AboutSettingsState extends State<AboutSettingsWidget> {
                                   )
                               ),
                               ListTile(
-                                  title: GestureDetector(
-                                    child: Text("Languages icons created by Freepik - Flaticon", style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue)),
-                                    onTap: () async {
-                                      const url = 'https://www.flaticon.com/free-icons/languages';
-                                      if (await canLaunch(url)) launch(url);
-                                    },
+                                  title: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      linkedUrl("Languages icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/languages'),
+                                      linkedUrl("Gym icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/gym'),
+                                    ],
                                   )
                               ),
                             ],
