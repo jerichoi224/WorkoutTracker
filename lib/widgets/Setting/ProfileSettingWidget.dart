@@ -6,6 +6,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:workout_tracker/widgets/UIComponents.dart';
 
 class ProfileSettingsWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -32,7 +33,7 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
 
   getUserImage() async {
     String? profileImage = widget.objectbox.getPref('profile_image');
-    if(profileImage == null)
+    if(profileImage == null || profileImage.isEmpty)
       return;
 
     img = imageFromBase64String(profileImage);
@@ -135,13 +136,17 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
                               CircleAvatar(
                                 radius: 63,
                                backgroundColor: Colors.amberAccent,
-                               child: CircleAvatar(
-                                 radius: 60,
-                                 child: ClipOval(
-                                   child: (img != null)
-                                       ? img!
-                                       : null,
-                                 ),
+                                child: CircleAvatar(
+                                  radius: 60,
+                                  child: (img_file != null || img != null) ?
+                                  ClipOval(
+                                      child: img
+                                  ):
+                                  Icon(
+                                    Icons.person,
+                                    size: 60,
+                                    color: Colors.black54,
+                                  ),
                                 ),
                               ),
                               Container(
@@ -204,27 +209,11 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
                             ],
                           )
                       ),
-                      Card(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                          margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                          color: Theme.of(context).colorScheme.primary,
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                ListTile(
-                                    onTap:(){
-                                      saveChanges();
-                                    },
-                                    title: Text(AppLocalizations.of(context)!.save_changes,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    )
-                                )
-                              ]
-                          )
-                      ),// Save Bu
+                      CardButton(
+                          Theme.of(context).colorScheme.primary,
+                          AppLocalizations.of(context)!.save_changes,
+                              () {saveChanges();}
+                      ),
                     ]),
               ),
             ],

@@ -36,7 +36,9 @@
     "dashboard_post_name": "",
     "dashboard_start_routine": "Start Routine",
     "dashboard_overview": "Overview",
-    "dashboard_total_session_count": "Total Session Count: ",
+    "dashboard_month_session_count": "Session Count this Month",
+    "dashboard_month_session_time": "Workout Time this Month",
+    "dashboard_month_pie_chart_title": "Session Count by Part",
 
     "settings_user_settings": "User Settings",
     "settings_profile": "Profile",
@@ -70,6 +72,7 @@
     "workout_avg_weight": "Avg Weight",
     "workout_max_count": "Max Count",
     "workout_total_count": "Total Count",
+    "workout_type_msg": "Once created, you won't be able to change the metric.",
 
     "session_info": "Session Info",
     "session_choose_routine": "Choose Routine",

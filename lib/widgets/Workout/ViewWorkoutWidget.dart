@@ -84,8 +84,10 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
         data.add(WeightChartData(date, max, sum/sessionItem.sets.length));
       }
 
-    data.insert(0, WeightChartData(data[0].date.subtract(Duration(days: 1)), null, null));
-    data.add(WeightChartData(data.last.date.add(Duration(days: 1)), null, null));
+    DateTime prevDay = data.first.date.subtract(Duration(days: 1));
+    DateTime nextDay = data.last.date.add(Duration(days: 1));
+    data.insert(0, WeightChartData(new DateTime(prevDay.year, prevDay.month, prevDay.day), null, null));
+    data.add(WeightChartData(new DateTime(nextDay.year, nextDay.month, nextDay.day), null, null));
 
     return <LineSeries<WeightChartData, DateTime>>[
       LineSeries<WeightChartData, DateTime>(
@@ -138,8 +140,10 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
       data.add(CountChartData(date, max, sum));
     }
 
-    data.insert(0, CountChartData(data[0].date.subtract(Duration(days: 1)), null, null));
-    data.add(CountChartData(data.last.date.add(Duration(days: 1)), null, null));
+    DateTime prevDay = data.first.date.subtract(Duration(days: 1));
+    DateTime nextDay = data.last.date.add(Duration(days: 1));
+    data.insert(0, CountChartData(new DateTime(prevDay.year, prevDay.month, prevDay.day), null, null));
+    data.add(CountChartData(new DateTime(nextDay.year, nextDay.month, nextDay.day), null, null));
 
     return <LineSeries<CountChartData, DateTime>>[
       LineSeries<CountChartData, DateTime>(
@@ -162,6 +166,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
         dataSource:  data,
         xValueMapper: (CountChartData dataPoint, _) => dataPoint.date,
         yValueMapper: (CountChartData dataPoint, _) => dataPoint.totalVal,
+        yAxisName: 'totalYAxis',
         markerSettings: MarkerSettings(
             isVisible: true,
             height: 4,
@@ -254,7 +259,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                               children: <Widget>[
                                                 Text(AppLocalizations.of(context)!.type),
                                                 Spacer(),
-                                                Text(workoutEntry!.type.capitalize()),
+                                                Text(WorkoutType.values.firstWhere((element) => element.name == workoutEntry!.type).toLanguageString(locale).capitalize(locale)),
                                               ],
                                             )
                                         ),
@@ -263,7 +268,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                               children: <Widget>[
                                                 Text(AppLocalizations.of(context)!.metric),
                                                 Spacer(),
-                                                Text(workoutEntry!.metric.capitalize()),
+                                                Text(workoutEntry!.metric.capitalize(locale)),
                                               ],
                                             )
                                         ), // Metric Dropdown
@@ -344,6 +349,14 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                           primaryXAxis: DateTimeAxis(
                                               enableAutoIntervalOnZooming: true
                                           ),
+                                          axes: <ChartAxis>[
+                                            NumericAxis(
+                                                name: 'totalYAxis',
+                                                opposedPosition: true,
+                                                title: AxisTitle(
+                                                )
+                                            )
+                                          ],
                                           legend: Legend(
                                               isVisible: true,
                                               position: LegendPosition.bottom

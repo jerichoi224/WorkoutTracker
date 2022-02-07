@@ -10,7 +10,7 @@ enum PartType {
   other,
 }
 
-extension toString on PartType {
+extension toStringPartType on PartType {
   String toLanguageString(String locale) {
     if(locale == "kr")
       {
@@ -46,6 +46,28 @@ enum WorkoutType {
   cardio,
   machine,
   other,
+}
+
+extension toStringWorkoutType on WorkoutType {
+  String toLanguageString(String locale) {
+    if(locale == "kr")
+    {
+      switch(this.name)
+      {
+        case "barbell":
+          return "바벨";
+        case "dumbbell":
+          return "아령";
+        case "cardio":
+          return "유산소";
+        case "machine":
+          return "기구 운동";
+        case "other":
+          return "기타";
+      }
+    }
+    return this.name;
+  }
 }
 
 enum MetricType {

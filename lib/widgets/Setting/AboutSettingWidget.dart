@@ -162,6 +162,7 @@ class _AboutSettingsState extends State<AboutSettingsWidget> {
                           child: Column(
                             children: <Widget>[
                               InkWell(
+                                borderRadius: BorderRadius.circular(8.0),
                                 onTap: (){
                                   openLicense();
                                 },

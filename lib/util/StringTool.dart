@@ -15,7 +15,9 @@ bool isKorean(String text)
 }
 
 extension StringExtension on String {
-  String capitalize() {
+  String capitalize(String locale) {
+    if(locale == "kr")
+      return this;
     return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
   }
 }

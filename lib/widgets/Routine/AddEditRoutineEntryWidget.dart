@@ -115,7 +115,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                 title: new Row(
                   children: <Widget>[
                     new Flexible(
-                        child: new Text(WorkoutEntryList[index].caption.capitalize(),
+                        child: new Text(WorkoutEntryList[index].caption.capitalize(locale),
                           style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold
@@ -205,6 +205,27 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
     if(partList.length == 0)
       tagList.add(tag(" + " + AppLocalizations.of(context)!.add_part +"  ", (){_openTagPopup(context);}, Color.fromRGBO(230, 230, 230, 0.8)));
     return tagList;
+  }
+
+  void saveRoutine()
+  {
+    if(routineNameController.text.isEmpty) {
+      final snackBar = SnackBar(
+        content: Text(AppLocalizations.of(context)!.routine_snackbar_msg),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    }
+    newEntry!.name = routineNameController.text;
+    newEntry!.description = descriptionController.text;
+    newEntry!.workoutIds.clear();
+    for(WorkoutEntry i in WorkoutEntryList)
+      newEntry!.workoutIds.add(i.id.toString());
+    newEntry!.parts = partList;
+    widget.objectbox.routineBox.put(newEntry!);
+    widget.objectbox.routineList = widget.objectbox.routineBox.getAll();
+    Navigator.pop(context, true);
   }
 
   @override
@@ -338,43 +359,11 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                         ]
                                     )
                                 ),
-                                Card(
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 10),
-                                    color: Theme.of(context).colorScheme.primary,
-                                    child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          ListTile(
-                                              onTap:(){
-                                                if(routineNameController.text.isEmpty) {
-                                                  final snackBar = SnackBar(
-                                                    content: Text(AppLocalizations.of(context)!.routine_snackbar_msg),
-                                                  );
-
-                                                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                                  return;
-                                                }
-                                                newEntry!.name = routineNameController.text;
-                                                newEntry!.description = descriptionController.text;
-                                                newEntry!.workoutIds.clear();
-                                                for(WorkoutEntry i in WorkoutEntryList)
-                                                  newEntry!.workoutIds.add(i.id.toString());
-                                                newEntry!.parts = partList;
-                                                widget.objectbox.routineBox.put(newEntry!);
-                                                widget.objectbox.routineList = widget.objectbox.routineBox.getAll();
-                                                Navigator.pop(context, true);
-                                              },
-                                              title: Text(widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.routine_add_routine,
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              )
-                                          )
-                                        ]
-                                    )
-                                ),// Save Button
+                                CardButton(
+                                    Theme.of(context).colorScheme.primary,
+                                    widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.routine_add_routine,
+                                        () {saveRoutine();}
+                                ),
                               ],
                             )
                         )

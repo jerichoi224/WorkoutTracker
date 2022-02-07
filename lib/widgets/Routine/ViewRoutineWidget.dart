@@ -52,7 +52,7 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
         title: new Row(
           children: <Widget>[
             new Flexible(
-                child: new Text(WorkoutEntryList[index].caption.capitalize(),
+                child: new Text(WorkoutEntryList[index].caption.capitalize(locale),
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold

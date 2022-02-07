@@ -118,6 +118,26 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
     );
   }
 
+  void saveWorkout()
+  {
+    if(workoutNameController.text.isEmpty) {
+      final snackBar = SnackBar(
+        content: Text(AppLocalizations.of(context)!.workout_snackbar_msg),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    }
+
+    newEntry!.caption = workoutNameController.text;
+    newEntry!.type = type;
+    newEntry!.partList = partList;
+    newEntry!.metric = metric;
+    newEntry!.description = descriptionController.text;
+    widget.objectbox.workoutBox.put(newEntry!);
+    widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
+    Navigator.pop(context, true);
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -200,7 +220,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                 ),
                                 Card(
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.all(8.0),
+                                    margin: EdgeInsets.fromLTRB(8, 8, 8, 4),
                                     child: Column(
                                       children: <Widget>[
                                         ListTile(
@@ -223,7 +243,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                       return Container(
                                                           alignment: Alignment.centerRight,
                                                           width: 100, // TODO: Find Proper Width
-                                                          child: Text(value.name.capitalize(), textAlign: TextAlign.end)
+                                                          child: Text(value.toLanguageString(locale).capitalize(locale), textAlign: TextAlign.end)
                                                       );
                                                     }).toList();
                                                   },
@@ -231,7 +251,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                                       .map<DropdownMenuItem<String>>((WorkoutType value) {
                                                     return DropdownMenuItem<String>(
                                                       value: value.name,
-                                                      child: Text(value.name.capitalize()),
+                                                      child: Text(value.toLanguageString(locale).capitalize(locale)),
                                                     );
                                                   }).toList(),
                                                 )
@@ -276,6 +296,27 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                       ],
                                     )
                                 ),
+                                if(!widget.edit)
+                                  Container(
+                                      padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.info_outline,
+                                            size: 16,
+                                            color: Colors.grey,
+                                          ),
+                                          Text(" " + AppLocalizations.of(context)!.workout_type_msg,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                                fontSize: 12
+                                            ),
+                                          )
+                                        ],
+                                      )
+                                  ),
                                 Container(
                                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
                                     child: Text(AppLocalizations.of(context)!.note,
@@ -311,43 +352,11 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                         ]
                                     )
                                 ),
-                                Card(
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 10),
-                                    color: Theme.of(context).colorScheme.primary,
-                                    child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          ListTile(
-                                              onTap:(){
-                                                if(workoutNameController.text.isEmpty) {
-                                                  final snackBar = SnackBar(
-                                                    content: Text(AppLocalizations.of(context)!.workout_snackbar_msg),
-                                                  );
-
-                                                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                                  return;
-                                                }
-
-                                                newEntry!.caption = workoutNameController.text;
-                                                newEntry!.type = type;
-                                                newEntry!.partList = partList;
-                                                newEntry!.metric = metric;
-                                                newEntry!.description = descriptionController.text;
-                                                widget.objectbox.workoutBox.put(newEntry!);
-                                                widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
-                                                Navigator.pop(context, true);
-                                              },
-                                              title: Text(widget.edit ? "Save Changes" : AppLocalizations.of(context)!.workout_add_workout,
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              )
-                                          )
-                                        ]
-                                    )
-                                ),// Save Button
+                                CardButton(
+                                    Theme.of(context).colorScheme.primary,
+                                    widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.workout_add_workout,
+                                        () {saveWorkout();}
+                                ),
                               ],
                             )
                         )

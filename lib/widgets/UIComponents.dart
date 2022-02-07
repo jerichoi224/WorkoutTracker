@@ -32,3 +32,29 @@ Widget tag(String caption, onTap, color) {
     ],
   );
 }
+
+Widget CardButton(color, text, onTap)
+{
+  return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
+      color: color,
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            new InkWell(
+                borderRadius: BorderRadius.circular(8.0),
+                onTap: onTap,
+                child: ListTile(
+                    title: Text(text,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                      textAlign: TextAlign.center,
+                    )
+                )
+            )
+          ]
+      )
+  );
+}

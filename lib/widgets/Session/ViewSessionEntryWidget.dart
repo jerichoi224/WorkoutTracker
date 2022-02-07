@@ -37,6 +37,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
   String locale = "";
 
   bool modified = false;
+  bool firstTime = true;
 
   TextStyle titleStyle = TextStyle(
       fontSize: 14,
@@ -55,7 +56,6 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     super.initState();
     String? temp = widget.objectbox.getPref("locale");
     locale = temp != null ? temp : 'en';
-    updateInfo();
   }
 
   void updateInfo()
@@ -69,8 +69,8 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     timeRange = "";
     int duration = (endTime - startTime)~/60000;
     if(duration > 60)
-      timeRange += (duration ~/ 60).toString() + "hr ";
-    timeRange += (duration % 60).toString() + " min";
+      timeRange += (duration ~/ 60).toString() + AppLocalizations.of(context)!.hour + " ";
+    timeRange += (duration % 60).toString() + " " + AppLocalizations.of(context)!.minute;
     setState(() {});
   }
   // List of Tags in partList
@@ -273,6 +273,12 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if(firstTime)
+    {
+      firstTime = false;
+      updateInfo();
+    }
+
     return WillPopScope(
         onWillPop: () async{
           Navigator.pop(context, modified);

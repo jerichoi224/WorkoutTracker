@@ -226,7 +226,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                 title: new Row(
                   children: <Widget>[
                     new Flexible(
-                        child: new Text(workoutCardList[index].entry.caption.capitalize(),
+                        child: new Text(workoutCardList[index].entry.caption.capitalize(locale),
                           style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold
@@ -687,27 +687,11 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                         ]
                                     )
                                 ),
-                                Card(
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.fromLTRB(8, 0, 8, 20),
-                                    color: Theme.of(context).colorScheme.primary,
-                                    child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          ListTile(
-                                              onTap:(){
-                                                saveSession();
-                                                },
-                                              title: Text(widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.session_finish_session,
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              )
-                                          )
-                                        ]
-                                    )
-                                ),// Save Button
+                                CardButton(
+                                    Theme.of(context).colorScheme.primary,
+                                    widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.session_finish_session,
+                                        () {saveSession();}
+                                ),
                               ],
                             )
                         )

@@ -171,8 +171,8 @@ class _WorkoutState extends State<WorkoutWidget> {
                       ],
                     ),
                   ),
-                  subtitle: Text(i.type),
-                    trailing: _popUpMenuButton(i)
+                  subtitle: Text(WorkoutType.values.firstWhere((element) => element.name == i.type).toLanguageString(locale).capitalize(locale)),
+                  trailing: _popUpMenuButton(i)
               )
           )
         )

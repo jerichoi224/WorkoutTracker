@@ -93,6 +93,7 @@ class _SettingsState extends State<SettingsWidget> {
                      child: Column(
                        children: <Widget>[
                          InkWell(
+                           borderRadius: BorderRadius.circular(8.0),
                            onTap: (){
                              openProfilePage(context);
                              },
@@ -122,6 +123,7 @@ class _SettingsState extends State<SettingsWidget> {
                      child: Column(
                        children: <Widget>[
                          InkWell(
+                           borderRadius: BorderRadius.circular(8.0),
                            onTap: (){},
                            child: ListTile(
                                title: new Row(
@@ -179,6 +181,7 @@ class _SettingsState extends State<SettingsWidget> {
                      child: Column(
                        children: <Widget>[
                          InkWell(
+                           borderRadius: BorderRadius.circular(8.0),
                            onTap: (){
                              openOtherPage(context);
                            },

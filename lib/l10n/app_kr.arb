@@ -37,6 +37,9 @@
   "dashboard_start_routine": "루틴 시작",
   "dashboard_overview": "정보",
   "dashboard_total_session_count": "총 운동 횟수: ",
+  "dashboard_month_session_count": "이번 달 운동 횟수",
+  "dashboard_month_session_time": "이번 달 운동 시간",
+  "dashboard_month_pie_chart_title": "각 부위별 운동 횟수",
 
   "settings_user_settings": "사용자 설정",
   "settings_profile": "사용자 프로필",
@@ -70,6 +73,7 @@
   "workout_avg_weight": "평균 무게",
   "workout_max_count": "최대 횟수",
   "workout_total_count": "총 횟수",
+  "workout_type_msg": "저장 후, 측정 단위는 수정할 수 없습니다.",
 
   "session_info": "운동 세션 정보",
   "session_choose_routine": "루틴 선택",
