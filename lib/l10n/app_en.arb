@@ -29,6 +29,8 @@
     "license": "License",
     "image": "Images",
     "contact": "Contact",
+    "yes": "Yes",
+    "no": "No",
 
     "helloWorld": "Hello World!",
     "dashboard_start_workout": "Start Workout",
@@ -80,7 +82,9 @@
     "session_edit_session": "Edit Workout Session",
     "session_start_time": "Start Time",
     "session_end_time": "End Time",
+    "session_workout_time": "Workout Time",
     "session_set_time_manually": "Set Time Manually",
+    "session_set_time_automatically": "Set Time Automatically",
     "session_finish_session": "Finish Session",
     "session_add_set": "Add Set",
     "session_time_msg": "End Time must be after Start Time",
@@ -89,6 +93,9 @@
     "session_total_weight": "Total Weight",
     "session_total_distance": "Total Distance",
     "session_stairs": "Stairs",
+    "session_please_confirm": "Please Confirm",
+    "session_quit_msg": "Are you sure to quit the workout?",
+    "session_delete_msg": "This workout has data recorded. Are you sure you want to delete it?",
 
     "instruction_select_language": "Select your langauge",
     "instruction_ask_name_msg": "Welcome to Workout Tracker!\nWhat's your name?",

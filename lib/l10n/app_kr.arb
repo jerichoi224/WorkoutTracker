@@ -29,6 +29,8 @@
   "llicense": "라이센스",
   "image": "이미지",
   "contact": "연락처",
+  "yes": "예",
+  "no": "아니오",
 
   "helloWorld": "안녕하세요",
   "dashboard_start_workout": "운동 시작",
@@ -81,7 +83,9 @@
   "session_edit_session": "운동 세션 편집",
   "session_start_time": "시작 시간",
   "session_end_time": "종료 시간",
+  "session_workout_time": "운동 시간",
   "session_set_time_manually": "시간 직접 설정",
+  "session_set_time_automatically": "시간 자동 설정",
   "session_finish_session": "운동 종료",
   "session_add_set": "세트 추가",
   "session_time_msg": "종료 시간이 시작 시간보다 나중이어야 합니다.",
@@ -90,6 +94,9 @@
   "session_total_weight": "총 무게",
   "session_total_distance": "총 거리",
   "session_stairs": "계단",
+  "session_please_confirm": "확인",
+  "session_quit_msg": "정말 운동을 그만두시겠습니까?",
+  "session_delete_msg": "운동이 기록되어 있습니다. 정말로 삭제하시겠습니까?",
 
   "instruction_select_language": "언어를 선택해주세요",
   "instruction_ask_name_msg": "환영합니다.\n이름을 알려주세요",

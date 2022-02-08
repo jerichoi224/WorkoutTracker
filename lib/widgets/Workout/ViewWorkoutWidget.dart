@@ -121,7 +121,8 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
     ];
   }
 
-  List<LineSeries<CountChartData, DateTime>> _createCountChartData() {
+  Widget countLineChart()
+  {
     sessions.sort((a, b) => b.time.compareTo(a.time));
     sessions = sessions.reversed.toList();
 
@@ -145,7 +146,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
     data.insert(0, CountChartData(new DateTime(prevDay.year, prevDay.month, prevDay.day), null, null));
     data.add(CountChartData(new DateTime(nextDay.year, nextDay.month, nextDay.day), null, null));
 
-    return <LineSeries<CountChartData, DateTime>>[
+    List<LineSeries<CountChartData, DateTime>> datapoints = [
       LineSeries<CountChartData, DateTime>(
         name: AppLocalizations.of(context)!.workout_max_count + " (" + workoutEntry!.metric + ")",
         // Bind data source
@@ -176,6 +177,32 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
         ),
       )
     ];
+
+    return SfCartesianChart(
+      primaryXAxis: DateTimeAxis(
+          enableAutoIntervalOnZooming: true
+      ),
+      axes: <ChartAxis>[
+        NumericAxis(
+            name: 'totalYAxis',
+            opposedPosition: true,
+            title: AxisTitle(
+            )
+        )
+      ],
+      legend: Legend(
+          isVisible: true,
+          position: LegendPosition.bottom
+      ),
+      margin: EdgeInsets.fromLTRB(15, 15, 15, 10),
+      tooltipBehavior: TooltipBehavior( enable: true),
+      series: datapoints,
+      zoomPanBehavior: ZoomPanBehavior(
+        enablePinching: true,
+        zoomMode: ZoomMode.x,
+        enablePanning: true,
+      ),
+    );
   }
 
   List<Widget> _buildActions() {
@@ -345,31 +372,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                     )
                                 else if([MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(workoutEntry!.metric))
                                     Container(
-                                        child: SfCartesianChart(
-                                          primaryXAxis: DateTimeAxis(
-                                              enableAutoIntervalOnZooming: true
-                                          ),
-                                          axes: <ChartAxis>[
-                                            NumericAxis(
-                                                name: 'totalYAxis',
-                                                opposedPosition: true,
-                                                title: AxisTitle(
-                                                )
-                                            )
-                                          ],
-                                          legend: Legend(
-                                              isVisible: true,
-                                              position: LegendPosition.bottom
-                                          ),
-                                          margin: EdgeInsets.fromLTRB(15, 15, 15, 10),
-                                          tooltipBehavior: TooltipBehavior( enable: true),
-                                          series: _createCountChartData(),
-                                          zoomPanBehavior: ZoomPanBehavior(
-                                            enablePinching: true,
-                                            zoomMode: ZoomMode.x,
-                                            enablePanning: true,
-                                          ),
-                                        )
+                                        child: countLineChart()
                                     )
                               ],
                             )

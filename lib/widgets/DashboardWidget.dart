@@ -221,7 +221,7 @@ class _DashboardState extends State<DashboardWidget>{
 
   void startNewSession(BuildContext context) async {
     // start the SecondScreen and wait for it to finish with a result
-    bool result = await Navigator.push(
+    final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine:false, edit: false, id:0),
@@ -272,7 +272,7 @@ class _DashboardState extends State<DashboardWidget>{
         series: <PieSeries<_PieData, String>>[
           PieSeries<_PieData, String>(
               explode: true,
-              explodeIndex: 0,
+//              explodeIndex: 0,
               dataSource: pie_data,
               xValueMapper: (_PieData data, _) => data.xData,
               yValueMapper: (_PieData data, _) => data.yData,

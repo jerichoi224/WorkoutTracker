@@ -25,10 +25,11 @@ class WorkoutCard {
     countList.add(count);
     TextEditingController metricTextController = new TextEditingController();
     TextEditingController countTextController = new TextEditingController();
-    if(metric != 0)
-      metricTextController.text  = metric.toStringRemoveTrailingZero();
-    if(count != 0)
-      countTextController.text  = count.toString();
+    if(metric != 0 || count != 0)
+      {
+        metricTextController.text  = metric.toStringRemoveTrailingZero();
+        countTextController.text  = count.toString();
+      }
 
     metricController.add(metricTextController);
     countController.add(countTextController);

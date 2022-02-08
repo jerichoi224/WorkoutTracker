@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/class/WorkoutCard.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
@@ -40,6 +42,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   int month = 0;
   String locale = "";
 
+  late Timer _timer;
+
   @override
   void initState() {
     super.initState();
@@ -52,8 +56,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
         sessionNameController.text = sessionEntry!.name;
         startTime = sessionEntry!.startTime;
         endTime = sessionEntry!.endTime;
-        startDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
-        endDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
+        startDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
+        endDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
         partList = sessionEntry!.parts;
         for(SessionItem item in sessionEntry!.sets)
           {
@@ -68,8 +72,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       sessionEntry = new SessionEntry();
       DateTime now = new DateTime.now();
       defaultName = dateFormatter.format(now);
-      startDate = timeFormatter.format(now);
-      endDate = timeFormatter.format(now);
+      startDate = dateTimeFormatter.format(now);
+      endDate = dateTimeFormatter.format(now);
       startTime = now.millisecondsSinceEpoch;
       endTime = now.millisecondsSinceEpoch;
       if (widget.fromRoutine) {
@@ -83,7 +87,29 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   id), true);
         }
       }
+      StateTimerStart();
     }
+  }
+
+  String timeString()
+  {
+    DateTime now = new DateTime.now();
+    Duration timeElapsed = now.difference(DateTime.fromMillisecondsSinceEpoch(startTime));
+
+    if(timeElapsed.inSeconds < 3600)
+      return timeElapsed.toMinutesSeconds();
+
+    return timeElapsed.toHoursMinutesSeconds();
+  }
+
+  void StateTimerStart(){
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if(!setTime)
+        {
+          setState(() {
+          });
+        }
+    });
   }
 
   List<Widget> selectPartList(setDialogState)
@@ -220,44 +246,74 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         margin: EdgeInsets.all(8.0),
-        child: Column(
-            children: <Widget>[
-              ListTile(
-                title: new Row(
-                  children: <Widget>[
-                    new Flexible(
-                        child: new Text(workoutCardList[index].entry.caption.capitalize(locale),
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold
-                          ),
-                        )
+//        clipBehavior: Clip.antiAlias,
+        child: Theme(
+          data: ThemeData().copyWith(dividerColor: Colors.transparent),
+          child:  ExpansionTile(
+            initiallyExpanded: true,
+            maintainState: true,
+            iconColor: Colors.grey,
+            title: ListTile(
+              title: new Row(
+                children: <Widget>[
+                  new Flexible(
+                      child: new Text(workoutCardList[index].entry.caption.capitalize(locale),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold
+                        ),
+                      )
+                  ),
+                ],
+              ),
+              trailing: new Container(
+                child: new IconButton(
+                    icon: new Icon(
+                        Icons.close,
+                      color: Colors.grey,
                     ),
-                  ],
-                ),
-                trailing: new Container(
-                  child: new IconButton(
-                      icon: new Icon(Icons.close),
-                      onPressed:(){
+                    onPressed:(){
+                      WorkoutCard card = workoutCardList[index];
+                      bool ask = false;
+                      for(int i = 0; i < card.numSets; i++)
+                        {
+                          if(card.countController[i].text.isNotEmpty || card.metricController[i].text.isNotEmpty)
+                            {
+                              ask = true;
+                              break;
+                            }
+                        }
+                      if(ask)
+                        confirmDelete(index);
+                      else{
                         workoutCardList.removeAt(index);
                         workoutEntryList.removeAt(index);
+                        partList = [];
+                        for(WorkoutEntry entry in workoutEntryList)
+                          for(String part in entry.partList)
+                            if(!partList.contains(part))
+                              partList.add(part);
+
                         setState(() {
                         });
                       }
-                  )
-                  ,
-                ),
+                    }
+                )
+                ,
               ),
+            ),
+            children: [
               ListView.builder(
-                itemCount: workoutCardList[index].numSets,
-                itemBuilder: (BuildContext context, int ind) {
-                  return _BuildSets(context, ind, index);
-                },
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-              ),
-              AddButton(AppLocalizations.of(context)!.session_add_set, (){AddSet(index, 0, 0);})
-            ]
+              itemCount: workoutCardList[index].numSets,
+              itemBuilder: (BuildContext context, int ind) {
+                return _BuildSets(context, ind, index);
+              },
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+            ),
+            AddButton(AppLocalizations.of(context)!.session_add_set, (){AddSet(index, 0, 0);})
+          ]
+          )
         )
     );
   }
@@ -282,9 +338,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     return ListTile(
       title: new Row(
         children: <Widget>[
-          new Text(prev,
-            style: TextStyle(
-              color: Colors.black38
+          Container(
+            margin: EdgeInsets.fromLTRB(15, 0, 0, 0),
+
+            child: Text(prev,
+              style: TextStyle(
+                  color: Colors.black38
+              ),
             ),
           ),
           new Expanded(child: Container()),
@@ -370,7 +430,6 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
 
       }
     sessionEntry!.name = sessionNameController.text;
-    sessionEntry!.parts = partList;
 
     sessionEntry!.startTime = startTime;
     if(endTime == 0)
@@ -380,23 +439,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     sessionEntry!.month = DateTime.fromMillisecondsSinceEpoch(startTime).month;
     sessionEntry!.day = DateTime.fromMillisecondsSinceEpoch(startTime).day;
 
+    partList = [];
     List<SessionItem> tempList = [];
     for(WorkoutCard cardItem in workoutCardList)
     {
       if(cardItem.numSets == 0)
         continue;
-/*
-      // remove invalid sets
-      for(int i = cardItem.numSets - 1; i >=0; i--)
-        {
-          if(cardItem.metricController[i].text.isEmpty && cardItem.countController[i].text.isEmpty)
-            cardItem.remove(i);
-          else if(![MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(cardItem.entry.metric)  && cardItem.metricController[i].text.isEmpty)
-            cardItem.remove(i);
-          else if (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[i].text.isEmpty)
-            cardItem.remove(i);
-        }
-*/
+
       // if there's an invalid WorkoutCard, skip it.
       bool skip = true;
       for(int i = 0; i < cardItem.numSets; i++) {
@@ -428,6 +477,11 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               countValue: cardItem.countController[j].text.isNotEmpty ? int.parse(cardItem.countController[j].text) : 0
           ));
       }
+
+      for(String part in cardItem.entry.partList)
+        if(!partList.contains(part))
+          partList.add(part);
+
       tempList.add(item);
       widget.objectbox.sessionItemBox.put(item);
       widget.objectbox.itemList.add(item);
@@ -474,6 +528,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     for(SessionItem item in tempList)
       sessionEntry!.sets.add(item);
 
+    sessionEntry!.parts = partList;
+
     // Add Session to DB
     widget.objectbox.sessionBox.put(sessionEntry!);
 
@@ -496,6 +552,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
         widget.objectbox.workoutBox.put(workoutEntry);
       }
     }
+    if(!widget.edit)
+      _timer.cancel();
 
     // update all lists that changed.
     if(!widget.edit)
@@ -505,12 +563,75 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     Navigator.pop(context, true);
   }
 
+  void confirmExit() {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: Text(AppLocalizations.of(context)!.session_please_confirm),
+            content: Text(AppLocalizations.of(context)!.session_quit_msg),
+            actions: [
+              // The "Yes" button
+              TextButton(
+                  onPressed: () {
+                    // Close the dialog
+                    Navigator.of(ctx).pop();
+                    if(!widget.edit)
+                        _timer.cancel();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(AppLocalizations.of(context)!.yes)),
+              TextButton(
+                  onPressed: () {
+                    // Close the dialog
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text(AppLocalizations.of(context)!.no))
+            ],
+          );
+        });
+  }
+
+  void confirmDelete(int index) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: Text(AppLocalizations.of(context)!.session_please_confirm),
+            content: Text(AppLocalizations.of(context)!.session_delete_msg),
+            actions: [
+              // The "Yes" button
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    workoutCardList.removeAt(index);
+                    workoutEntryList.removeAt(index);
+                    partList = [];
+                    for(WorkoutEntry entry in workoutEntryList)
+                      for(String part in entry.partList)
+                        if(!partList.contains(part))
+                          partList.add(part);
+
+                    setState(() {
+                    });
+                  },
+                  child: Text(AppLocalizations.of(context)!.yes)),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text(AppLocalizations.of(context)!.no))
+            ],
+          );
+        });
+  }
+
   Widget _popUpMenuButton() {
     return PopupMenuButton(
       icon: Icon(Icons.more_vert),
       itemBuilder: (context) => [
         PopupMenuItem(
-          child: Text(AppLocalizations.of(context)!.session_set_time_manually),
+          child: Text(setTime ? AppLocalizations.of(context)!.session_set_time_automatically : AppLocalizations.of(context)!.session_set_time_manually),
           value: 0,
         ),
       ],
@@ -518,7 +639,10 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       onSelected: (selectedIndex) {
         if(selectedIndex == 0){
           setState(() {
-            setTime = true;
+            DateTime now = new DateTime.now();
+            endDate = dateTimeFormatter.format(now);
+            endTime = now.millisecondsSinceEpoch;
+            setTime = !setTime;
           });
         }
       },
@@ -552,8 +676,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async{
-          Navigator.pop(context, false);
-          return true;
+          confirmExit();
+          return false;
         },
         child: new GestureDetector(
             onTap: () {
@@ -599,7 +723,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                         ),
                                                       )
                                                   ),
-                                                  if(!setTime)
+                                                  if(!widget.edit)
                                                     _popUpMenuButton()
                                                 ],
                                               )
@@ -615,7 +739,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                     if(newTime != 0)
                                                       setState(() {
                                                         startTime = newTime;
-                                                        startDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
+                                                        startDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
                                                       });
                                                   },
                                                   child: Text(startDate),
@@ -623,26 +747,45 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                               ],
                                             )
                                           ),
-                                          if(setTime)
-                                            ListTile(
-                                              title: new Row(
-                                                children: <Widget>[
-                                                  Text(AppLocalizations.of(context)!.session_end_time),
-                                                  Expanded(child: Container()),
-                                                  InkWell(
-                                                    onTap: () async {
-                                                      int newTime = await _selectDate(context, endTime);
-                                                      if(newTime != 0)
-                                                        setState(() {
-                                                        endTime = newTime;
-                                                        endDate = timeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
-                                                      });
-                                                    },
-                                                    child: Text(endDate),
-                                                  )
-                                                ],
-                                              )
-                                            ),
+                                          ListTile(
+                                            title: new Row(
+                                              children: <Widget>[
+                                                Text(setTime ? AppLocalizations.of(context)!.session_end_time : AppLocalizations.of(context)!.session_workout_time),
+                                                Expanded(child: Container()),
+                                                setTime ?InkWell(
+                                                  onTap: () async {
+                                                    int newTime = await _selectDate(context, endTime);
+                                                    if(newTime != 0)
+                                                      setState(() {
+                                                      endTime = newTime;
+                                                      endDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
+                                                    });
+                                                  },
+                                                  child: Text(endDate),
+                                                ) :
+                                               RichText(
+                                                   text: TextSpan(
+                                                       children: [
+                                                         WidgetSpan(
+                                                           child: Icon(
+                                                             Icons.timer,
+                                                             color: Color.fromRGBO(0, 0, 0, 0.7),
+                                                             size: 18,
+                                                           ),
+                                                         ),
+                                                         TextSpan(
+                                                           text: "\t" + timeString(),
+                                                           style: TextStyle(
+                                                             color: Color.fromRGBO(0, 0, 0, 0.7),
+                                                             fontSize: 18
+                                                           ),
+                                                         )
+                                                       ]
+                                                   ),
+                                               )
+                                              ],
+                                            )
+                                          ),
                                         ]
                                     )
                                 ),
@@ -692,6 +835,9 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                     widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.session_finish_session,
                                         () {saveSession();}
                                 ),
+                                Container(
+                                  margin: EdgeInsets.all(10),
+                                )
                               ],
                             )
                         )

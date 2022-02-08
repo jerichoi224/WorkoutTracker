@@ -45,7 +45,7 @@ class _CalendarState extends State<CalendarWidget>{
 
   void _openEditWidget(BuildContext context, int id) async {
     // start the SecondScreen and wait for it to finish with a result
-    bool result = await Navigator.push(
+    final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine:false, edit: true, id:id),

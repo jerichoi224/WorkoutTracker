@@ -31,8 +31,26 @@ extension DoubleExtension on double {
   }
 }
 
+extension DurationExtensions on Duration {
+  String toMinutesSeconds() {
+    String twoDigitSeconds = _toTwoDigits(this.inSeconds.remainder(60));
+    return "${_toTwoDigits(this.inMinutes)}:$twoDigitSeconds";
+  }
+
+  String toHoursMinutesSeconds() {
+    String twoDigitMinutes = _toTwoDigits(this.inMinutes.remainder(60));
+    String twoDigitSeconds = _toTwoDigits(this.inSeconds.remainder(60));
+    return "${_toTwoDigits(this.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
+
+  String _toTwoDigits(int n) {
+    if (n >= 10) return "$n";
+    return "0$n";
+  }
+}
+
 final dateFormatter = new DateFormat('yy/MM/dd');
-final timeFormatter = new DateFormat('yyyy/MM/dd HH:mm');
+final dateTimeFormatter = new DateFormat('yyyy/MM/dd HH:mm');
 
 String getKoreanFirstVowel(String text)
 {
