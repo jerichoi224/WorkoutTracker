@@ -47,6 +47,8 @@
     "settings_profile": "Profile",
     "settings_system_settings": "System Settings",
     "settings_change_language": "Change Language",
+    "settings_preferred_weight_metric": "Preferred Weight Metric",
+    "settings_preferred_distance_metric": "Preferred Distance Metric",
     "settings_other": "Other",
     "settings_about": "About",
     "settings_edit_profile": "Edit Profile",

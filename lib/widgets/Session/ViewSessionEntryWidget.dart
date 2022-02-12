@@ -36,6 +36,8 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
   int year = 0;
   int month = 0;
   String locale = "";
+  String distMetric = "";
+  String weightMetric = "";
 
   bool modified = false;
   bool firstTime = true;
@@ -57,6 +59,10 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     super.initState();
     String? temp = widget.objectbox.getPref("locale");
     locale = temp != null ? temp : 'en';
+    temp = widget.objectbox.getPref("preferred_distance");
+    distMetric = temp != null ? temp : 'km';
+    temp = widget.objectbox.getPref("preferred_weight");
+    weightMetric = temp != null ? temp : 'kg';
   }
 
   void updateInfo()
@@ -205,8 +211,10 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
           {
             for(SetItem set in item.sets)
               {
-                if(item.metric == MetricType.lb.name)
+                if(weightMetric == MetricType.kg.name && item.metric == MetricType.lb.name)
                   weight += set.countValue * set.metricValue * 0.453592;
+                else if(weightMetric == MetricType.lb.name && item.metric == MetricType.kg.name)
+                  weight += set.countValue * set.metricValue * 2.20462;
                 else
                   weight += set.countValue * set.metricValue;
               }
@@ -215,8 +223,10 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
           {
             for(SetItem set in item.sets)
             {
-              if(item.metric == MetricType.miles.name)
+              if(distMetric == MetricType.km.name && item.metric == MetricType.miles.name)
                 distance += set.metricValue * 1.60934;
+              else if(distMetric == MetricType.miles.name && item.metric == MetricType.km.name)
+                distance += set.metricValue * 0.621371;
               else
                 distance += set.metricValue;
             }
@@ -236,7 +246,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
           textAlign: TextAlign.left,
             style: titleStyle
         ),
-        Text(weight.toStringRemoveTrailingZero() + "kg",
+        Text(weight.toStringRemoveTrailingZero() + " " + weightMetric,
           textAlign: TextAlign.left,
             style: contentStyle
         ),
@@ -247,7 +257,7 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
             textAlign: TextAlign.left,
             style: titleStyle
         ),
-        Text(distance.toStringRemoveTrailingZero() + "km",
+        Text(distance.toStringRemoveTrailingZero() + " " + distMetric,
             textAlign: TextAlign.left,
             style: contentStyle
         ),

@@ -48,6 +48,8 @@
   "settings_profile": "사용자 프로필",
   "settings_system_settings": "시스템 설정",
   "settings_change_language": "언어 변경",
+  "settings_preferred_weight_metric": "선호하는 무게 단위",
+  "settings_preferred_distance_metric": "선호하는 거리 단위",
   "settings_other": "기타",
   "settings_about": "앱 정보",
   "settings_edit_profile": "프로필 편집",

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/objectbox.dart';
+import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/HomeWidget.dart';
 import 'package:workout_tracker/widgets/Setting/AboutSettingWidget.dart';
 import 'package:workout_tracker/widgets/Setting/ProfileSettingWidget.dart';
@@ -18,11 +19,18 @@ class _SettingsState extends State<SettingsWidget> {
    bool bToggle = false;
    Map<String, String> languages = {'English': 'en', '한국어': 'kr'};
    String locale = "";
+   String distMetric = "";
+   String weightMetric = "";
+
   @override
   void initState() {
     super.initState();
     String? temp = widget.objectbox.getPref("locale");
     locale = temp != null ? temp : 'en';
+    temp = widget.objectbox.getPref("preferred_distance");
+    distMetric = temp != null ? temp : 'km';
+    temp = widget.objectbox.getPref("preferred_weight");
+    weightMetric = temp != null ? temp : 'kg';
   }
 
    void openProfilePage(BuildContext context) async {
@@ -154,6 +162,88 @@ class _SettingsState extends State<SettingsWidget> {
                                        }).toList();
                                      },
                                      items: languages.keys.map<DropdownMenuItem<String>>((String value) {
+                                       return DropdownMenuItem<String>(
+                                         value: value,
+                                         child: Text(value),
+                                       );
+                                     }).toList(),
+                                   )
+                                 ],
+                               )
+                           ),
+                         ),
+                         InkWell(
+                           borderRadius: BorderRadius.circular(8.0),
+                           onTap: (){},
+                           child: ListTile(
+                               title: new Row(
+                                 children: <Widget>[
+                                   new Text(AppLocalizations.of(context)!.settings_preferred_distance_metric),
+                                   Spacer(),
+                                   DropdownButton<String>(
+                                     value: distMetric,
+                                     iconSize: 24,
+                                     elevation: 16,
+                                     onChanged: (value){
+                                       setState(() {
+                                         distMetric = value!;
+                                         widget.objectbox.setPref("preferred_distance", value);
+                                       });
+                                     },
+                                     underline: Container(
+                                       height: 2,
+                                     ),
+                                     selectedItemBuilder: (BuildContext context) {
+                                       return [MetricType.km.name, MetricType.miles.name].map<Widget>((String value) {
+                                         return Container(
+                                             alignment: Alignment.centerRight,
+                                             width: 100,
+                                             child: Text(value, textAlign: TextAlign.end)
+                                         );
+                                       }).toList();
+                                     },
+                                     items: [MetricType.km.name, MetricType.miles.name].map<DropdownMenuItem<String>>((String value) {
+                                       return DropdownMenuItem<String>(
+                                         value: value,
+                                         child: Text(value),
+                                       );
+                                     }).toList(),
+                                   )
+                                 ],
+                               )
+                           ),
+                         ),
+                         InkWell(
+                           borderRadius: BorderRadius.circular(8.0),
+                           onTap: (){},
+                           child: ListTile(
+                               title: new Row(
+                                 children: <Widget>[
+                                   new Text(AppLocalizations.of(context)!.settings_preferred_weight_metric),
+                                   Spacer(),
+                                   DropdownButton<String>(
+                                     value: weightMetric,
+                                     iconSize: 24,
+                                     elevation: 16,
+                                     onChanged: (value){
+                                       setState(() {
+                                         weightMetric = value!;
+                                         widget.objectbox.setPref("preferred_weight", value);
+                                       });
+                                     },
+                                     underline: Container(
+                                       height: 2,
+                                     ),
+                                     selectedItemBuilder: (BuildContext context) {
+                                       return [MetricType.kg.name, MetricType.lb.name].map<Widget>((String value) {
+                                         return Container(
+                                             alignment: Alignment.centerRight,
+                                             width: 100,
+                                             child: Text(value, textAlign: TextAlign.end)
+                                         );
+                                       }).toList();
+                                     },
+                                     items: [MetricType.kg.name, MetricType.lb.name].map<DropdownMenuItem<String>>((String value) {
                                        return DropdownMenuItem<String>(
                                          value: value,
                                          child: Text(value),
