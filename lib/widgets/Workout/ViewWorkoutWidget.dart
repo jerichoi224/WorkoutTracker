@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/session_item_model.dart';
-import 'package:workout_tracker/dbModels/set_item_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/objectbox.g.dart';
+import 'package:workout_tracker/util/charts.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ViewWorkoutWidget extends StatefulWidget {
@@ -31,7 +31,9 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
     String? temp = widget.objectbox.getPref("locale");
     locale = temp != null ? temp : 'en';
 
-    sessions = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry!.id).toList();
+    sessions = widget.objectbox.sessionItemBox.query(
+      SessionItem_.workoutId.equals(workoutEntry!.id)
+    ).build().find();
   }
 
   void updateInfo()
@@ -62,147 +64,6 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
         updateInfo();
         setState(() {});
       }
-  }
-
-  List<LineSeries<WeightChartData, DateTime>> _createWeightChartData() {
-    sessions.sort((a, b) => b.time.compareTo(a.time));
-    sessions = sessions.reversed.toList();
-
-    List<WeightChartData> data= [];
-
-    for(SessionItem sessionItem in sessions)
-      {
-        double max = -1;
-        double sum = 0;
-        DateTime date = DateTime.fromMillisecondsSinceEpoch(sessionItem.time);
-        for(SetItem setItem in sessionItem.sets)
-          {
-            if(max < setItem.metricValue)
-              max = setItem.metricValue;
-            sum += setItem.metricValue;
-          }
-        data.add(WeightChartData(date, max, sum/sessionItem.sets.length));
-      }
-
-    DateTime prevDay = data.first.date.subtract(Duration(days: 1));
-    DateTime nextDay = data.last.date.add(Duration(days: 1));
-    data.insert(0, WeightChartData(new DateTime(prevDay.year, prevDay.month, prevDay.day), null, null));
-    data.add(WeightChartData(new DateTime(nextDay.year, nextDay.month, nextDay.day), null, null));
-
-    return <LineSeries<WeightChartData, DateTime>>[
-      LineSeries<WeightChartData, DateTime>(
-        name: AppLocalizations.of(context)!.workout_max_weight,
-        // Bind data source
-          dataSource: data,
-          xValueMapper: (WeightChartData dataPoint, _) => dataPoint.date,
-          yValueMapper: (WeightChartData dataPoint, _) => dataPoint.maxVal,
-          markerSettings: MarkerSettings(
-            isVisible: true,
-            height: 4,
-            width: 4,
-            shape: DataMarkerType.circle,
-            borderWidth: 1
-          ),
-      ),
-      LineSeries<WeightChartData, DateTime>(
-        // Bind data source
-          name: AppLocalizations.of(context)!.workout_avg_weight,
-          dataSource:  data,
-          xValueMapper: (WeightChartData dataPoint, _) => dataPoint.date,
-          yValueMapper: (WeightChartData dataPoint, _) => dataPoint.avgVal,
-          markerSettings: MarkerSettings(
-              isVisible: true,
-              height: 4,
-              width: 4,
-              shape: DataMarkerType.circle,
-              borderWidth: 1
-          ),
-      )
-    ];
-  }
-
-  Widget countLineChart()
-  {
-    sessions.sort((a, b) => b.time.compareTo(a.time));
-    sessions = sessions.reversed.toList();
-
-    List<CountChartData> data= [];
-    for(SessionItem sessionItem in sessions)
-    {
-      double max = -1;
-      double sum = 0;
-      DateTime date = DateTime.fromMillisecondsSinceEpoch(sessionItem.time);
-      for(SetItem setItem in sessionItem.sets)
-      {
-        if(max < setItem.metricValue)
-          max = setItem.metricValue;
-        sum += setItem.metricValue;
-      }
-      data.add(CountChartData(date, max, sum));
-    }
-
-    DateTime prevDay = data.first.date.subtract(Duration(days: 1));
-    DateTime nextDay = data.last.date.add(Duration(days: 1));
-    data.insert(0, CountChartData(new DateTime(prevDay.year, prevDay.month, prevDay.day), null, null));
-    data.add(CountChartData(new DateTime(nextDay.year, nextDay.month, nextDay.day), null, null));
-
-    List<LineSeries<CountChartData, DateTime>> datapoints = [
-      LineSeries<CountChartData, DateTime>(
-        name: AppLocalizations.of(context)!.workout_max_count + " (" + workoutEntry!.metric + ")",
-        // Bind data source
-        dataSource: data,
-        xValueMapper: (CountChartData dataPoint, _) => dataPoint.date,
-        yValueMapper: (CountChartData dataPoint, _) => dataPoint.maxVal,
-        markerSettings: MarkerSettings(
-            isVisible: true,
-            height: 4,
-            width: 4,
-            shape: DataMarkerType.circle,
-            borderWidth: 1
-        ),
-      ),
-      LineSeries<CountChartData, DateTime>(
-        // Bind data source
-        name: AppLocalizations.of(context)!.workout_total_count + " (" + workoutEntry!.metric + ")",
-        dataSource:  data,
-        xValueMapper: (CountChartData dataPoint, _) => dataPoint.date,
-        yValueMapper: (CountChartData dataPoint, _) => dataPoint.totalVal,
-        yAxisName: 'totalYAxis',
-        markerSettings: MarkerSettings(
-            isVisible: true,
-            height: 4,
-            width: 4,
-            shape: DataMarkerType.circle,
-            borderWidth: 1
-        ),
-      )
-    ];
-
-    return SfCartesianChart(
-      primaryXAxis: DateTimeAxis(
-          enableAutoIntervalOnZooming: true
-      ),
-      axes: <ChartAxis>[
-        NumericAxis(
-            name: 'totalYAxis',
-            opposedPosition: true,
-            title: AxisTitle(
-            )
-        )
-      ],
-      legend: Legend(
-          isVisible: true,
-          position: LegendPosition.bottom
-      ),
-      margin: EdgeInsets.fromLTRB(15, 15, 15, 10),
-      tooltipBehavior: TooltipBehavior( enable: true),
-      series: datapoints,
-      zoomPanBehavior: ZoomPanBehavior(
-        enablePinching: true,
-        zoomMode: ZoomMode.x,
-        enablePanning: true,
-      ),
-    );
   }
 
   List<Widget> _buildActions() {
@@ -295,7 +156,7 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                               children: <Widget>[
                                                 Text(AppLocalizations.of(context)!.metric),
                                                 Spacer(),
-                                                Text(workoutEntry!.metric.capitalize(locale)),
+                                                Text(workoutEntry!.metric),
                                               ],
                                             )
                                         ), // Metric Dropdown
@@ -350,30 +211,18 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
                                     )
                                   ),
                                 if(sessions.length > 0)
-                                  if(workoutEntry!.metric == MetricType.kg.name)
+                                  if([MetricType.lb.name, MetricType.kg.name].contains(workoutEntry!.metric))
                                     Container(
-                                      child: SfCartesianChart(
-                                          primaryXAxis: DateTimeAxis(
-                                              enableAutoIntervalOnZooming: true
-                                          ),
-                                          legend: Legend(
-                                            isVisible: true,
-                                            position: LegendPosition.bottom
-                                          ),
-                                        margin: EdgeInsets.fromLTRB(15, 15, 15, 10),
-                                        tooltipBehavior: TooltipBehavior( enable: true),
-                                          series: _createWeightChartData(),
-                                          zoomPanBehavior: ZoomPanBehavior(
-                                            enablePinching: true,
-                                            zoomMode: ZoomMode.x,
-                                            enablePanning: true,
-                                          ),
+                                      child: weightLineChart(sessions, context, workoutEntry!.metric)
+                                    )
+                                  else if([MetricType.reps.name, MetricType.duration.name].contains(workoutEntry!.metric))
+                                    Container(
+                                        child: countLineChart(sessions, context, workoutEntry!.metric)
+                                    )
+                                  else if([MetricType.km.name, MetricType.miles.name, MetricType.floor.name].contains(workoutEntry!.metric))
+                                      Container(
+                                          child: speedLineChart(sessions, context, workoutEntry!.metric)
                                       )
-                                    )
-                                else if([MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(workoutEntry!.metric))
-                                    Container(
-                                        child: countLineChart()
-                                    )
                               ],
                             )
                         )
@@ -382,20 +231,4 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
         )
     );
   }
-}
-
-class WeightChartData {
-  DateTime date = DateTime.now();
-  double? maxVal = 0;
-  double? avgVal = 0;
-
-  WeightChartData(this.date, this.maxVal, this.avgVal);
-}
-
-class CountChartData {
-  DateTime date = DateTime.now();
-  double? maxVal = 0;
-  double? totalVal = 0;
-
-  CountChartData(this.date, this.maxVal, this.totalVal);
 }

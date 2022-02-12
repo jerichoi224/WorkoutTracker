@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
+import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -16,6 +18,8 @@ class WorkoutListWidget extends StatefulWidget {
 }
 
 class _WorkoutListState extends State<WorkoutListWidget> {
+  List<String> partList = [];
+
   TextEditingController searchTextController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "";
@@ -48,9 +52,56 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     return s;
   }
 
+  List<Widget> selectPartList()
+  {
+    List<Widget> tagList = [];
+
+    for(int i = 0; i < PartType.values.length; i++)
+    {
+      PartType p = PartType.values[i];
+      tagList.add(
+          tag(p.toLanguageString(locale),
+                  (){
+                if(partList.contains(p.name))
+                  partList.remove(p.name);
+                else
+                  partList.add(p.name);
+                setState(() {});
+              } ,
+              partList.contains(p.name) ? Colors.amber : Colors.black12)
+      );
+    }
+    return tagList;
+  }
+
   List<Widget> workoutList(){
-    List<Widget> WorkoutWidgetList = [];
+    List<Widget> workoutWidgetList = [];
     String firstChar = "";
+
+    if(widget.objectbox.workoutList.length == 0)
+      return List.from(
+          [
+            Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+              child: Text(
+                AppLocalizations.of(context)!.workout_not_found,
+                style: TextStyle(fontSize: 14),
+              ),
+            )
+          ]);
+
+//    if(_isSearching)
+      workoutWidgetList.add(
+        Container(
+          margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
+          child: Wrap(
+              alignment: WrapAlignment.center,
+              children: selectPartList()
+          )
+
+        )
+      );
 
     widget.objectbox.workoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
@@ -63,12 +114,15 @@ class _WorkoutListState extends State<WorkoutListWidget> {
           continue;
       }
       // Skip if already added
-      if(widget.list.any((element) => element.caption == i.caption))
+      if(widget.list.any((element) => element.id == i.id))
+        continue;
+
+      if(partList.isNotEmpty && setEquals(partList.toSet().difference(i.partList.toSet()), partList.toSet()))
         continue;
       // If alphabet changes, add caption
       if(firstChar != i.caption[0].toUpperCase()){
         firstChar = i.caption[0].toUpperCase();
-        WorkoutWidgetList.add(
+        workoutWidgetList.add(
             Padding(
                 padding: EdgeInsets.fromLTRB(15, 7, 0, 0),
                 child: Text(getFirstchar(firstChar),
@@ -81,7 +135,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
             )
         );
       }
-      WorkoutWidgetList.add(
+      workoutWidgetList.add(
           new Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
@@ -109,23 +163,14 @@ class _WorkoutListState extends State<WorkoutListWidget> {
                           ],
                         ),
                       ),
-                      subtitle: Text(i.type),
+                      subtitle: Text(WorkoutType.values.firstWhere((element) => element.name == i.type).toLanguageString(locale)),
                   )
               )
           )
       );
     }
-    return WorkoutWidgetList.length > 0 ? WorkoutWidgetList : List.from(
-        [
-          Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: Text(
-              "No Workout Found.",
-              style: TextStyle(fontSize: 14),
-            ),
-          )
-        ]);
+
+    return workoutWidgetList;
   }
 
   Widget _buildSearchField() {

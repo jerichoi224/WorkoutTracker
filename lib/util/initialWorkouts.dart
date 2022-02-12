@@ -58,7 +58,7 @@ List<WorkoutEntry> initList = [
       caption: "T-Row Bar"
   ),
   WorkoutEntry(
-      metric: MetricType.kg.name,
+      metric: MetricType.reps.name,
       type: WorkoutType.machine.name,
       partList: [PartType.core.name],
       caption: "Knee Raise"
@@ -80,5 +80,11 @@ List<WorkoutEntry> initList = [
       type: WorkoutType.machine.name,
       partList: [PartType.back.name],
       caption: "Back Extension"
+  ),
+  WorkoutEntry(
+      metric: MetricType.kg.name,
+      type: WorkoutType.machine.name,
+      partList: [PartType.tricep.name],
+      caption: "Seated Dips"
   ),
 ];

@@ -4,6 +4,7 @@ import 'package:workout_tracker/dbModels/session_entry_model.dart';
 import 'package:workout_tracker/dbModels/session_item_model.dart';
 import 'package:workout_tracker/dbModels/set_item_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/objectbox.g.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
@@ -95,12 +96,15 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
 
       if(workoutEntry.prevSessionId == item.id)
       {
-        List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id).toList();
+        List<SessionItem> itemsForWorkout = widget.objectbox.sessionItemBox.query(
+            SessionItem_.workoutId.equals(workoutEntry.id)
+        ).build().find();
+
         if(itemsForWorkout.length == 0)
           workoutEntry.prevSessionId = -1;
         else
         {
-          itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
+          itemsForWorkout.sort((a, b) => b.time.compareTo(a.time));
           workoutEntry.prevSessionId = itemsForWorkout[0].id;
         }
 
@@ -128,10 +132,35 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
       ]));
       for(SetItem set in item.sets)
         {
-          String setText = "\t\t\t" + set.metricValue.toStringRemoveTrailingZero();
-          setText += " " + workoutEntry.metric;
-          if([MetricType.kg.name].contains(workoutEntry.metric))
-            setText += " × " + set.countValue.toString();
+          String setText = "\t\t\t";
+          if(workoutEntry.metric != MetricType.duration.name)
+            {
+              setText += set.metricValue.toStringRemoveTrailingZero();
+              setText += " " + workoutEntry.metric;
+
+              // show num of reps
+              if([MetricType.kg.name, MetricType.lb.name].contains(workoutEntry.metric))
+                setText += " × " + set.countValue.toString();
+
+              // show time
+              if([MetricType.km.name, MetricType.miles.name, MetricType.floor.name].contains(workoutEntry.metric))
+                if(set.countValue != 0)
+                  {
+                    String time = numToTimeText(set.countValue);
+                    if(time.substring(0, 1) == "0")
+                      time = time.substring(2, time.length);
+                    setText += " (" + time + ")";
+                  }
+            }
+          else
+          {
+            // Duration just shows Time
+            String time = numToTimeText(set.countValue);
+            if(time.substring(0, 1) == "0")
+              time = time.substring(2, time.length);
+            setText += time;
+          }
+
           detailsInfo.add(TableRow(children: [
             Text(setText,
                 textAlign: TextAlign.left,
@@ -172,18 +201,24 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
     double floors = 0;
     for(SessionItem item in sessionEntry!.sets)
       {
-        if(item.metric == MetricType.kg.name)
+        if([MetricType.kg.name, MetricType.lb.name].contains(item.metric))
           {
             for(SetItem set in item.sets)
               {
-                weight += set.countValue * set.metricValue;
+                if(item.metric == MetricType.lb.name)
+                  weight += set.countValue * set.metricValue * 0.453592;
+                else
+                  weight += set.countValue * set.metricValue;
               }
           }
-        else if(item.metric == MetricType.km.name)
+        else if([MetricType.km.name, MetricType.miles.name].contains(item.metric))
           {
             for(SetItem set in item.sets)
             {
-              distance += set.metricValue;
+              if(item.metric == MetricType.miles.name)
+                distance += set.metricValue * 1.60934;
+              else
+                distance += set.metricValue;
             }
           }
         else if(item.metric == MetricType.floor.name)
@@ -258,13 +293,13 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
 
   void _openEditWidget(SessionEntry entry) async {
     // start the SecondScreen and wait for it to finish with a   result
-    bool result = await Navigator.push(
+    final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => AddSessionEntryWidget(objectbox: widget.objectbox, fromRoutine: false, edit:true, id:entry.id),
         ));
 
-    if(result)
+    if(result.runtimeType == bool && result)
     {
       modified = true;
       updateInfo();

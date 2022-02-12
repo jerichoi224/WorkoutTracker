@@ -5,6 +5,7 @@ import 'package:workout_tracker/util/initialWorkouts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:workout_tracker/util/typedef.dart';
 
 class InstructionWidget extends StatefulWidget {
   final BuildContext parentCtx;
@@ -20,6 +21,8 @@ class _InstructionState extends State<InstructionWidget>{
   TextEditingController userName = new TextEditingController();
   Map<String, String> languages = {'English': 'en', '한국어': 'kr'};
 
+  String distance = "km";
+  String weight = "kg";
   int _currentIndex = 0;
   String locale = "";
 
@@ -61,7 +64,6 @@ class _InstructionState extends State<InstructionWidget>{
       duration: Duration(seconds: 3),
     ));
   }
-
 
   Widget languageScreen(BuildContext context) {
     return new GestureDetector(
@@ -181,8 +183,6 @@ class _InstructionState extends State<InstructionWidget>{
         )
     );
   }
-
-
   Widget introScreen(BuildContext context) {
     return new GestureDetector(
         onTap: () {
@@ -253,6 +253,169 @@ class _InstructionState extends State<InstructionWidget>{
                                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                   return;
                                 }
+                                nextPage();
+                                },
+                              title: Text(AppLocalizations.of(context)!.next,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.center,
+                              )
+                          )
+                        ]
+                    )
+                )
+              ],
+            )
+        )
+    );
+  }
+  Widget metricScreen(BuildContext context) {
+    return new GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: new Scaffold(
+            body: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(15),
+                  child: Center(
+                      child: Image(
+                        image: AssetImage('assets/settings.png'),
+                        width: 150,
+                      )
+                  ),
+                ),
+                Padding(
+                    padding: EdgeInsets.fromLTRB(40, 10, 40, 10),
+                    child: Center(
+                        child: Text(
+                          AppLocalizations.of(context)!.instruction_initial_setting,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                        )
+                    )
+                ),
+                Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                    margin: EdgeInsets.fromLTRB(20, 8, 20, 4),
+                    child: Column(
+                      children: <Widget>[
+                        ListTile(
+                            title: new Row(
+                              children: <Widget>[
+                                Text(AppLocalizations.of(context)!.instruction_default_weight),
+                                Spacer(),
+                                DropdownButton<String>(
+                                  value: weight,
+                                  iconSize: 24,
+                                  elevation: 16,
+                                  onChanged: (value){
+                                    setState(() {weight = value!;});
+                                  },
+                                  underline: Container(
+                                    height: 2,
+                                  ),
+                                  selectedItemBuilder: (BuildContext context) {
+                                    return ["kg", "lb"].map<Widget>((String value) {
+                                      return Container(
+                                          alignment: Alignment.centerRight,
+                                          width: 100, // TODO: Find Proper Width
+                                          child: Text(value, textAlign: TextAlign.end)
+                                      );
+                                    }).toList();
+                                  },
+                                  items: ["kg", "lb"]
+                                      .map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                )
+                              ],
+                            )
+                        ),
+                        ListTile(
+                            title: new Row(
+                              children: <Widget>[
+                                Text(AppLocalizations.of(context)!.instruction_default_distance),
+                                Spacer(),
+                                DropdownButton<String>(
+                                  value: distance,
+                                  iconSize: 24,
+                                  elevation: 16,
+                                  onChanged: (value){
+                                    setState(() {distance = value!;});
+                                  },
+                                  underline: Container(
+                                    height: 2,
+                                  ),
+                                  selectedItemBuilder: (BuildContext context) {
+                                    return ["km", "miles"].map<Widget>((String value) {
+                                      return Container(
+                                          alignment: Alignment.centerRight,
+                                          width: 100, // TODO: Find Proper Width
+                                          child: Text(value, textAlign: TextAlign.end)
+                                      );
+                                    }).toList();
+                                  },
+                                  items: ["km", "miles"]
+                                      .map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                )
+                              ],
+                            )
+                        ),
+                      ],
+                    )
+                ),
+                Container(
+                      padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
+                          Text(" " + AppLocalizations.of(context)!.instruction_metric_note,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey,
+                                fontSize: 12
+                            ),
+                          )
+                        ],
+                      )
+                  ),
+                Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                    margin: EdgeInsets.fromLTRB(40, 10, 40, 10),
+                    color: Colors.amber,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          ListTile(
+                              onTap:(){
+                                if(userName.text.isEmpty) {
+                                  final snackBar = SnackBar(
+                                    content: Text(AppLocalizations.of(context)!.instruction_name_msg),
+                                  );
+                                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                  return;
+                                }
                                 finishSplash();
                               },
                               title: Text(AppLocalizations.of(context)!.start,
@@ -298,6 +461,7 @@ class _InstructionState extends State<InstructionWidget>{
     List<Widget> introPages = <Widget>[
       languageScreen(context),
       introScreen(context),
+      metricScreen(context),
       loadingScreen(context)
     ];
     return Scaffold(
@@ -319,6 +483,11 @@ class _InstructionState extends State<InstructionWidget>{
   void addInitialWorkouts() async{
     for(WorkoutEntry entry in initList)
       {
+        if(entry.metric == MetricType.kg.name)
+          entry.metric = weight;
+        if(entry.metric == MetricType.km.name)
+          entry.metric = distance;
+
         widget.objectbox.workoutBox.put(entry);
       }
 

@@ -31,6 +31,7 @@
     "contact": "Contact",
     "yes": "Yes",
     "no": "No",
+    "sec": "sec",
 
     "helloWorld": "Hello World!",
     "dashboard_start_workout": "Start Workout",
@@ -74,6 +75,8 @@
     "workout_avg_weight": "Avg Weight",
     "workout_max_count": "Max Count",
     "workout_total_count": "Total Count",
+    "workout_avg_speed": "Avg Speed",
+    "workout_total_distance": "Total Distance",
     "workout_type_msg": "Once created, you won't be able to change the metric.",
 
     "session_info": "Session Info",
@@ -96,9 +99,15 @@
     "session_please_confirm": "Please Confirm",
     "session_quit_msg": "Are you sure to quit the workout?",
     "session_delete_msg": "This workout has data recorded. Are you sure you want to delete it?",
+    "session_routine_exists": "A routine with identical workout list already exists",
+    "session_save_as_routine": "Add current workout as new routine.",
 
     "instruction_select_language": "Select your langauge",
     "instruction_ask_name_msg": "Welcome to Workout Tracker!\nWhat's your name?",
     "instruction_name_msg": "Please enter your name",
-    "instruction_creating_db": "Creating Database.\nPlease Wait."
+    "instruction_creating_db": "Creating Database.\nPlease Wait.",
+    "instruction_initial_setting": "Please Select your initial setting",
+    "instruction_default_weight": "Weight Metric",
+    "instruction_default_distance": "Distance Metric",
+    "instruction_metric_note": "The selected metric will be applied to the initial list of workouts"
 }

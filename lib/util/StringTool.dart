@@ -79,3 +79,17 @@ Image imageFromBase64String(String base64String)
       fit: BoxFit.fill
   );
 }
+
+String numToTimeText(int time)
+{
+  String hr = (time~/3600).toString();
+  String min = ((time%3600)~/60).toString();
+  String sec = (time%60).toString();
+
+  if(min.length == 1)
+    min = "0" + min;
+  if(sec.length == 1)
+    sec = "0" + sec;
+
+  return  hr + ":" + min + ":" + sec;
+}

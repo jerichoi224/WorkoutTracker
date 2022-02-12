@@ -141,6 +141,7 @@ class _AboutSettingsState extends State<AboutSettingsWidget> {
                                     children: [
                                       linkedUrl("Languages icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/languages'),
                                       linkedUrl("Gym icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/gym'),
+                                      linkedUrl("Settings icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/settings'),
                                     ],
                                   )
                               ),

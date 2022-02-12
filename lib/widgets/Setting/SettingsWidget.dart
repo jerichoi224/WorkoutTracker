@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/objectbox.dart';
+import 'package:workout_tracker/widgets/HomeWidget.dart';
 import 'package:workout_tracker/widgets/Setting/AboutSettingWidget.dart';
 import 'package:workout_tracker/widgets/Setting/ProfileSettingWidget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';

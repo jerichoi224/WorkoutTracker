@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/class/WorkoutCard.dart';
 import 'package:workout_tracker/dbModels/routine_entry_model.dart';
@@ -7,11 +8,11 @@ import 'package:workout_tracker/dbModels/session_entry_model.dart';
 import 'package:workout_tracker/dbModels/session_item_model.dart';
 import 'package:workout_tracker/dbModels/set_item_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/objectbox.g.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
-import 'package:collection/collection.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -26,23 +27,24 @@ class AddSessionEntryWidget extends StatefulWidget {
 }
 
 class _AddSessionEntryState extends State<AddSessionEntryWidget> {
+  List<WorkoutEntry> workoutEntryList = [];
+  List<WorkoutCard> workoutCardList = [];
+  final sessionNameController = TextEditingController();
+  String locale = "";
+  bool setTime = false;
+  bool saveAsRoutine = false;
+  late Timer _timer;
+
+  late SessionEntry? sessionEntry;
+  late RoutineEntry? routineEntry;
   String defaultName = "";
   String startDate = "";
   String endDate = "";
-  List<WorkoutEntry> workoutEntryList = [];
-  List<WorkoutCard> workoutCardList = [];
-  bool setTime = false;
-  late RoutineEntry? routineEntry;
-  late SessionEntry? sessionEntry;
-  final sessionNameController = TextEditingController();
   List<String> partList = [];
   int startTime = 0;
   int endTime = 0;
   int year = 0;
   int month = 0;
-  String locale = "";
-
-  late Timer _timer;
 
   @override
   void initState() {
@@ -75,7 +77,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       startDate = dateTimeFormatter.format(now);
       endDate = dateTimeFormatter.format(now);
       startTime = now.millisecondsSinceEpoch;
-      endTime = now.millisecondsSinceEpoch;
+      endTime = 0;
       if (widget.fromRoutine) {
         routineEntry = widget.objectbox.routineList.firstWhere((
             element) => element.id == widget.id);
@@ -87,7 +89,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   id), true);
         }
       }
-      StateTimerStart();
+      stateTimerStart();
     }
   }
 
@@ -102,7 +104,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     return timeElapsed.toHoursMinutesSeconds();
   }
 
-  void StateTimerStart(){
+  void stateTimerStart(){
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if(!setTime)
         {
@@ -277,7 +279,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                       bool ask = false;
                       for(int i = 0; i < card.numSets; i++)
                         {
-                          if(card.countController[i].text.isNotEmpty || card.metricController[i].text.isNotEmpty)
+                          if(card.metricController[i].text.isNotEmpty ||
+                              (card.countController[i].text.isNotEmpty && card.countController[i].text != "0:00:00"))
                             {
                               ask = true;
                               break;
@@ -318,18 +321,65 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     );
   }
 
+  int timeTextToTime(String value)
+  {
+    int time = 0;
+    List<String> splitted = value.split(":");
+    time += (3600 * int.parse(splitted[0]));
+    time += (60 * int.parse(splitted[1]));
+    time += int.parse(splitted[2]);
+    return time;
+  }
+
+  String textToTimeText(String value)
+  {
+    switch(value.length)
+    {
+      case 1:
+        {
+          return "0:00:0" + value;
+        }
+      case 2:
+        {
+          return "0:00:" + value;
+        }
+      case 3:
+        {
+          return "0:0" + value.substring(0, 1) + ":" + value.substring(1, 3);
+        }
+      case 4:
+        {
+          return "0:" + value.substring(0,2) + ":" + value.substring(2, 4);
+        }
+      case 5:
+        {
+          return value.substring(0, 1) + ":" + value.substring(1,3) + ":" + value.substring(3, 5);
+        }
+    }
+    return "0:00:00";
+  }
+
   Widget _BuildSets(BuildContext context, int index, int cardInd) {
     WorkoutEntry workoutEntry = workoutCardList[cardInd].entry;
     String prev = " - " ;
-    if(workoutEntry.prevSessionId != 0)
+    if(workoutEntry.prevSessionId != -1)
       {
-        SessionItem? sessionItem = widget.objectbox.itemList.firstWhereOrNull((element) => element.id == workoutEntry.prevSessionId);
+        SessionItem? sessionItem = widget.objectbox.sessionItemBox.get(workoutEntry.prevSessionId);
         if(sessionItem != null)
           {
             if(sessionItem.sets.length > index)
             {
-              prev = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
-              prev += " " + workoutCardList[cardInd].entry.metric;
+              if([MetricType.duration.name].contains(workoutCardList[cardInd].entry.metric))
+                {
+                  prev = numToTimeText(sessionItem.sets[index].countValue);
+                  if(prev.substring(0, 1) == "0")
+                    prev = prev.substring(2, prev.length);
+                }
+              else
+                {
+                  prev = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
+                  prev += " " + workoutCardList[cardInd].entry.metric;
+                }
               if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
                 prev += " × " + sessionItem.sets[index].countValue.toString();
             }
@@ -339,40 +389,43 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       title: new Row(
         children: <Widget>[
           Container(
-            margin: EdgeInsets.fromLTRB(15, 0, 0, 0),
-
+            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Text(prev,
               style: TextStyle(
-                  color: Colors.black38
+                color: Colors.black38,
+                fontSize: 15
               ),
             ),
           ),
           new Expanded(child: Container()),
-          new Container(
-            width: 65,
-            height: 40,
-            child: new TextField(
-              cursorColor: Colors.black54,
-              maxLength: 4,
-              keyboardType: TextInputType.number,
-              controller: workoutCardList[cardInd].metricController[index],
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    // width: 0.0 produces a thin "hairline" border
-                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                    borderSide: BorderSide.none,
-                    //borderSide: const BorderSide(),
-                  ),
-                  counterText: "",
-                  fillColor: Color.fromRGBO(240, 240, 240, 1),
-                  filled: true
+          if(![MetricType.duration.name].contains(workoutCardList[cardInd].entry.metric))
+            new Container(
+              width: 65,
+              height: 40,
+              child: new TextField(
+                cursorColor: Colors.black54,
+                maxLength: 4,
+                keyboardType: TextInputType.number,
+                controller: workoutCardList[cardInd].metricController[index],
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      // width: 0.0 produces a thin "hairline" border
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      borderSide: BorderSide.none,
+                      //borderSide: const BorderSide(),
+                    ),
+                    counterText: "",
+                    fillColor: Color.fromRGBO(240, 240, 240, 1),
+                    filled: true
+                ),
               ),
             ),
-          ),
-            new Text(" " + workoutCardList[cardInd].entry.metric),
-            if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
+          new Text(" " + workoutCardList[cardInd].entry.metric),
+          if([MetricType.kg.name, MetricType.lb.name].contains(workoutCardList[cardInd].entry.metric))
               new Text(" × "),
-            if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
+          if([MetricType.km.name, MetricType.miles.name, MetricType.duration.name, MetricType.floor.name].contains(workoutCardList[cardInd].entry.metric))
+            new Text("   "),
+            if([MetricType.kg.name, MetricType.lb.name].contains(workoutCardList[cardInd].entry.metric))
               new Container(
                 width: 65,
                 height: 40,
@@ -394,6 +447,42 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   ),
                 ),
               ),
+          // Time input
+          if([MetricType.km.name, MetricType.miles.name, MetricType.duration.name, MetricType.floor.name].contains(workoutCardList[cardInd].entry.metric))
+            new Container(
+              width: 80,
+              height: 40,
+              child: new TextField(
+                cursorColor: Colors.black54,
+                maxLength: 8,
+                keyboardType: TextInputType.number,
+                controller: workoutCardList[cardInd].countController[index],
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      // width: 0.0 produces a thin "hairline" border
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      borderSide: BorderSide.none,
+                      //borderSide: const BorderSide(),
+                    ),
+                    counterText: "",
+                    fillColor: Color.fromRGBO(240, 240, 240, 1),
+                    filled: true
+                ),
+                onTap: (){
+                  workoutCardList[cardInd].countController[index].selection = TextSelection.fromPosition(TextPosition(offset: workoutCardList[cardInd].countController[index].text.length));
+                },
+                onChanged: (String value){
+                  value = value.replaceAll(":", "");
+                  while(value.length > 0 && value.substring(0, 1) == "0"){
+                    value = value.substring(1, value.length);
+                  }
+                  if(value.length > 5)
+                    value = value.substring(value.length - 5, value.length);
+                  workoutCardList[cardInd].countController[index].text = textToTimeText(value);
+                  workoutCardList[cardInd].countController[index].selection = TextSelection.fromPosition(TextPosition(offset: workoutCardList[cardInd].countController[index].text.length));
+                },
+              ),
+            ),
         ],
       ),
       trailing: new Container(
@@ -413,9 +502,21 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   // Save current session and pop screen.
   saveSession()
   {
+    if(!setTime)
+      endTime = DateTime.now().millisecondsSinceEpoch;
+
     if(endTime < startTime) {
       final snackBar = SnackBar(
         content: Text(AppLocalizations.of(context)!.session_time_msg),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    }
+
+    if(saveAsRoutine && routineExists(workoutEntryList, widget.objectbox.routineList))
+    {
+      final snackBar = SnackBar(
+        content: Text(AppLocalizations.of(context)!.session_routine_exists),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
@@ -432,14 +533,12 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     sessionEntry!.name = sessionNameController.text;
 
     sessionEntry!.startTime = startTime;
-    if(endTime == 0)
-      endTime = DateTime.now().millisecondsSinceEpoch;
     sessionEntry!.endTime = endTime;
     sessionEntry!.year = DateTime.fromMillisecondsSinceEpoch(startTime).year;
     sessionEntry!.month = DateTime.fromMillisecondsSinceEpoch(startTime).month;
     sessionEntry!.day = DateTime.fromMillisecondsSinceEpoch(startTime).day;
 
-    partList = [];
+    List<String> tmpPartList = [];
     List<SessionItem> tempList = [];
     for(WorkoutCard cardItem in workoutCardList)
     {
@@ -450,8 +549,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       bool skip = true;
       for(int i = 0; i < cardItem.numSets; i++) {
         if ((cardItem.metricController[i].text.isNotEmpty && cardItem.countController[i].text.isNotEmpty) ||
-            ([MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(cardItem.entry.metric) && cardItem.metricController[i].text.isNotEmpty) ||
-            (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[i].text.isNotEmpty)
+            ([MetricType.km.name, MetricType.miles.name, MetricType.floor.name, MetricType.reps.name].contains(cardItem.entry.metric) && cardItem.metricController[i].text.isNotEmpty) ||
+            ([MetricType.duration.name, MetricType.lb.name, MetricType.kg.name].contains(cardItem.entry.metric)  && cardItem.countController[i].text.isNotEmpty)
         )
         {
           skip = false;
@@ -464,31 +563,52 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       // Create SessionItem from WorkoutCard
       SessionItem item = new SessionItem();
       item.workoutId = cardItem.entry.id;
-      item.time = endTime;
+      item.time = startTime;
       item.metric = cardItem.entry.metric;
       for(int j = 0; j < cardItem.numSets; j++)
       {
+        /*
+        required Field of each metric
+          km        metric (distance)   (if count == 0, time will be ignored)
+          miles     metric (distance)   (if count == 0, time will be ignored)
+          floor     metric (num floors) (if count == 0, time will be ignored)
+          reps      metric (num reps)   (count is not used)
+          kg        count (num count)   (if metric == 0, weight will be 0)
+          lb        count (num count)   (if metric == 0, weight will be 0)
+          duration  count (time)        (metric is not used)
+         */
         if ((cardItem.metricController[j].text.isNotEmpty && cardItem.countController[j].text.isNotEmpty) ||
-            ([MetricType.km.name, MetricType.floor.name, MetricType.reps.name].contains(cardItem.entry.metric) && cardItem.metricController[j].text.isNotEmpty) ||
-            (cardItem.entry.metric == MetricType.kg.name && cardItem.countController[j].text.isNotEmpty)
+            ([MetricType.km.name, MetricType.miles.name, MetricType.floor.name, MetricType.reps.name].contains(cardItem.entry.metric) && cardItem.metricController[j].text.isNotEmpty) ||
+            ([MetricType.kg.name, MetricType.lb.name, MetricType.duration.name].contains(cardItem.entry.metric) && cardItem.countController[j].text.isNotEmpty)
         )
-          item.sets.add(SetItem(
-              metricValue: cardItem.metricController[j].text.isNotEmpty ? double.parse(cardItem.metricController[j].text) : 0,
-              countValue: cardItem.countController[j].text.isNotEmpty ? int.parse(cardItem.countController[j].text) : 0
-          ));
+          if([MetricType.km.name, MetricType.miles.name, MetricType.duration.name, MetricType.floor.name].contains(cardItem.entry.metric))
+            {
+              item.sets.add(SetItem(
+                  metricValue: cardItem.metricController[j].text.isNotEmpty ? double.parse(cardItem.metricController[j].text) : 0,
+                  countValue: cardItem.countController[j].text.isNotEmpty ? timeTextToTime(cardItem.countController[j].text) : 0
+              ));
+            }
+        else
+          {
+            item.sets.add(SetItem(
+                metricValue: cardItem.metricController[j].text.isNotEmpty ? double.parse(cardItem.metricController[j].text) : 0,
+                countValue: cardItem.countController[j].text.isNotEmpty ? int.parse(cardItem.countController[j].text) : 0
+            ));
+          }
       }
 
       for(String part in cardItem.entry.partList)
-        if(!partList.contains(part))
-          partList.add(part);
+        if(!tmpPartList.contains(part))
+          tmpPartList.add(part);
 
       tempList.add(item);
       widget.objectbox.sessionItemBox.put(item);
-      widget.objectbox.itemList.add(item);
 
       // update workout Entry Previous Session Ids.
       WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
-      List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id).toList();
+      List<SessionItem> itemsForWorkout = widget.objectbox.sessionItemBox.query(
+          SessionItem_.workoutId.equals(workoutEntry.id)
+      ).build().find();
 
       if(itemsForWorkout.length == 0)
         workoutEntry.prevSessionId = -1;
@@ -523,6 +643,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       }
     }
     sessionEntry!.sets.clear();
+    partList = tmpPartList;
 
     // add the new session
     for(SessionItem item in tempList)
@@ -541,7 +662,9 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       widget.objectbox.itemList.remove(item);
       if(workoutEntry.prevSessionId == item.id || workoutEntry.prevSessionId == -1)
       {
-        List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id && element.id != item.id).toList();
+        List<SessionItem> itemsForWorkout = widget.objectbox.sessionItemBox.query(
+            SessionItem_.workoutId.equals(workoutEntry.id)
+        ).build().find();
         if(itemsForWorkout.length == 0)
           workoutEntry.prevSessionId = -1;
         else
@@ -555,12 +678,41 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     if(!widget.edit)
       _timer.cancel();
 
+    if(saveAsRoutine && sessionEntry!.sets.length > 0)
+      {
+        createNewRoutine(sessionEntry!.name);
+      }
+
     // update all lists that changed.
     if(!widget.edit)
       widget.objectbox.sessionList.add(sessionEntry!);
-    widget.objectbox.itemList = widget.objectbox.sessionItemBox.getAll();
-    print(widget.objectbox.sessionList.length);
+
+    DateTime now = new DateTime.now();
+
+    widget.objectbox.updateSessionList(now.year, now.month);
     Navigator.pop(context, true);
+  }
+
+  void createNewRoutine(String name)
+  {
+    RoutineEntry routineEntry = new RoutineEntry();
+
+    routineEntry.name = name + " " + AppLocalizations.of(context)!.routine;
+    routineEntry.parts = partList;
+    routineEntry.workoutIds = workoutEntryList.map((e) => e.id.toString()).toList();
+
+    widget.objectbox.routineBox.put(routineEntry);
+    widget.objectbox.routineList = widget.objectbox.routineBox.getAll();
+  }
+
+  bool routineExists(List<WorkoutEntry> workoutEntries, List<RoutineEntry> routines)
+  {
+    for(RoutineEntry routine in routines)
+    {
+      if(setEquals(routine.workoutIds.toSet(), workoutEntries.map((e) => e.id.toString()).toSet()))
+        return true;
+    }
+    return false;
   }
 
   void confirmExit() {
@@ -676,6 +828,11 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async{
+          if(widget.edit)
+            {
+              Navigator.of(context).pop();
+              return true;
+            }
           confirmExit();
           return false;
         },
@@ -735,6 +892,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                 Expanded(child: Container()),
                                                 InkWell(
                                                   onTap: () async {
+                                                    if(!setTime)
+                                                      return;
                                                     int newTime = await _selectDate(context, startTime);
                                                     if(newTime != 0)
                                                       setState(() {
@@ -770,14 +929,14 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                            child: Icon(
                                                              Icons.timer,
                                                              color: Color.fromRGBO(0, 0, 0, 0.7),
-                                                             size: 18,
+                                                             size: 16,
                                                            ),
                                                          ),
                                                          TextSpan(
                                                            text: "\t" + timeString(),
                                                            style: TextStyle(
                                                              color: Color.fromRGBO(0, 0, 0, 0.7),
-                                                             fontSize: 18
+                                                             fontSize: 16
                                                            ),
                                                          )
                                                        ]
@@ -830,6 +989,40 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                         ]
                                     )
                                 ),
+                                if(!widget.edit && !widget.fromRoutine)
+                                  Container(
+                                    child: Row(
+                                      children:[
+                                        Checkbox(
+                                          checkColor: Colors.white,
+                                          fillColor: MaterialStateProperty.all<Color>(Colors.grey),
+                                          value: saveAsRoutine,
+                                          onChanged: (bool? value) {
+                                            if(value == true)
+                                              {
+                                                if(routineExists(workoutEntryList, widget.objectbox.routineList))
+                                                  {
+                                                    final snackBar = SnackBar(
+                                                      content: Text(AppLocalizations.of(context)!.session_routine_exists),
+                                                    );
+                                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                    return;
+                                                  }
+                                              }
+                                            setState(() {
+                                              saveAsRoutine = value!;
+                                            });
+                                          },
+                                        ),
+                                        Text(AppLocalizations.of(context)!.session_save_as_routine,
+                                            style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey
+                                            ),
+                                        )
+                                      ]
+                                    ),
+                                  ),
                                 CardButton(
                                     Theme.of(context).colorScheme.primary,
                                     widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.session_finish_session,

@@ -74,5 +74,8 @@ enum MetricType {
   km,
   kg,
   floor,
-  reps
+  reps,
+  lb,
+  duration,
+  miles
 }

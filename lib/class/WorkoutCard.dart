@@ -2,6 +2,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/StringTool.dart';
+import 'package:workout_tracker/util/typedef.dart';
 
 class WorkoutCard {
   int id = 0;
@@ -30,7 +31,13 @@ class WorkoutCard {
         metricTextController.text  = metric.toStringRemoveTrailingZero();
         countTextController.text  = count.toString();
       }
-
+    if([MetricType.km.name, MetricType.miles.name, MetricType.duration.name, MetricType.floor.name].contains(entry.metric))
+      {
+        if(count == 0)
+          countTextController.text = "0:00:00";
+        else
+          countTextController.text = numToTimeText(count);
+      }
     metricController.add(metricTextController);
     countController.add(countTextController);
   }
@@ -42,19 +49,5 @@ class WorkoutCard {
     countList.removeAt(ind);
     metricController.removeAt(ind);
     countController.removeAt(ind);
-  }
-
-  Map<String, Object> getMap() {
-    Map<String, Object> retMap = new Map();
-    retMap["id"] = entry.id;
-    retMap["numSet"] = numSets;
-
-    List<Map<String, Object>> sets = [];
-    for (int i = 0; i < numSets; i++) {
-      Map<String, num> set = new Map();
-      set["metric"] = metricList[i];
-      set["count"] = countList[i];
-    }
-    return retMap;
   }
 }

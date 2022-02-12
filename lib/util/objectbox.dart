@@ -34,11 +34,33 @@ class ObjectBox {
 
     workoutList = workoutBox.getAll().where((element) => element.visible).toList();
     routineList = routineBox.getAll();
-    itemList = sessionItemBox.getAll();
-    sessionList = sessionBox.getAll();
+
+    DateTime now = new DateTime.now();
+    updateSessionList(now.year, now.month);
+
+    // itemList = sessionItemBox.getAll();
+    // sessionList = sessionBox.getAll();
 
     for(String key in prefs.getKeys())
       setPref(key, prefs.get(key));
+  }
+
+  void updateSessionList(int year, int month)
+  {
+    DateTime start = new DateTime(year, month - 1, 23);
+    DateTime end = new DateTime(year, month + 1, 7);
+
+    sessionList = sessionBox.query(
+        SessionEntry_.startTime.greaterOrEqual(start.millisecondsSinceEpoch).and(
+            SessionEntry_.startTime.lessOrEqual(end.millisecondsSinceEpoch)
+        )
+    ).build().find();
+
+    itemList = sessionItemBox.query(
+        SessionItem_.time.greaterOrEqual(start.millisecondsSinceEpoch).and(
+            SessionItem_.time.lessOrEqual(end.millisecondsSinceEpoch)
+        )
+    ).build().find();
   }
 
   void setPref(String key, dynamic value)

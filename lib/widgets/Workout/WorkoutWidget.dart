@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
+import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/StringTool.dart';
@@ -20,6 +22,7 @@ class _WorkoutState extends State<WorkoutWidget> {
   bool _isSearching = false;
   String searchQuery = "";
   String locale = "";
+  List<String> partList = [];
 
   void initState() {
     super.initState();
@@ -104,6 +107,28 @@ class _WorkoutState extends State<WorkoutWidget> {
     return s;
   }
 
+  List<Widget> selectPartList()
+  {
+    List<Widget> tagList = [];
+
+    for(int i = 0; i < PartType.values.length; i++)
+    {
+      PartType p = PartType.values[i];
+      tagList.add(
+          tag(p.toLanguageString(locale),
+                  (){
+                if(partList.contains(p.name))
+                  partList.remove(p.name);
+                else
+                  partList.add(p.name);
+                setState(() {});
+              } ,
+              partList.contains(p.name) ? Colors.amber : Colors.black12)
+      );
+    }
+    return tagList;
+  }
+
   List<Widget> workoutList(){
     List<Widget> workoutWidgetList = [];
     String firstChar = "";
@@ -121,6 +146,18 @@ class _WorkoutState extends State<WorkoutWidget> {
             )
           ]);
 
+    if(_isSearching)
+      workoutWidgetList.add(
+          Container(
+              margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
+              child: Wrap(
+                  alignment: WrapAlignment.center,
+                  children: selectPartList()
+              )
+
+          )
+      );
+
     widget.objectbox.workoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
     for(WorkoutEntry i in widget.objectbox.workoutList){
@@ -131,6 +168,10 @@ class _WorkoutState extends State<WorkoutWidget> {
         )
           continue;
       }
+
+      if(partList.isNotEmpty && setEquals(partList.toSet().difference(i.partList.toSet()), partList.toSet()))
+        continue;
+
       // If alphabet changes, add caption
       if(firstChar != i.caption[0].toUpperCase()){
         firstChar = i.caption[0].toUpperCase();

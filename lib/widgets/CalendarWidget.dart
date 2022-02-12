@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/session_entry_model.dart';
 import 'package:workout_tracker/dbModels/session_item_model.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
+import 'package:workout_tracker/objectbox.g.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/util/objectbox.dart';
@@ -28,6 +29,8 @@ class _CalendarState extends State<CalendarWidget>{
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   String locale = "";
+  int? year = 2000;
+  int? month = 1;
 
   List<SessionEntry> sessionsToday = [];
 
@@ -35,7 +38,17 @@ class _CalendarState extends State<CalendarWidget>{
     super.initState();
     String? temp = widget.objectbox.getPref("locale");
     locale = temp != null ? temp : 'en';
-    sessionsToday = _getEventsForDay(DateTime.now());
+    DateTime now = new DateTime.now();
+
+    sessionsToday = _getEventsForDay(now);
+    year = now.year;
+    month = now.month;
+  }
+
+  getSessions()
+  {
+    widget.objectbox.updateSessionList(year!, month!);
+    setState(() {});
   }
 
   List<SessionEntry> _getEventsForDay(DateTime day) {
@@ -68,12 +81,14 @@ class _CalendarState extends State<CalendarWidget>{
 
       if(workoutEntry.prevSessionId == item.id)
       {
-        List<SessionItem> itemsForWorkout = widget.objectbox.itemList.where((element) => element.workoutId == workoutEntry.id).toList();
+        List<SessionItem> itemsForWorkout = widget.objectbox.sessionItemBox.query(
+            SessionItem_.workoutId.equals(workoutEntry.id)
+        ).build().find();
         if(itemsForWorkout.length == 0)
           workoutEntry.prevSessionId = -1;
         else
         {
-          itemsForWorkout.sort((a, b) => a.time.compareTo(b.time));
+          itemsForWorkout.sort((a, b) => b.time.compareTo(a.time));
           workoutEntry.prevSessionId = itemsForWorkout[0].id;
         }
 
@@ -263,7 +278,13 @@ class _CalendarState extends State<CalendarWidget>{
                         }
                       },
                       onPageChanged: (focusedDay) {
+                        if(focusedDay.runtimeType == DateTime) {
+                          year = focusedDay.year;
+                          month = focusedDay.month;
+                          getSessions();
+                        }
                         _focusedDay = focusedDay;
+                        _selectedDay = focusedDay;
                       },
                       eventLoader: (day) {
                         return _getEventsForDay(day);

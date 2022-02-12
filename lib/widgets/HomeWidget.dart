@@ -11,6 +11,15 @@ class HomeWidget extends StatefulWidget {
   late final objectbox;
   HomeWidget({Key? key, required this.parentCtx, required this.objectbox});
 
+  // current = 4 해야지, 언어 바꿀때, 선택이 설정으로 된다.
+  int _currentIndex = 4;
+
+  static void changePage(BuildContext context, int ind) async {
+    _HomeState? state = context.findAncestorStateOfType<_HomeState>();
+    if(state != null)
+      state.onTabTapped(ind);
+  }
+
   @override
   State createState() => _HomeState();
 
@@ -20,13 +29,13 @@ class _HomeState extends State<HomeWidget>{
   final List<Widget> screens = [];
 //  DatabaseHelper dbHelper = DatabaseHelper();
   final pageController = PageController(initialPage: 2);
-  int _currentIndex = 2;
   bool ready = false;
   String? username = "";
 
   @override
   void initState(){
     super.initState();
+    widget._currentIndex = 2;
   }
 
   List<Widget> _children() => [
@@ -39,7 +48,7 @@ class _HomeState extends State<HomeWidget>{
 
   changePage(int index){
     setState(() {
-      _currentIndex = index;
+      widget._currentIndex = index;
     });
   }
 
@@ -81,7 +90,7 @@ class _HomeState extends State<HomeWidget>{
         selectedItemColor: Theme.of(widget.parentCtx).colorScheme.secondary,
         type: BottomNavigationBarType.fixed,
         onTap: onTabTapped, // new
-        currentIndex: _currentIndex, // new
+        currentIndex: widget._currentIndex, // new
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.fitness_center),
@@ -110,8 +119,8 @@ class _HomeState extends State<HomeWidget>{
 
   void onTabTapped(int index) {
     setState(() {
-      _currentIndex = index;
-      pageController.animateToPage(_currentIndex, duration: Duration(milliseconds: 500), curve: Curves.ease);
+      widget._currentIndex = index;
+      pageController.animateToPage(widget._currentIndex, duration: Duration(milliseconds: 500), curve: Curves.ease);
     });
   }
 }

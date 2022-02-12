@@ -31,6 +31,7 @@
   "contact": "연락처",
   "yes": "예",
   "no": "아니오",
+  "sec": "초",
 
   "helloWorld": "안녕하세요",
   "dashboard_start_workout": "운동 시작",
@@ -75,6 +76,8 @@
   "workout_avg_weight": "평균 무게",
   "workout_max_count": "최대 횟수",
   "workout_total_count": "총 횟수",
+  "workout_avg_speed": "평균 속도",
+  "workout_total_distance": "총 거리",
   "workout_type_msg": "저장 후, 측정 단위는 수정할 수 없습니다.",
 
   "session_info": "운동 세션 정보",
@@ -97,9 +100,15 @@
   "session_please_confirm": "확인",
   "session_quit_msg": "정말 운동을 그만두시겠습니까?",
   "session_delete_msg": "운동이 기록되어 있습니다. 정말로 삭제하시겠습니까?",
+  "session_routine_exists": "이미 동일한 운동으로 구성된 루틴이 존재합니다.",
+  "session_save_as_routine": "현재 운동 세션으로 루틴 저장하기",
 
   "instruction_select_language": "언어를 선택해주세요",
   "instruction_ask_name_msg": "환영합니다.\n이름을 알려주세요",
   "instruction_name_msg": "이름을 입력해주세요",
-  "instruction_creating_db": "데이터베이스를 만들고 있습니다.\n잠시만 기다려주세요."
+  "instruction_creating_db": "데이터베이스를 만들고 있습니다.\n잠시만 기다려주세요.",
+  "instruction_initial_setting": "초기 설정을 지정해주세요",
+  "instruction_default_weight": "무게 단위",
+  "instruction_default_distance": "거리 단위",
+  "instruction_metric_note": "선택된 측정 단위는 초기 운동 목록에 적용됩니다."
 }

@@ -4,6 +4,7 @@ import 'package:workout_tracker/dbModels/session_entry_model.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
+import 'package:workout_tracker/widgets/HomeWidget.dart';
 import 'package:workout_tracker/widgets/Session/AddSessionEntryWidget.dart';
 import 'package:workout_tracker/widgets/Session/RoutineListWidget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -272,7 +273,6 @@ class _DashboardState extends State<DashboardWidget>{
         series: <PieSeries<_PieData, String>>[
           PieSeries<_PieData, String>(
               explode: true,
-//              explodeIndex: 0,
               dataSource: pie_data,
               xValueMapper: (_PieData data, _) => data.xData,
               yValueMapper: (_PieData data, _) => data.yData,
@@ -375,17 +375,21 @@ class _DashboardState extends State<DashboardWidget>{
                         ),
                         margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
                         color: Colors.white,
-                        child: Container(
-                          padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
-                          child: ListTile(
-                              title: new Row(
-                                children: <Widget>[
-                                  new Flexible(
-                                    child: overviewTable(),
-                                  )
-                                ],
-                              )
-                          ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10.0),
+                          onTap: (){HomeWidget.changePage(context, 3);},
+                          child: Container(
+                            padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+                            child: ListTile(
+                                title: new Row(
+                                  children: <Widget>[
+                                    new Flexible(
+                                      child: overviewTable(),
+                                    )
+                                  ],
+                                )
+                            ),
+                          )
                         )
                       ),
                       workoutPartChart()
