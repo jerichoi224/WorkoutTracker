@@ -91,7 +91,6 @@ class _WorkoutListState extends State<WorkoutListWidget> {
             )
           ]);
 
-//    if(_isSearching)
       workoutWidgetList.add(
         Container(
           margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
@@ -106,6 +105,8 @@ class _WorkoutListState extends State<WorkoutListWidget> {
     widget.objectbox.workoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
     for(WorkoutEntry i in widget.objectbox.workoutList){
+
+      // search field filtering
       if(searchTextController.text.isNotEmpty) {
         if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
             &&!i.partList.contains(searchTextController.text.toLowerCase())
@@ -113,12 +114,19 @@ class _WorkoutListState extends State<WorkoutListWidget> {
         )
           continue;
       }
-      // Skip if already added
+
+      // Skip if already added to session
       if(widget.list.any((element) => element.id == i.id))
         continue;
 
+      // partlist filtering
       if(partList.isNotEmpty && setEquals(partList.toSet().difference(i.partList.toSet()), partList.toSet()))
         continue;
+
+      // skip deleted workouts
+      if(!i.visible)
+        continue;
+
       // If alphabet changes, add caption
       if(firstChar != i.caption[0].toUpperCase()){
         firstChar = i.caption[0].toUpperCase();

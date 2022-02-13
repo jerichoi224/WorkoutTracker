@@ -9,6 +9,7 @@ import 'package:workout_tracker/util/objectbox.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:workout_tracker/widgets/Session/ViewSessionEntryWidget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:workout_tracker/widgets/UIComponents.dart';
 
 class CalendarWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -123,7 +124,15 @@ class _CalendarState extends State<CalendarWidget>{
         }
         // Delete
         else if(selectedIndex == 1){
-          _deleteSession(i);
+          confirmPopup(context,
+            AppLocalizations.of(context)!.session_please_confirm,
+            AppLocalizations.of(context)!.confirm_delete_msg,
+            AppLocalizations.of(context)!.yes,
+            AppLocalizations.of(context)!.no,).then((value) {
+            if (value) {
+              _deleteSession(i);
+            }
+          });
         }
       },
     );

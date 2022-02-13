@@ -286,8 +286,16 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                               break;
                             }
                         }
-                      if(ask)
-                        confirmDelete(index);
+                      if(ask){
+                        confirmPopup(context,
+                          AppLocalizations.of(context)!.session_please_confirm,
+                          AppLocalizations.of(context)!.session_delete_msg,
+                          AppLocalizations.of(context)!.yes,
+                          AppLocalizations.of(context)!.no,).then((value) {
+                          if(value)
+                            confirmDelete(index);
+                        });
+                      }
                       else{
                         workoutCardList.removeAt(index);
                         workoutEntryList.removeAt(index);
@@ -715,67 +723,17 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     return false;
   }
 
-  void confirmExit() {
-    showDialog(
-        context: context,
-        builder: (BuildContext ctx) {
-          return AlertDialog(
-            title: Text(AppLocalizations.of(context)!.session_please_confirm),
-            content: Text(AppLocalizations.of(context)!.session_quit_msg),
-            actions: [
-              // The "Yes" button
-              TextButton(
-                  onPressed: () {
-                    // Close the dialog
-                    Navigator.of(ctx).pop();
-                    if(!widget.edit)
-                        _timer.cancel();
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(AppLocalizations.of(context)!.yes)),
-              TextButton(
-                  onPressed: () {
-                    // Close the dialog
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Text(AppLocalizations.of(context)!.no))
-            ],
-          );
-        });
-  }
-
   void confirmDelete(int index) {
-    showDialog(
-        context: context,
-        builder: (BuildContext ctx) {
-          return AlertDialog(
-            title: Text(AppLocalizations.of(context)!.session_please_confirm),
-            content: Text(AppLocalizations.of(context)!.session_delete_msg),
-            actions: [
-              // The "Yes" button
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    workoutCardList.removeAt(index);
-                    workoutEntryList.removeAt(index);
-                    partList = [];
-                    for(WorkoutEntry entry in workoutEntryList)
-                      for(String part in entry.partList)
-                        if(!partList.contains(part))
-                          partList.add(part);
+    workoutCardList.removeAt(index);
+    workoutEntryList.removeAt(index);
+    partList = [];
+    for(WorkoutEntry entry in workoutEntryList)
+      for(String part in entry.partList)
+        if(!partList.contains(part))
+          partList.add(part);
 
-                    setState(() {
-                    });
-                  },
-                  child: Text(AppLocalizations.of(context)!.yes)),
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Text(AppLocalizations.of(context)!.no))
-            ],
-          );
-        });
+    setState(() {
+    });
   }
 
   Widget _popUpMenuButton() {
@@ -833,7 +791,18 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               Navigator.of(context).pop();
               return true;
             }
-          confirmExit();
+          confirmPopup(context,
+            AppLocalizations.of(context)!.session_please_confirm,
+            AppLocalizations.of(context)!.session_quit_msg,
+            AppLocalizations.of(context)!.yes,
+            AppLocalizations.of(context)!.no,).then((value) {
+            if(value)
+              {
+                if(!widget.edit)
+                  _timer.cancel();
+                Navigator.of(context).pop();
+              }
+          });
           return false;
         },
         child: new GestureDetector(

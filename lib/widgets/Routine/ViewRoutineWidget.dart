@@ -101,9 +101,17 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
       IconButton(
           icon: Icon(Icons.delete),
           onPressed: () {
-            widget.objectbox.routineList.removeWhere((element) => element.id == routineEntry!.id);
-            widget.objectbox.routineBox.remove(routineEntry!.id);
-            Navigator.pop(context, true);
+            confirmPopup(context,
+              AppLocalizations.of(context)!.session_please_confirm,
+              AppLocalizations.of(context)!.confirm_delete_msg,
+              AppLocalizations.of(context)!.yes,
+              AppLocalizations.of(context)!.no,).then((value) {
+              if (value) {
+                widget.objectbox.routineList.removeWhere((element) => element.id == routineEntry!.id);
+                widget.objectbox.routineBox.remove(routineEntry!.id);
+                Navigator.pop(context, true);
+              }
+            });
           }
       ),
     ];

@@ -163,13 +163,13 @@ class _ProfileSettingsState extends State<ProfileSettingsWidget> {
                                   ],
                                 ),
                                 child: IconButton(
-                                  iconSize: 16,
+                                  iconSize: 18,
                                   onPressed: (){
                                     getImage();
                                   },
                                   icon: Icon(
-                                    Icons.edit,
-                                    color: Colors.black,
+                                    Icons.add_a_photo,
+                                    color: Color.fromRGBO(0, 0, 0, 0.7),
                                   ),
                                 ),
                               ),

@@ -32,8 +32,8 @@
   "yes": "예",
   "no": "아니오",
   "sec": "초",
+  "confirm_delete_msg": "정말로 삭제하시겠습니까?",
 
-  "helloWorld": "안녕하세요",
   "dashboard_start_workout": "운동 시작",
   "dashboard_welcome_back": "안녕하세요,",
   "dashboard_post_name": " 님",
@@ -57,6 +57,7 @@
   "settings_name_msg": "이름을 입력해주세요.",
   "settings_about_open_license": "라이센스 보기",
   "settings_developer_info": "개발자 정보",
+  "settings_send_me_bugs": "버그 찾으면 이메일 보내주세요. (안찾으시면 더 좋고요...)",
 
   "routine_not_found": "저장된 루틴이 없습니다.",
   "routine_add_routine": "루틴 추가",

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:workout_tracker/dbModels/session_entry_model.dart';
 import 'package:workout_tracker/dbModels/session_item_model.dart';
 import 'package:workout_tracker/objectbox.g.dart';
@@ -32,7 +35,7 @@ class ObjectBox {
     sessionItemBox = Box<SessionItem>(store);
     sessionBox = Box<SessionEntry>(store);
 
-    workoutList = workoutBox.getAll().where((element) => element.visible).toList();
+    workoutList = workoutBox.getAll();
     routineList = routineBox.getAll();
 
     DateTime now = new DateTime.now();
@@ -88,5 +91,10 @@ class ObjectBox {
     final store = await openStore();
     final prefs = await SharedPreferences.getInstance();
     return ObjectBox._create(store, prefs);
+  }
+
+  Future<File> objectBoxDataFile() async{
+    final directory = (await getApplicationDocumentsDirectory()).path;
+    return File("$directory/objectbox/data.mdb");
   }
 }

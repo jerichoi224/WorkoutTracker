@@ -65,10 +65,17 @@ class _WorkoutState extends State<WorkoutWidget> {
         }
         // Delete
         else if(selectedIndex == 1){
-          i.visible = false;
-          widget.objectbox.workoutBox.put(i);
-          widget.objectbox.workoutList.remove(i);
-          setState(() {});
+          confirmPopup(context,
+            AppLocalizations.of(context)!.session_please_confirm,
+            AppLocalizations.of(context)!.confirm_delete_msg,
+            AppLocalizations.of(context)!.yes,
+            AppLocalizations.of(context)!.no,).then((value) {
+            if (value) {
+              i.visible = false;
+              widget.objectbox.workoutBox.put(i);
+              setState(() {});
+            }
+          });
         }
       },
     );
@@ -161,6 +168,8 @@ class _WorkoutState extends State<WorkoutWidget> {
     widget.objectbox.workoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
 
     for(WorkoutEntry i in widget.objectbox.workoutList){
+
+      // search field filtering
       if(searchTextController.text.isNotEmpty) {
         if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
            &&!i.partList.contains(searchTextController.text.toLowerCase())
@@ -169,7 +178,12 @@ class _WorkoutState extends State<WorkoutWidget> {
           continue;
       }
 
+      // partlist filtering
       if(partList.isNotEmpty && setEquals(partList.toSet().difference(i.partList.toSet()), partList.toSet()))
+        continue;
+
+      // skip deleted workouts
+      if(!i.visible)
         continue;
 
       // If alphabet changes, add caption

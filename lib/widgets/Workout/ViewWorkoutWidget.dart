@@ -77,10 +77,17 @@ class _ViewWorkoutWidget extends State<ViewWorkoutWidget> {
       IconButton(
           icon: Icon(Icons.delete),
           onPressed: () {
-            workoutEntry!.visible = false;
-            widget.objectbox.workoutBox.put(workoutEntry!);
-            widget.objectbox.workoutList.remove(workoutEntry);
-            Navigator.pop(context, true);
+            confirmPopup(context,
+              AppLocalizations.of(context)!.session_please_confirm,
+              AppLocalizations.of(context)!.confirm_delete_msg,
+              AppLocalizations.of(context)!.yes,
+              AppLocalizations.of(context)!.no,).then((value) {
+              if (value) {
+                workoutEntry!.visible = false;
+                widget.objectbox.workoutBox.put(workoutEntry!);
+                Navigator.pop(context, true);
+              }
+            });
           }
       ),
     ];

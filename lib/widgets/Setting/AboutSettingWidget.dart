@@ -112,6 +112,26 @@ class _AboutSettingsState extends State<AboutSettingsWidget> {
                           )
                       ),
                       Container(
+                          padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.mail_outline_rounded,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
+                              Text(" " + AppLocalizations.of(context)!.settings_send_me_bugs,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                    fontSize: 12
+                                ),
+                              )
+                            ],
+                          )
+                      ),
+                      Container(
                           padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
                           child: Text(AppLocalizations.of(context)!.credits,
                             style: TextStyle(

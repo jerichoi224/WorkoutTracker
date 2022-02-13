@@ -1,4 +1,6 @@
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
@@ -46,7 +48,7 @@ class _SettingsState extends State<SettingsWidget> {
      }
    }
 
-   void openOtherPage(BuildContext context) async {
+   void openAboutPage(BuildContext context) async {
      final result = await Navigator.push(
          context,
          MaterialPageRoute(
@@ -274,7 +276,7 @@ class _SettingsState extends State<SettingsWidget> {
                          InkWell(
                            borderRadius: BorderRadius.circular(8.0),
                            onTap: (){
-                             openOtherPage(context);
+                             openAboutPage(context);
                            },
                            child: ListTile(
                                title: new Row(

@@ -295,7 +295,15 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
       IconButton(
           icon: Icon(Icons.delete),
           onPressed: () {
-            _deleteSession(sessionEntry!);
+            confirmPopup(context,
+              AppLocalizations.of(context)!.session_please_confirm,
+              AppLocalizations.of(context)!.confirm_delete_msg,
+              AppLocalizations.of(context)!.yes,
+              AppLocalizations.of(context)!.no,).then((value) {
+              if (value) {
+                _deleteSession(sessionEntry!);
+              }
+            });
           }
       ),
     ];

@@ -7,6 +7,7 @@ import 'package:workout_tracker/widgets/Routine/AddEditRoutineEntryWidget.dart';
 import 'package:workout_tracker/widgets/Routine/ViewRoutineWidget.dart';
 import 'dart:math';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:workout_tracker/widgets/UIComponents.dart';
 
 class RoutineWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -58,8 +59,18 @@ class _RoutineState extends State<RoutineWidget>{
         }
         // Delete
         else if(selectedIndex == 1){
-          widget.objectbox.routineBox.remove(i.id);
-          widget.objectbox.routineList.remove(i);
+          confirmPopup(context,
+            AppLocalizations.of(context)!.session_please_confirm,
+            AppLocalizations.of(context)!.confirm_delete_msg,
+            AppLocalizations.of(context)!.yes,
+            AppLocalizations.of(context)!.no,).then((value) {
+            if (value) {
+              widget.objectbox.routineBox.remove(i.id);
+              widget.objectbox.routineList.remove(i);
+              setState(() {});
+            }
+          });
+
         }
       },
     );
