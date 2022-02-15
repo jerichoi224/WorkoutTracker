@@ -77,43 +77,47 @@ class _HomeState extends State<HomeWidget>{
       );
     }
     // App Loads
-    return Scaffold(
-      body: PageView(
-          onPageChanged: (index) {
-            FocusScope.of(context).unfocus();
-            changePage(index);
-          },
-          controller: pageController,
-          children: _children()
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Theme.of(widget.parentCtx).colorScheme.secondary,
-        type: BottomNavigationBarType.fixed,
-        onTap: onTabTapped, // new
-        currentIndex: widget._currentIndex, // new
-        items: [
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.fitness_center),
-            label: AppLocalizations.of(context)!.workout,
+    final mediaQueryData = MediaQuery.of(context);
+    return MediaQuery(
+        data: mediaQueryData.copyWith(textScaleFactor: 1.0),
+        child: Scaffold(
+          body: PageView(
+              onPageChanged: (index) {
+                FocusScope.of(context).unfocus();
+                changePage(index);
+              },
+              controller: pageController,
+              children: _children()
           ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.repeat),
-            label: AppLocalizations.of(context)!.routine,
+          bottomNavigationBar: BottomNavigationBar(
+            selectedItemColor: Theme.of(widget.parentCtx).colorScheme.secondary,
+            type: BottomNavigationBarType.fixed,
+            onTap: onTabTapped, // new
+            currentIndex: widget._currentIndex, // new
+            items: [
+              BottomNavigationBarItem(
+                icon: new Icon(Icons.fitness_center),
+                label: AppLocalizations.of(context)!.workout,
+              ),
+              BottomNavigationBarItem(
+                icon: new Icon(Icons.repeat),
+                label: AppLocalizations.of(context)!.routine,
+              ),
+              BottomNavigationBarItem(
+                icon: new Icon(Icons.insert_chart_outlined),
+                label: AppLocalizations.of(context)!.dashboard,
+              ),
+              BottomNavigationBarItem(
+                icon: new Icon(Icons.calendar_today),
+                label: AppLocalizations.of(context)!.calendar,
+              ),
+              BottomNavigationBarItem(
+                icon: new Icon(Icons.settings),
+                label: AppLocalizations.of(context)!.settings,
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.insert_chart_outlined),
-            label: AppLocalizations.of(context)!.dashboard,
-          ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.calendar_today),
-            label: AppLocalizations.of(context)!.calendar,
-          ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.settings),
-            label: AppLocalizations.of(context)!.settings,
-          ),
-        ],
-      ),
+      )
     );
   }
 

@@ -14,13 +14,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Create this in the apps main function.
 class ObjectBox {
   /// The Store of this app.
-  late final Store store;
+  late Store store;
   late final SharedPreferences prefs;
 
-  late final Box<WorkoutEntry> workoutBox;
-  late final Box<RoutineEntry> routineBox;
-  late final Box<SessionItem> sessionItemBox;
-  late final Box<SessionEntry> sessionBox;
+  late Box<WorkoutEntry> workoutBox;
+  late Box<RoutineEntry> routineBox;
+  late Box<SessionItem> sessionItemBox;
+  late Box<SessionEntry> sessionBox;
 
   List<WorkoutEntry> workoutList = [];
   List<RoutineEntry> routineList = [];
@@ -30,6 +30,11 @@ class ObjectBox {
   Map<String, dynamic> prefMap = Map();
 
   ObjectBox._create(this.store, this.prefs) {
+    initObjectBox();
+  }
+
+  void initObjectBox()
+  {
     workoutBox = Box<WorkoutEntry>(store);
     routineBox = Box<RoutineEntry>(store);
     sessionItemBox = Box<SessionItem>(store);
@@ -93,8 +98,18 @@ class ObjectBox {
     return ObjectBox._create(store, prefs);
   }
 
-  Future<File> objectBoxDataFile() async{
+  Future<String> objectBoxDataFilePath() async{
     final directory = (await getApplicationDocumentsDirectory()).path;
-    return File("$directory/objectbox/data.mdb");
+    return "$directory/objectbox/data.mdb";
+  }
+
+  bool closeStore(){
+    store.close();
+    return true;
+  }
+
+  restartDB() async{
+    store = await openStore();
+    initObjectBox();
   }
 }

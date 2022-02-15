@@ -69,20 +69,22 @@ Future<bool> confirmPopup (BuildContext context, String title, String content, S
           content: Text(content),
           actions: [
             // The "Yes" button
-            TextButton(
-                onPressed: (){
-                  ret = true;
-                  Navigator.of(ctx).pop();
-                },
-              child: Text(yes),
-            ),
-            TextButton(
-                onPressed: () {
-                  ret = false;
-                  Navigator.of(ctx).pop();
-                },
-                child: Text(no)
-            ),
+            if(yes.isNotEmpty)
+              TextButton(
+                  onPressed: (){
+                    ret = true;
+                    Navigator.of(ctx).pop();
+                  },
+                child: Text(yes),
+              ),
+            if(no.isNotEmpty)
+              TextButton(
+                  onPressed: () {
+                    ret = false;
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text(no)
+              ),
           ],
         );
       });

@@ -14,7 +14,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   objectbox = await ObjectBox.create();
 
-  runApp(MaterialApp(home:MyApp()));
+  runApp(MaterialApp(
+    home:MyApp()
+  ));
 }
 
 class MyApp extends StatefulWidget {

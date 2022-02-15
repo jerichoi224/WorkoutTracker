@@ -32,6 +32,8 @@
   "yes": "예",
   "no": "아니오",
   "sec": "초",
+  "ok": "확인",
+  "help": "도움말",
   "confirm_delete_msg": "정말로 삭제하시겠습니까?",
 
   "dashboard_start_workout": "운동 시작",
@@ -58,6 +60,10 @@
   "settings_about_open_license": "라이센스 보기",
   "settings_developer_info": "개발자 정보",
   "settings_send_me_bugs": "버그 찾으면 이메일 보내주세요. (안찾으시면 더 좋고요...)",
+  "settings_backup_restore": "백업 및 복구",
+  "settings_backup_data": "데이터 백업",
+  "settings_restore_data": "데이터 복구",
+  "settings_backup_instruction": "운동 목록, 루틴, 운동 세션들이 백업됩니다. 안전한 곳에 파일을 저장해주세요.",
 
   "routine_not_found": "저장된 루틴이 없습니다.",
   "routine_add_routine": "루틴 추가",

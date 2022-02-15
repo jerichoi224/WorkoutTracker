@@ -31,7 +31,9 @@
     "contact": "Contact",
     "yes": "Yes",
     "no": "No",
+    "ok": "Ok",
     "sec": "sec",
+    "help": "Help Info",
     "confirm_delete_msg": "Are you sure you want to delete this item?",
 
     "dashboard_start_workout": "Start Workout",
@@ -57,6 +59,10 @@
     "settings_about_open_license": "View License",
     "settings_developer_info": "About Developer",
     "settings_send_me_bugs": "Email me if you find any bugs in the app (hopefully you don't)",
+    "settings_backup_restore": "Backup & Restore",
+    "settings_backup_data": "Backup Data",
+    "settings_restore_data": "Restore Data",
+    "settings_backup_instruction": "This will backup your workouts, routines, and workout sessions. Please save it somewhere safe.",
 
     "routine_not_found": "No Routine Found.",
     "routine_add_routine": "Add Routine",

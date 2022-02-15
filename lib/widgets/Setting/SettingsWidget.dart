@@ -1,13 +1,13 @@
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
-import 'package:workout_tracker/widgets/HomeWidget.dart';
 import 'package:workout_tracker/widgets/Setting/AboutSettingWidget.dart';
 import 'package:workout_tracker/widgets/Setting/ProfileSettingWidget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:workout_tracker/widgets/UIComponents.dart';
 
 class SettingsWidget extends StatefulWidget {
   late ObjectBox objectbox;
@@ -67,6 +67,28 @@ class _SettingsState extends State<SettingsWidget> {
      widget.objectbox.setPref("locale", language);
      MyApp.setLocale(context, newLocale);
      setState(() {});
+   }
+
+   void backupFile(BuildContext context) async {
+    bool msg = await confirmPopup(context,
+      AppLocalizations.of(context)!.help,
+      AppLocalizations.of(context)!.settings_backup_instruction,
+      AppLocalizations.of(context)!.ok,
+        "");
+    if(!msg)
+      return;
+
+    widget.objectbox.closeStore();
+
+    String filePath = await widget.objectbox.objectBoxDataFilePath();
+    final box = context.findRenderObject() as RenderBox?;
+    if (filePath.isNotEmpty) {
+      await Share.shareFiles([filePath],
+          text: "workout_tracker_db",
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    }
+
+    await widget.objectbox.restartDB();
    }
 
  @override
@@ -252,6 +274,48 @@ class _SettingsState extends State<SettingsWidget> {
                                        );
                                      }).toList(),
                                    )
+                                 ],
+                               )
+                           ),
+                         ),
+                       ],
+                     )
+                 ),
+                 Container(
+                     padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                     child: Text(AppLocalizations.of(context)!.settings_backup_restore,
+                       style: TextStyle(
+                           fontWeight: FontWeight.bold,
+                           color: Colors.grey
+                       ),
+                     )
+                 ),
+                 Card(
+                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                     margin: EdgeInsets.all(8.0),
+                     child: Column(
+                       children: <Widget>[
+                         InkWell(
+                           borderRadius: BorderRadius.circular(8.0),
+                           onTap: (){
+                             backupFile(context);
+                           },
+                           child: ListTile(
+                               title: new Row(
+                                 children: <Widget>[
+                                   new Text(AppLocalizations.of(context)!.settings_backup_data),
+                                 ],
+                               )
+                           ),
+                         ),
+                         InkWell(
+                           borderRadius: BorderRadius.circular(8.0),
+                           onTap: (){
+                           },
+                           child: ListTile(
+                               title: new Row(
+                                 children: <Widget>[
+                                   new Text(AppLocalizations.of(context)!.settings_restore_data),
                                  ],
                                )
                            ),

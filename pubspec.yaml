@@ -38,6 +38,7 @@ dependencies:
   image_cropper: ^1.4.1
   url_launcher: ^6.0.18
   dropdown_button2: ^1.1.1
+  share_plus: ^3.0.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

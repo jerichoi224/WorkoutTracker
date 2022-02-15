@@ -155,16 +155,20 @@ class _AboutSettingsState extends State<AboutSettingsWidget> {
                                     ),
                                   )
                               ),
-                              ListTile(
-                                  title: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      linkedUrl("Languages icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/languages'),
-                                      linkedUrl("Gym icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/gym'),
-                                      linkedUrl("Settings icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/settings'),
-                                    ],
-                                  )
-                              ),
+                              Container(
+                                padding: EdgeInsets.fromLTRB(0, 5, 0, 10),
+                                child: ListTile(
+                                    title: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        linkedUrl("Languages icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/languages'),
+                                        linkedUrl("Gym icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/gym'),
+                                        linkedUrl("Settings icons created by Freepik - Flaticon", 'https://www.flaticon.com/free-icons/settings'),
+                                      ],
+                                    )
+                                ),
+
+                              )
                             ],
                           )
                       ),

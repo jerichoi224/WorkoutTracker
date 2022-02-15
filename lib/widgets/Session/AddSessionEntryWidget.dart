@@ -462,9 +462,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               height: 40,
               child: new TextField(
                 cursorColor: Colors.black54,
+                // 0:00:00 (7) + input (1) = 8
                 maxLength: 8,
                 keyboardType: TextInputType.number,
                 controller: workoutCardList[cardInd].countController[index],
+                style: TextStyle(
+                  fontSize: 16
+                ),
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                       // width: 0.0 produces a thin "hairline" border
@@ -480,6 +484,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   workoutCardList[cardInd].countController[index].selection = TextSelection.fromPosition(TextPosition(offset: workoutCardList[cardInd].countController[index].text.length));
                 },
                 onChanged: (String value){
+                  print(value);
                   value = value.replaceAll(":", "");
                   while(value.length > 0 && value.substring(0, 1) == "0"){
                     value = value.substring(1, value.length);
@@ -784,7 +789,11 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
+    final mediaQueryData = MediaQuery.of(context);
+
+    return MediaQuery(
+      data: mediaQueryData.copyWith(textScaleFactor: 1.0),
+      child:WillPopScope(
         onWillPop: () async{
           if(widget.edit)
             {
@@ -1006,6 +1015,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                 )
             )
         )
+      )
     );
   }
 }
