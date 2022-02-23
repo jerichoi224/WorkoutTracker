@@ -62,7 +62,13 @@
     "settings_backup_restore": "Backup & Restore",
     "settings_backup_data": "Backup Data",
     "settings_restore_data": "Restore Data",
+    "settings_invalid_db_file": "Data File is invalid.",
+    "settings_restore_failed_msg": "Data Restore failed with msg: ",
+    "settings_restore_warning_msg": "Selecting a invalid file may lead to unexpected behavior. Please choose the file properly.",
     "settings_backup_instruction": "This will backup your workouts, routines, and workout sessions. Please save it somewhere safe.",
+    "settings_need_permission": "Write permission is needed to backup your file",
+    "settings_saved_at": "File saved in Download Folder:\n",
+    "settings_bsd_license": "BSD-3 Clause",
 
     "routine_not_found": "No Routine Found.",
     "routine_add_routine": "Add Routine",

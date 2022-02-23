@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:workout_tracker/widgets/Setting/BSDLicenseWidget.dart';
 
 class AboutSettingsWidget extends StatefulWidget {
   AboutSettingsWidget({Key? key}) : super(key: key);
@@ -15,8 +16,12 @@ class _AboutSettingsState extends State<AboutSettingsWidget> {
     super.initState();
   }
 
-  void openLicense(){
-
+  void openLicense() async{
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BSDLicenseWidget(),
+        ));
   }
 
   Widget linkedUrl(String caption, String url){

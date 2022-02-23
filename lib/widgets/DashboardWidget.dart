@@ -98,7 +98,7 @@ class _DashboardState extends State<DashboardWidget>{
               ),
               Text(
                   overviewCount.toString(),
-                  textAlign: TextAlign.left,
+                  textAlign: TextAlign.center,
                   style: contentStyle
               ),
             ]
@@ -114,7 +114,7 @@ class _DashboardState extends State<DashboardWidget>{
               ),
               Text(
                   overviewTime.toString(),
-                  textAlign: TextAlign.left,
+                  textAlign: TextAlign.center,
                   style: contentStyle
               ),
             ]

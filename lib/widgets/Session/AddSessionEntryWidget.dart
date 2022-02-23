@@ -491,6 +491,9 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   }
                   if(value.length > 5)
                     value = value.substring(value.length - 5, value.length);
+                  print(timeTextToTime(textToTimeText(value)));
+                  if(timeTextToTime(textToTimeText(value)) > 35999)
+                    value = "95959"; // 9:59:59 max time.
                   workoutCardList[cardInd].countController[index].text = textToTimeText(value);
                   workoutCardList[cardInd].countController[index].selection = TextSelection.fromPosition(TextPosition(offset: workoutCardList[cardInd].countController[index].text.length));
                 },
