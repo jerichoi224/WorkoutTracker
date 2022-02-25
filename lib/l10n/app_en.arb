@@ -62,6 +62,7 @@
     "settings_backup_restore": "Backup & Restore",
     "settings_backup_data": "Backup Data",
     "settings_restore_data": "Restore Data",
+    "settings_export_data": "Export Data",
     "settings_invalid_db_file": "Data File is invalid.",
     "settings_restore_failed_msg": "Data Restore failed with msg: ",
     "settings_restore_warning_msg": "Selecting a invalid file may lead to unexpected behavior. Please choose the file properly.",

@@ -2,6 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/dbModels/session_entry_model.dart';
+import 'package:workout_tracker/dbModels/session_item_model.dart';
+import 'package:workout_tracker/dbModels/set_item_model.dart';
+import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/main.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 import 'package:workout_tracker/util/objectbox.dart';
@@ -79,6 +83,7 @@ class _SettingsState extends State<SettingsWidget> {
      if (!status.isGranted) {
        await Permission.storage.request();
      }
+     status = await Permission.storage.status;
      if (!status.isGranted) {
        bool msg = await confirmPopup(context,
            AppLocalizations.of(context)!.help,
@@ -187,7 +192,98 @@ class _SettingsState extends State<SettingsWidget> {
      return true;
    }
 
- @override
+   String exportText()
+   {
+     String returnText = "";
+     List<SessionEntry> allSessions = widget.objectbox.sessionBox.getAll();
+     allSessions.sort((a, b) => a.startTime.compareTo(b.startTime));
+     for(SessionEntry sessionEntry in allSessions)
+       {
+         returnText += sessionEntry.name;
+         returnText += "(" + dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(sessionEntry.startTime)) + "-" + dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(sessionEntry.endTime)) + ")\n";
+         for(SessionItem item in sessionEntry.sets)
+         {
+           WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
+           returnText += workoutEntry.caption + "(" + workoutEntry.metric + "/" + workoutEntry.type + ")\n";
+           for(SetItem set in item.sets)
+           {
+             if(workoutEntry.metric != MetricType.duration.name)
+             {
+               returnText += set.metricValue.toStringRemoveTrailingZero();
+               returnText += " " + workoutEntry.metric;
+
+               // show num of reps
+               if([MetricType.kg.name, MetricType.lb.name].contains(workoutEntry.metric))
+                 returnText += " × " + set.countValue.toString();
+
+               // show time
+               if([MetricType.km.name, MetricType.miles.name, MetricType.floor.name].contains(workoutEntry.metric))
+                 if(set.countValue != 0)
+                 {
+                   String time = numToTimeText(set.countValue);
+                   if(time.substring(0, 1) == "0")
+                     time = time.substring(2, time.length);
+                   returnText += " (" + time + ")";
+                 }
+             }
+             else
+             {
+               // Duration just shows Time
+               String time = numToTimeText(set.countValue);
+               if(time.substring(0, 1) == "0")
+                 time = time.substring(2, time.length);
+               returnText += time;
+             }
+             returnText += "\n";
+           }
+           returnText += "\n";
+         }
+       }
+     return returnText;
+   }
+
+   void exportData() async{
+     var status = await Permission.storage.status;
+     if (!status.isGranted) {
+       await Permission.storage.request();
+     }
+     status = await Permission.storage.status;
+     if (!status.isGranted) {
+       bool msg = await confirmPopup(context,
+           AppLocalizations.of(context)!.help,
+           AppLocalizations.of(context)!.settings_need_permission,
+           AppLocalizations.of(context)!.ok,
+           "");
+       return null;
+     }
+
+     String filename = "WorkoutData_" + dateFormatterUnderscore.format(DateTime.now());
+     int count = 0;
+     String downloadPath = '/storage/emulated/0/Download/';
+     if((await File(downloadPath + filename + ".txt").exists()))
+     {
+       count = 1;
+       while((await File(downloadPath + filename + "_" + count.toString() + ".txt").exists()))
+       {
+         count += 1;
+       }
+     }
+
+     if(count != 0)
+     {
+       filename = filename + "_" + count.toString();
+     }
+
+     File written = await File(downloadPath + filename+ ".txt").writeAsString(exportText());
+
+     bool msg = await confirmPopup(context,
+         AppLocalizations.of(context)!.help,
+         AppLocalizations.of(context)!.settings_saved_at + filename + ".txt",
+         AppLocalizations.of(context)!.ok,
+         "");
+   }
+
+   @override
  Widget build(BuildContext context) {
    return IgnorePointer(
        ignoring: ignoreInput,
@@ -416,6 +512,20 @@ class _SettingsState extends State<SettingsWidget> {
                                        title: new Row(
                                          children: <Widget>[
                                            new Text(AppLocalizations.of(context)!.settings_restore_data),
+                                         ],
+                                       )
+                                   ),
+                                 ),
+                                 InkWell(
+                                   borderRadius: BorderRadius.circular(8.0),
+                                   onTap: (){
+                                     exportData();
+                                     ignoreInput = false;
+                                   },
+                                   child: ListTile(
+                                       title: new Row(
+                                         children: <Widget>[
+                                           new Text(AppLocalizations.of(context)!.settings_export_data),
                                          ],
                                        )
                                    ),

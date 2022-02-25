@@ -34,17 +34,20 @@ class _BSDLicenseState extends State<BSDLicenseWidget> {
               SliverList(
                 delegate: SliverChildListDelegate(
                     [
-                      RichText(text:
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: BSD_3_Clause,
-                            style: TextStyle(
-                              color: Colors.grey
-                            )
-                          )
-                        ]
-                      ))
+                      Container(
+                        padding: EdgeInsets.all(15),
+                        child: RichText(text:
+                        TextSpan(
+                            children: [
+                              TextSpan(
+                                  text: BSD_3_Clause,
+                                  style: TextStyle(
+                                      color: Colors.grey
+                                  )
+                              )
+                            ]
+                        )),
+                      )
                     ]),
               ),
             ],
