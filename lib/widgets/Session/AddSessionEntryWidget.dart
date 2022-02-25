@@ -245,6 +245,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   }
 
   Widget _BuildWorkoutCards(BuildContext context, int index) {
+    List<String> WorkoutNames = workoutCardList.map((item) => item.entry.caption).toList();
+
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         margin: EdgeInsets.all(8.0),
@@ -259,7 +261,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               title: new Row(
                 children: <Widget>[
                   new Flexible(
-                      child: new Text(workoutCardList[index].entry.caption.capitalize(locale),
+                      child: new Text(WorkoutNames.map((element) => element == workoutCardList[index].entry.caption ? 1 : 0).reduce((value, element) => value + element) == 1 ?
+                      workoutCardList[index].entry.caption.capitalize(locale) : workoutCardList[index].entry.caption.capitalize(locale) + " (" + WorkoutType.values.firstWhere((element) => element.name == workoutCardList[index].entry.type).toLanguageString(locale) + ")",
                         style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold

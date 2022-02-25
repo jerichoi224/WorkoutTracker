@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
 import 'package:workout_tracker/util/objectbox.dart';
@@ -134,6 +135,26 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
     newEntry!.partList = partList;
     newEntry!.metric = metric;
     newEntry!.description = descriptionController.text;
+
+    if(!widget.edit)
+    {
+      for(WorkoutEntry entry in widget.objectbox.workoutList)
+        if(entry.caption == newEntry!.caption &&
+            entry.type == newEntry!.type &&
+            listEquals(entry.partList, newEntry!.partList) &&
+            entry.metric == newEntry!.metric &&
+            entry.description == newEntry!.description &&
+            entry.visible == newEntry!.visible
+        )
+          {
+            final snackBar = SnackBar(
+              content: Text(AppLocalizations.of(context)!.workout_identical_exists),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            return;
+          }
+    }
+
     widget.objectbox.workoutBox.put(newEntry!);
     widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
     Navigator.pop(context, true);

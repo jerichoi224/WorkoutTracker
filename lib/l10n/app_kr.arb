@@ -95,6 +95,7 @@
   "workout_avg_speed": "평균 속도",
   "workout_total_distance": "총 거리",
   "workout_type_msg": "저장 후, 측정 단위는 수정할 수 없습니다.",
+  "workout_identical_exists": "동일한 운동이 존재합니다.",
 
   "session_info": "운동 세션 정보",
   "session_choose_routine": "루틴 선택",

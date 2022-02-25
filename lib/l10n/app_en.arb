@@ -94,6 +94,7 @@
     "workout_avg_speed": "Avg Speed",
     "workout_total_distance": "Total Distance",
     "workout_type_msg": "Once created, you won't be able to change the metric.",
+    "workout_identical_exists": "Identical Workout Exists",
 
     "session_info": "Session Info",
     "session_choose_routine": "Choose Routine",

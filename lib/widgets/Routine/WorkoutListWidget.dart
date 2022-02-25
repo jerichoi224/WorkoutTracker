@@ -166,12 +166,12 @@ class _WorkoutListState extends State<WorkoutListWidget> {
                                 style: TextStyle(color: Colors.black)
                             ),
                             TextSpan(
-                                text: i.partList.length == 0 ? " " : " ("  + i.partList.map((e) => PartType.values.firstWhere((element) => element.name == e).toLanguageString(locale)).join(", ") + ")",
+                                text: " (" + WorkoutType.values.firstWhere((element) => element.name == i.type).toLanguageString(locale) + ")",
                                 style: TextStyle(color: Colors.black54)),
                           ],
                         ),
                       ),
-                      subtitle: Text(WorkoutType.values.firstWhere((element) => element.name == i.type).toLanguageString(locale)),
+                      subtitle: Text(i.partList.length == 0 ? " " : " ("  + i.partList.map((e) => PartType.values.firstWhere((element) => element.name == e).toLanguageString(locale)).join(", ") + ")"),
                   )
               )
           )

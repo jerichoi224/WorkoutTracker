@@ -127,12 +127,14 @@ class _ViewSessionEntryState extends State<ViewSessionEntryWidget> {
   Widget detailsText()
   {
     List<TableRow> detailsInfo = [];
+    List<String> WorkoutNames = sessionEntry!.sets.map((item) => widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId).caption).toList();
     for(SessionItem item in sessionEntry!.sets)
     {
       WorkoutEntry workoutEntry = widget.objectbox.workoutList.firstWhere((element) => element.id == item.workoutId);
       detailsInfo.add(TableRow(children: [
-        Text(workoutEntry.caption,
-            textAlign: TextAlign.left,
+        Text(WorkoutNames.map((element) => element == workoutEntry.caption ? 1 : 0).reduce((value, element) => value + element) == 1 ?
+        workoutEntry.caption.capitalize(locale) : workoutEntry.caption.capitalize(locale) + " (" + WorkoutType.values.firstWhere((element) => element.name == workoutEntry.type).toLanguageString(locale) + ")",
+          textAlign: TextAlign.left,
             style: titleStyle
         ),
       ]));
