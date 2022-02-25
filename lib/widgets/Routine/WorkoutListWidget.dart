@@ -171,7 +171,7 @@ class _WorkoutListState extends State<WorkoutListWidget> {
                           ],
                         ),
                       ),
-                      subtitle: Text(i.partList.length == 0 ? " " : " ("  + i.partList.map((e) => PartType.values.firstWhere((element) => element.name == e).toLanguageString(locale)).join(", ") + ")"),
+                      subtitle: Text(i.partList.length == 0 ? " " : i.partList.map((e) => PartType.values.firstWhere((element) => element.name == e).toLanguageString(locale)).join(", ")),
                   )
               )
           )

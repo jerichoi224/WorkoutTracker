@@ -15,7 +15,8 @@ Future<void> main() async {
   objectbox = await ObjectBox.create();
 
   runApp(MaterialApp(
-    home:MyApp()
+      debugShowCheckedModeBanner: false,
+      home:MyApp()
   ));
 }
 

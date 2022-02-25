@@ -45,6 +45,7 @@ class _InstructionState extends State<InstructionWidget>{
       nextPage();
       objectbox.setPref('show_instruction', false);
       objectbox.setPref('user_name', userName.text);
+      objectbox.setPref('version', '1.0.0');
       addInitialWorkouts();
       await Future.delayed(const Duration(seconds: 2), (){});
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
