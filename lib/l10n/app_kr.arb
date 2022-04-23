@@ -119,6 +119,7 @@
   "session_delete_msg": "운동이 기록되어 있습니다. 정말로 삭제하시겠습니까?",
   "session_routine_exists": "이미 동일한 운동으로 구성된 루틴이 존재합니다.",
   "session_save_as_routine": "현재 운동 세션으로 루틴 저장하기",
+  "session_confirm_finish_session": "운동을 끝내시겠습니까?",
 
   "instruction_select_language": "언어를 선택해주세요",
   "instruction_ask_name_msg": "환영합니다.\n이름을 알려주세요",

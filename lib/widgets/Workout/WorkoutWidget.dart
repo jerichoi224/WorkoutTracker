@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:workout_tracker/util/koreanSearch.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
@@ -171,7 +172,8 @@ class _WorkoutState extends State<WorkoutWidget> {
 
       // search field filtering
       if(searchTextController.text.isNotEmpty) {
-        if(!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())
+        if(((!i.caption.toLowerCase().contains(searchTextController.text.toLowerCase())) ||
+            (locale == "kr" && containsKr(i.caption, searchTextController.text)))
            &&!i.partList.contains(searchTextController.text.toLowerCase())
         // && !i.type.name.toLowerCase().contains(searchTextController.text.toLowerCase())
         )

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   bool setTime = false;
   bool saveAsRoutine = false;
   late Timer _timer;
+  bool showKeyboard = false;
 
   late SessionEntry? sessionEntry;
   late RoutineEntry? routineEntry;
@@ -45,6 +47,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   int endTime = 0;
   int year = 0;
   int month = 0;
+  TextEditingController? editingController;
 
   @override
   void initState() {
@@ -207,7 +210,19 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   }
 
   void AddSet(int cardIndex, double metric, int count) {
-    workoutCardList[cardIndex].addSet(metric, count);
+    print(workoutCardList[cardIndex].numSets);
+    if(workoutCardList[cardIndex].numSets > 0)
+    {
+      WorkoutCard workoutCard = workoutCardList[cardIndex];
+      String prevMetric = workoutCard.metricController[workoutCard.numSets - 1].text;
+      String prevCount = "";
+      if(![MetricType.km.name, MetricType.miles.name, MetricType.duration.name, MetricType.floor.name].contains(workoutCard.entry.metric))
+        prevCount = workoutCard.countController[workoutCard.numSets - 1].text;
+      print("[" + prevMetric + "][" + prevCount + "]");
+      workoutCard.addSet(metric, count, prevMetric.isNotEmpty ? double.parse(prevMetric) : -1, prevCount.isNotEmpty ? int.parse(prevCount) : -1);
+    }
+    else
+      workoutCardList[cardIndex].addSet(metric, count);
     setState(() {});
   }
 
@@ -241,7 +256,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       if(!partList.contains(part))
         partList.add(part);
     if(addSet)
-      AddSet(workoutCardList.length - 1, 0, 0);
+      AddSet(workoutCardList.length - 1, -1, -1);
   }
 
   Widget _BuildWorkoutCards(BuildContext context, int index) {
@@ -325,7 +340,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
             ),
-            AddButton(AppLocalizations.of(context)!.session_add_set, (){AddSet(index, 0, 0);})
+            AddButton(AppLocalizations.of(context)!.session_add_set, (){AddSet(index, -1, -1);})
           ]
           )
         )
@@ -414,9 +429,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               width: 65,
               height: 40,
               child: new TextField(
+                onTap: (){
+                  showKeyboard = true;
+                  editingController = workoutCardList[cardInd].metricController[index];
+                  },
                 cursorColor: Colors.black54,
                 maxLength: 4,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.none,
                 controller: workoutCardList[cardInd].metricController[index],
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -441,9 +460,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                 width: 65,
                 height: 40,
                 child: new TextField(
+                  onTap: (){
+                    showKeyboard = true;
+                    editingController = workoutCardList[cardInd].countController[index];
+                  },
                   cursorColor: Colors.black54,
                   maxLength: 4,
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.none,
                   controller: workoutCardList[cardInd].countController[index],
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -487,14 +510,12 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   workoutCardList[cardInd].countController[index].selection = TextSelection.fromPosition(TextPosition(offset: workoutCardList[cardInd].countController[index].text.length));
                 },
                 onChanged: (String value){
-                  print(value);
                   value = value.replaceAll(":", "");
                   while(value.length > 0 && value.substring(0, 1) == "0"){
                     value = value.substring(1, value.length);
                   }
                   if(value.length > 5)
                     value = value.substring(value.length - 5, value.length);
-                  print(timeTextToTime(textToTimeText(value)));
                   if(timeTextToTime(textToTimeText(value)) > 35999)
                     value = "95959"; // 9:59:59 max time.
                   workoutCardList[cardInd].countController[index].text = textToTimeText(value);
@@ -519,9 +540,22 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   }
 
   // Save current session and pop screen.
-  saveSession()
+  saveSession() async
   {
-    if(!setTime)
+    if(!widget.edit)
+      {
+        await confirmPopup(context,
+          AppLocalizations.of(context)!.session_please_confirm,
+          AppLocalizations.of(context)!.session_confirm_finish_session,
+          AppLocalizations.of(context)!.yes,
+          AppLocalizations.of(context)!.no,).then((value)
+        {
+          if(!value)
+            return;
+        });
+      }
+
+      if(!setTime)
       endTime = DateTime.now().millisecondsSinceEpoch;
 
     if(endTime < startTime) {
@@ -770,6 +804,105 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     );
   }
 
+  Widget KeyboardKey(String text, Function method)
+  {
+    Color color = Colors.white;
+    switch(text)
+    {
+      case "+ 5":
+      case "- 5":
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+      case "0":
+      case ".":
+        return Expanded(
+        flex: 1,
+        child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: InkWell(
+            onTap: () => {
+              method()
+            },
+            child: Container(
+              margin: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(40)),
+              ),
+              child: Center(
+                  child: Text(text,
+                      style:TextStyle(
+                          fontSize: 22
+                      )
+                  )
+              ),
+            ),
+          ),
+        ),
+      );
+      case "check":
+      case "clear":
+      return Expanded(
+        flex: 1,
+        child: Padding(
+          padding: const EdgeInsets.all(1.0),
+          child: InkWell(
+            onTap: () => {
+              method()
+            },
+            child: Container(
+              margin: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(40)),
+              ),
+              child: Center(
+                  child: Icon(
+                    text == "check" ? Icons.check : Icons.clear,
+                    color: Color.fromRGBO(0, 0, 0, 1),
+                    size: 22,
+                  ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    //      case "<-":
+    return Expanded(
+      flex: 1,
+      child: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: InkWell(
+          onTap: () => {
+            method()
+          },
+          child: Container(
+            margin: EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(40)),
+            ),
+            child: Center(
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Color.fromRGBO(0, 0, 0, 1),
+                  size: 22,
+                ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<int> _selectDate(BuildContext context, int time) async {
     DateTime original = DateTime.fromMillisecondsSinceEpoch(time);
     DateTime? pickedDate = await showDatePicker(
@@ -791,6 +924,60 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     DateTime picked = new DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
 
     return picked.millisecondsSinceEpoch;
+  }
+
+  void editText(String key)
+  {
+    switch(key)
+    {
+      case "1":
+      case "2":
+      case "3":
+      case "4":
+      case "5":
+      case "6":
+      case "7":
+      case "8":
+      case "9":
+      case "0":
+        if(editingController!.text.length < 4)
+          editingController!.text += key;
+        return;
+      case ".":
+        if(editingController!.text.length < 4 && !editingController!.text.contains("."))
+        editingController!.text += ".";
+        return;
+      case "check":
+        showKeyboard = false;
+        return;
+      case "clear":
+        editingController!.text = "";
+        return;
+      case "+5":
+        double i = double.parse(editingController!.text);
+        editingController!.text = (i+5).toStringRemoveTrailingZero();
+        return;
+      case "-5":
+        double i = double.parse(editingController!.text);
+        editingController!.text = (i-5).toStringRemoveTrailingZero();
+        return;
+      case "<-":
+        if(editingController!.text.length > 0)
+          editingController!.text = editingController!.text.substring(0, editingController!.text.length - 1);
+        return;
+    }
+
+  }
+
+  List<Widget> _buildActions() {
+    return <Widget>[
+      IconButton(
+        icon: const Icon(Icons.save),
+        onPressed: (){
+          saveSession();
+          },
+      ),
+    ];
   }
 
   @override
@@ -823,201 +1010,268 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
         child: new GestureDetector(
             onTap: () {
               FocusScope.of(context).unfocus();
+              showKeyboard = false;
             },
             child: new Scaffold(
                 appBar: AppBar(
                   title: Text(widget.edit ? AppLocalizations.of(context)!.session_edit_session : AppLocalizations.of(context)!.session_add_session),
+                  actions: _buildActions(),
                   backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
                     builder: (context) =>
-                        SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                    padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text(AppLocalizations.of(context)!.name,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey
+                    Column(
+                      children:
+                        [
+                          Container(
+                            child: Expanded(
+                              child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                          padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                                          child: Text(AppLocalizations.of(context)!.name,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey
+                                            ),
+                                          )
                                       ),
-                                    )
-                                ),
-                                Card(
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.all(8.0),
-                                    child: Column(
-                                        children: <Widget>[
-                                          ListTile(
-                                              title: new Row(
-                                                children: <Widget>[
-                                                  new Flexible(
-                                                      child: new TextField(
-                                                        controller: sessionNameController,
-                                                        decoration: InputDecoration(
-                                                          border:InputBorder.none,
-                                                          hintText: widget.fromRoutine ?  defaultName + " " + routineEntry!.name : defaultName + " " + AppLocalizations.of(context)!.workout,
-                                                          hintStyle: TextStyle(
-                                                            color: Colors.black26
-                                                          ),
+                                      Card(
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                                          margin: EdgeInsets.all(8.0),
+                                          child: Column(
+                                              children: <Widget>[
+                                                ListTile(
+                                                    title: new Row(
+                                                      children: <Widget>[
+                                                        new Flexible(
+                                                            child: new TextField(
+                                                              onTap: (){showKeyboard = false;},
+                                                              controller: sessionNameController,
+                                                              decoration: InputDecoration(
+                                                                border:InputBorder.none,
+                                                                hintText: widget.fromRoutine ?  defaultName + " " + routineEntry!.name : defaultName + " " + AppLocalizations.of(context)!.workout,
+                                                                hintStyle: TextStyle(
+                                                                    color: Colors.black26
+                                                                ),
+                                                              ),
+                                                            )
                                                         ),
-                                                      )
-                                                  ),
-                                                  if(!widget.edit)
-                                                    _popUpMenuButton()
-                                                ],
-                                              )
-                                          ),
-                                          ListTile(
-                                            title: new Row(
+                                                        if(!widget.edit)
+                                                          _popUpMenuButton()
+                                                      ],
+                                                    )
+                                                ),
+                                                ListTile(
+                                                    title: new Row(
+                                                      children: <Widget>[
+                                                        Text(AppLocalizations.of(context)!.session_start_time),
+                                                        Expanded(child: Container()),
+                                                        InkWell(
+                                                          onTap: () async {
+                                                            if(!setTime)
+                                                              return;
+                                                            int newTime = await _selectDate(context, startTime);
+                                                            if(newTime != 0)
+                                                              setState(() {
+                                                                startTime = newTime;
+                                                                startDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
+                                                              });
+                                                          },
+                                                          child: Text(startDate),
+                                                        )
+                                                      ],
+                                                    )
+                                                ),
+                                                ListTile(
+                                                    title: new Row(
+                                                      children: <Widget>[
+                                                        Text(setTime ? AppLocalizations.of(context)!.session_end_time : AppLocalizations.of(context)!.session_workout_time),
+                                                        Expanded(child: Container()),
+                                                        setTime ?InkWell(
+                                                          onTap: () async {
+                                                            int newTime = await _selectDate(context, endTime);
+                                                            if(newTime != 0)
+                                                              setState(() {
+                                                                endTime = newTime;
+                                                                endDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
+                                                              });
+                                                          },
+                                                          child: Text(endDate),
+                                                        ) :
+                                                        RichText(
+                                                          text: TextSpan(
+                                                              children: [
+                                                                WidgetSpan(
+                                                                  child: Icon(
+                                                                    Icons.timer,
+                                                                    color: Color.fromRGBO(0, 0, 0, 0.7),
+                                                                    size: 16,
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: "\t" + timeString(),
+                                                                  style: TextStyle(
+                                                                      color: Color.fromRGBO(0, 0, 0, 0.7),
+                                                                      fontSize: 16
+                                                                  ),
+                                                                )
+                                                              ]
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )
+                                                ),
+                                              ]
+                                          )
+                                      ),
+                                      Container(
+                                          padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                                          child: Text(AppLocalizations.of(context)!.workout_part,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey
+                                            ),
+                                          )
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                        child: Wrap(
+                                            alignment: WrapAlignment.start,
+                                            children: selectedTagList()
+                                        ),
+                                      ),
+                                      Container(
+                                          padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                                          child: Text(AppLocalizations.of(context)!.routine_details,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey
+                                            ),
+                                          )
+                                      ),
+
+                                      ListView.builder(
+                                        itemCount: workoutCardList.length,
+                                        itemBuilder: _BuildWorkoutCards,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                      ),
+                                      Card(
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                                          margin: EdgeInsets.all(8.0),
+                                          child: Column(
                                               children: <Widget>[
-                                                Text(AppLocalizations.of(context)!.session_start_time),
-                                                Expanded(child: Container()),
-                                                InkWell(
-                                                  onTap: () async {
-                                                    if(!setTime)
-                                                      return;
-                                                    int newTime = await _selectDate(context, startTime);
-                                                    if(newTime != 0)
-                                                      setState(() {
-                                                        startTime = newTime;
-                                                        startDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
-                                                      });
-                                                  },
-                                                  child: Text(startDate),
-                                                )
-                                              ],
-                                            )
-                                          ),
-                                          ListTile(
-                                            title: new Row(
-                                              children: <Widget>[
-                                                Text(setTime ? AppLocalizations.of(context)!.session_end_time : AppLocalizations.of(context)!.session_workout_time),
-                                                Expanded(child: Container()),
-                                                setTime ?InkWell(
-                                                  onTap: () async {
-                                                    int newTime = await _selectDate(context, endTime);
-                                                    if(newTime != 0)
-                                                      setState(() {
-                                                      endTime = newTime;
-                                                      endDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(endTime));
+                                                AddButton(AppLocalizations.of(context)!.workout_add_workout, AddWorkout)
+                                              ]
+                                          )
+                                      ),
+                                      if(!widget.edit && !widget.fromRoutine)
+                                        Container(
+                                          child: Row(
+                                              children:[
+                                                Checkbox(
+                                                  checkColor: Colors.white,
+                                                  fillColor: MaterialStateProperty.all<Color>(Colors.grey),
+                                                  value: saveAsRoutine,
+                                                  onChanged: (bool? value) {
+                                                    if(value == true)
+                                                    {
+                                                      if(routineExists(workoutEntryList, widget.objectbox.routineList))
+                                                      {
+                                                        final snackBar = SnackBar(
+                                                          content: Text(AppLocalizations.of(context)!.session_routine_exists),
+                                                        );
+                                                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                        return;
+                                                      }
+                                                    }
+                                                    setState(() {
+                                                      saveAsRoutine = value!;
                                                     });
                                                   },
-                                                  child: Text(endDate),
-                                                ) :
-                                               RichText(
-                                                   text: TextSpan(
-                                                       children: [
-                                                         WidgetSpan(
-                                                           child: Icon(
-                                                             Icons.timer,
-                                                             color: Color.fromRGBO(0, 0, 0, 0.7),
-                                                             size: 16,
-                                                           ),
-                                                         ),
-                                                         TextSpan(
-                                                           text: "\t" + timeString(),
-                                                           style: TextStyle(
-                                                             color: Color.fromRGBO(0, 0, 0, 0.7),
-                                                             fontSize: 16
-                                                           ),
-                                                         )
-                                                       ]
-                                                   ),
-                                               )
-                                              ],
-                                            )
+                                                ),
+                                                Text(AppLocalizations.of(context)!.session_save_as_routine,
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.w500,
+                                                      color: Colors.grey
+                                                  ),
+                                                )
+                                              ]
                                           ),
-                                        ]
-                                    )
-                                ),
-                                Container(
-                                    padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                                    child: Text(AppLocalizations.of(context)!.workout_part,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey
-                                      ),
-                                    )
-                                ),
-                                Container(
-                                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                  child: Wrap(
-                                      alignment: WrapAlignment.start,
-                                      children: selectedTagList()
-                                  ),
-                                ),
-                                Container(
-                                    padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                                    child: Text(AppLocalizations.of(context)!.routine_details,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey
-                                      ),
-                                    )
-                                ),
-
-                                ListView.builder(
-                                  itemCount: workoutCardList.length,
-                                  itemBuilder: _BuildWorkoutCards,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                ),
-                                Card(
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                                    margin: EdgeInsets.all(8.0),
-                                    child: Column(
-                                        children: <Widget>[
-                                          AddButton(AppLocalizations.of(context)!.workout_add_workout, AddWorkout)
-                                        ]
-                                    )
-                                ),
-                                if(!widget.edit && !widget.fromRoutine)
-                                  Container(
-                                    child: Row(
-                                      children:[
-                                        Checkbox(
-                                          checkColor: Colors.white,
-                                          fillColor: MaterialStateProperty.all<Color>(Colors.grey),
-                                          value: saveAsRoutine,
-                                          onChanged: (bool? value) {
-                                            if(value == true)
-                                              {
-                                                if(routineExists(workoutEntryList, widget.objectbox.routineList))
-                                                  {
-                                                    final snackBar = SnackBar(
-                                                      content: Text(AppLocalizations.of(context)!.session_routine_exists),
-                                                    );
-                                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                                    return;
-                                                  }
-                                              }
-                                            setState(() {
-                                              saveAsRoutine = value!;
-                                            });
-                                          },
                                         ),
-                                        Text(AppLocalizations.of(context)!.session_save_as_routine,
-                                            style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.grey
-                                            ),
-                                        )
-                                      ]
-                                    ),
+                                      /*
+                                  CardButton(
+                                      Theme.of(context).colorScheme.primary,
+                                      widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.session_finish_session,
+                                          () {saveSession();}
                                   ),
-                                CardButton(
-                                    Theme.of(context).colorScheme.primary,
-                                    widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.session_finish_session,
-                                        () {saveSession();}
+                                  */
+                                      Container(
+                                        margin: EdgeInsets.all(10),
+                                      )
+                                    ],
+                                  )
+                              )
+                            ),
+                          ),
+                          if(showKeyboard)
+                            Container(
+                              padding: EdgeInsets.fromLTRB(4, 6, 4, 6),
+                              color: Colors.amber.shade50,
+                              height: 240.0,
+                              child: InkWell(
+                                onTap: () {
+                                },
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                          children: [
+                                            KeyboardKey('1', (){editText("1");}),
+                                            KeyboardKey('2', (){editText("2");}),
+                                            KeyboardKey('3', (){editText("3");}),
+                                            KeyboardKey('+ 5', (){editText("+5");}),
+                                          ]
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                          children: [
+                                            KeyboardKey('4', (){editText("4");}),
+                                            KeyboardKey('5', (){editText("5");}),
+                                            KeyboardKey('6', (){editText("6");}),
+                                            KeyboardKey('- 5', (){editText("+5");}),                                          ]
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                          children: [
+                                            KeyboardKey('7', (){editText("7");}),
+                                            KeyboardKey('8', (){editText("8");}),
+                                            KeyboardKey('9', (){editText("9");}),
+                                            KeyboardKey('<-', (){editText("<-");}),
+                                          ]
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Row(
+                                          children: [
+                                            KeyboardKey('clear', (){editingController!.text = "";}),
+                                            KeyboardKey('0', (){editingController!.text += "0";}),
+                                            KeyboardKey('.', (){if(!editingController!.text.contains("."))editingController!.text += ".";}),
+                                            KeyboardKey('check', (){showKeyboard = false;}),
+                                          ]
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  margin: EdgeInsets.all(10),
-                                )
-                              ],
+                              ),
                             )
-                        )
+                        ]
+                    )
                 )
             )
         )

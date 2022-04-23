@@ -19,21 +19,27 @@ class WorkoutCard {
     entry = workoutEntry;
   }
 
-  void addSet(double metric, int count)
+  void addSet(double metric, int count, [double prev_metric =-1, int prev_count = -1])
   {
+    if(metric == -1 && prev_metric != -1)
+      metric = prev_metric;
+    if(count == -1 && prev_count != -1)
+      count = prev_count;
+
     numSets += 1;
     metricList.add(metric);
     countList.add(count);
     TextEditingController metricTextController = new TextEditingController();
     TextEditingController countTextController = new TextEditingController();
-    if(metric != 0 || count != 0)
-      {
+    if(metric != -1)
         metricTextController.text  = metric.toStringRemoveTrailingZero();
-        countTextController.text  = count.toString();
-      }
+
+    if(count != -1)
+      countTextController.text  = count.toString();
+
     if([MetricType.km.name, MetricType.miles.name, MetricType.duration.name, MetricType.floor.name].contains(entry.metric))
       {
-        if(count == 0)
+        if(count == -1)
           countTextController.text = "0:00:00";
         else
           countTextController.text = numToTimeText(count);

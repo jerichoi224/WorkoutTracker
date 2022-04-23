@@ -118,6 +118,7 @@
     "session_delete_msg": "This workout has data recorded. Are you sure you want to delete it?",
     "session_routine_exists": "A routine with identical workout list already exists",
     "session_save_as_routine": "Add current workout as new routine.",
+    "session_confirm_finish_session": "Would you like to finish your workout session?",
 
     "instruction_select_language": "Select your langauge",
     "instruction_ask_name_msg": "Welcome to Workout Tracker!\nWhat's your name?",
