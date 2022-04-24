@@ -13,6 +13,7 @@ import 'package:workout_tracker/objectbox.g.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
 import 'package:workout_tracker/widgets/Routine/WorkoutListWidget.dart';
+import 'package:workout_tracker/widgets/Session/CustomKeyboardWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -47,7 +48,9 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   int endTime = 0;
   int year = 0;
   int month = 0;
+
   TextEditingController? editingController;
+  int textLimit = 0;
 
   @override
   void initState() {
@@ -218,7 +221,6 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       String prevCount = "";
       if(![MetricType.km.name, MetricType.miles.name, MetricType.duration.name, MetricType.floor.name].contains(workoutCard.entry.metric))
         prevCount = workoutCard.countController[workoutCard.numSets - 1].text;
-      print("[" + prevMetric + "][" + prevCount + "]");
       workoutCard.addSet(metric, count, prevMetric.isNotEmpty ? double.parse(prevMetric) : -1, prevCount.isNotEmpty ? int.parse(prevCount) : -1);
     }
     else
@@ -293,6 +295,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                       color: Colors.grey,
                     ),
                     onPressed:(){
+                      showKeyboard = false;
                       WorkoutCard card = workoutCardList[index];
                       bool ask = false;
                       for(int i = 0; i < card.numSets; i++)
@@ -426,15 +429,16 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
           new Expanded(child: Container()),
           if(![MetricType.duration.name].contains(workoutCardList[cardInd].entry.metric))
             new Container(
-              width: 65,
+              width: 72,
               height: 40,
               child: new TextField(
                 onTap: (){
                   showKeyboard = true;
                   editingController = workoutCardList[cardInd].metricController[index];
+                  textLimit = 5;
                   },
                 cursorColor: Colors.black54,
-                maxLength: 4,
+                maxLength: 5,
                 keyboardType: TextInputType.none,
                 controller: workoutCardList[cardInd].metricController[index],
                 decoration: InputDecoration(
@@ -457,15 +461,16 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
             new Text("   "),
             if([MetricType.kg.name, MetricType.lb.name].contains(workoutCardList[cardInd].entry.metric))
               new Container(
-                width: 65,
+                width: 54,
                 height: 40,
                 child: new TextField(
                   onTap: (){
                     showKeyboard = true;
                     editingController = workoutCardList[cardInd].countController[index];
+                    textLimit = 3;
                   },
                   cursorColor: Colors.black54,
-                  maxLength: 4,
+                  maxLength: 3,
                   keyboardType: TextInputType.none,
                   controller: workoutCardList[cardInd].countController[index],
                   decoration: InputDecoration(
@@ -529,6 +534,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
         child: new IconButton(
             icon: new Icon(Icons.close),
             onPressed:(){
+              showKeyboard = false;
               workoutCardList[cardInd].remove(index);
               setState(() {
               });
@@ -784,15 +790,18 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
   Widget _popUpMenuButton() {
     return PopupMenuButton(
       icon: Icon(Icons.more_vert),
-      itemBuilder: (context) => [
+      itemBuilder: (context) =>
+      [
         PopupMenuItem(
-          child: Text(setTime ? AppLocalizations.of(context)!.session_set_time_automatically : AppLocalizations.of(context)!.session_set_time_manually),
+          child: Text(setTime ? AppLocalizations.of(context)!
+              .session_set_time_automatically : AppLocalizations.of(context)!
+              .session_set_time_manually),
           value: 0,
         ),
       ],
 
       onSelected: (selectedIndex) {
-        if(selectedIndex == 0){
+        if (selectedIndex == 0) {
           setState(() {
             DateTime now = new DateTime.now();
             endDate = dateTimeFormatter.format(now);
@@ -801,105 +810,6 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
           });
         }
       },
-    );
-  }
-
-  Widget KeyboardKey(String text, Function method)
-  {
-    Color color = Colors.white;
-    switch(text)
-    {
-      case "+ 5":
-      case "- 5":
-      case "1":
-      case "2":
-      case "3":
-      case "4":
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-      case "9":
-      case "0":
-      case ".":
-        return Expanded(
-        flex: 1,
-        child: Padding(
-          padding: const EdgeInsets.all(1.0),
-          child: InkWell(
-            onTap: () => {
-              method()
-            },
-            child: Container(
-              margin: EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(40)),
-              ),
-              child: Center(
-                  child: Text(text,
-                      style:TextStyle(
-                          fontSize: 22
-                      )
-                  )
-              ),
-            ),
-          ),
-        ),
-      );
-      case "check":
-      case "clear":
-      return Expanded(
-        flex: 1,
-        child: Padding(
-          padding: const EdgeInsets.all(1.0),
-          child: InkWell(
-            onTap: () => {
-              method()
-            },
-            child: Container(
-              margin: EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(40)),
-              ),
-              child: Center(
-                  child: Icon(
-                    text == "check" ? Icons.check : Icons.clear,
-                    color: Color.fromRGBO(0, 0, 0, 1),
-                    size: 22,
-                  ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-    //      case "<-":
-    return Expanded(
-      flex: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(1.0),
-        child: InkWell(
-          onTap: () => {
-            method()
-          },
-          child: Container(
-            margin: EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(40)),
-            ),
-            child: Center(
-                child: Icon(
-                  Icons.arrow_back,
-                  color: Color.fromRGBO(0, 0, 0, 1),
-                  size: 22,
-                ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -926,48 +836,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
     return picked.millisecondsSinceEpoch;
   }
 
-  void editText(String key)
-  {
-    switch(key)
-    {
-      case "1":
-      case "2":
-      case "3":
-      case "4":
-      case "5":
-      case "6":
-      case "7":
-      case "8":
-      case "9":
-      case "0":
-        if(editingController!.text.length < 4)
-          editingController!.text += key;
-        return;
-      case ".":
-        if(editingController!.text.length < 4 && !editingController!.text.contains("."))
-        editingController!.text += ".";
-        return;
-      case "check":
-        showKeyboard = false;
-        return;
-      case "clear":
-        editingController!.text = "";
-        return;
-      case "+5":
-        double i = double.parse(editingController!.text);
-        editingController!.text = (i+5).toStringRemoveTrailingZero();
-        return;
-      case "-5":
-        double i = double.parse(editingController!.text);
-        editingController!.text = (i-5).toStringRemoveTrailingZero();
-        return;
-      case "<-":
-        if(editingController!.text.length > 0)
-          editingController!.text = editingController!.text.substring(0, editingController!.text.length - 1);
-        return;
-    }
 
-  }
 
   List<Widget> _buildActions() {
     return <Widget>[
@@ -988,6 +857,12 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
       data: mediaQueryData.copyWith(textScaleFactor: 1.0),
       child:WillPopScope(
         onWillPop: () async{
+          if(showKeyboard)
+            {
+              showKeyboard = false;
+              FocusScope.of(context).unfocus();
+              return false;
+            }
           if(widget.edit)
             {
               Navigator.of(context).pop();
@@ -1218,58 +1093,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                             ),
                           ),
                           if(showKeyboard)
-                            Container(
-                              padding: EdgeInsets.fromLTRB(4, 6, 4, 6),
-                              color: Colors.amber.shade50,
-                              height: 240.0,
-                              child: InkWell(
-                                onTap: () {
-                                },
-                                child: Column(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                          children: [
-                                            KeyboardKey('1', (){editText("1");}),
-                                            KeyboardKey('2', (){editText("2");}),
-                                            KeyboardKey('3', (){editText("3");}),
-                                            KeyboardKey('+ 5', (){editText("+5");}),
-                                          ]
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Row(
-                                          children: [
-                                            KeyboardKey('4', (){editText("4");}),
-                                            KeyboardKey('5', (){editText("5");}),
-                                            KeyboardKey('6', (){editText("6");}),
-                                            KeyboardKey('- 5', (){editText("+5");}),                                          ]
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Row(
-                                          children: [
-                                            KeyboardKey('7', (){editText("7");}),
-                                            KeyboardKey('8', (){editText("8");}),
-                                            KeyboardKey('9', (){editText("9");}),
-                                            KeyboardKey('<-', (){editText("<-");}),
-                                          ]
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Row(
-                                          children: [
-                                            KeyboardKey('clear', (){editingController!.text = "";}),
-                                            KeyboardKey('0', (){editingController!.text += "0";}),
-                                            KeyboardKey('.', (){if(!editingController!.text.contains("."))editingController!.text += ".";}),
-                                            KeyboardKey('check', (){showKeyboard = false;}),
-                                          ]
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
+                            customeKeyboard(editingController!, showKeyboard, textLimit)
                         ]
                     )
                 )

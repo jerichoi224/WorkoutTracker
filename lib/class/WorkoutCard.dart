@@ -32,7 +32,7 @@ class WorkoutCard {
     TextEditingController metricTextController = new TextEditingController();
     TextEditingController countTextController = new TextEditingController();
     if(metric != -1)
-        metricTextController.text  = metric.toStringRemoveTrailingZero();
+        metricTextController.text  = metric.toStringRemoveTrailingZero().replaceAll(",", "");
 
     if(count != -1)
       countTextController.text  = count.toString();
