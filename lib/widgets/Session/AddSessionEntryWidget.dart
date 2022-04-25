@@ -419,12 +419,39 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
         children: <Widget>[
           Container(
             margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            child: Text(prev,
-              style: TextStyle(
-                color: Colors.black38,
-                fontSize: 15
+            child: InkWell(
+              onTap: () {
+                if(workoutEntry.prevSessionId != -1)
+                {
+                  SessionItem? sessionItem = widget.objectbox.sessionItemBox.get(workoutEntry.prevSessionId);
+                  if(sessionItem != null)
+                  {
+                    if(sessionItem.sets.length > index)
+                    {
+                      if([MetricType.duration.name].contains(workoutCardList[cardInd].entry.metric))
+                      {
+                        prev = numToTimeText(sessionItem.sets[index].countValue);
+                        if(prev.substring(0, 1) == "0")
+                          prev = prev.substring(2, prev.length);
+                        workoutCardList[cardInd].countController[index].text = prev;
+                      }
+                      else
+                      {
+                        workoutCardList[cardInd].metricController[index].text = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
+                      }
+                      if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
+                        workoutCardList[cardInd].countController[index].text = sessionItem.sets[index].countValue.toString();
+                    }
+                  }
+                }
+              },
+              child: Text(prev,
+                style: TextStyle(
+                    color: Colors.black38,
+                    fontSize: 15
+                ),
               ),
-            ),
+            )
           ),
           new Expanded(child: Container()),
           if(![MetricType.duration.name].contains(workoutCardList[cardInd].entry.metric))
@@ -939,27 +966,28 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                                                       ],
                                                     )
                                                 ),
-                                                ListTile(
-                                                    title: new Row(
-                                                      children: <Widget>[
-                                                        Text(AppLocalizations.of(context)!.session_start_time),
-                                                        Expanded(child: Container()),
-                                                        InkWell(
-                                                          onTap: () async {
-                                                            if(!setTime)
-                                                              return;
-                                                            int newTime = await _selectDate(context, startTime);
-                                                            if(newTime != 0)
-                                                              setState(() {
-                                                                startTime = newTime;
-                                                                startDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
-                                                              });
-                                                          },
-                                                          child: Text(startDate),
-                                                        )
-                                                      ],
-                                                    )
-                                                ),
+                                                if(setTime)
+                                                  ListTile(
+                                                      title: new Row(
+                                                        children: <Widget>[
+                                                          Text(AppLocalizations.of(context)!.session_start_time),
+                                                          Expanded(child: Container()),
+                                                          InkWell(
+                                                            onTap: () async {
+                                                              if(!setTime)
+                                                                return;
+                                                              int newTime = await _selectDate(context, startTime);
+                                                              if(newTime != 0)
+                                                                setState(() {
+                                                                  startTime = newTime;
+                                                                  startDate = dateTimeFormatter.format(DateTime.fromMillisecondsSinceEpoch(startTime));
+                                                                });
+                                                            },
+                                                            child: Text(startDate),
+                                                          )
+                                                        ],
+                                                      )
+                                                  ),
                                                 ListTile(
                                                     title: new Row(
                                                       children: <Widget>[
@@ -1093,7 +1121,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                             ),
                           ),
                           if(showKeyboard)
-                            customeKeyboard(editingController!, showKeyboard, textLimit)
+                            customKeyboard(editingController!, showKeyboard, textLimit, (){showKeyboard = false;})
                         ]
                     )
                 )

@@ -210,7 +210,7 @@ void editText(String key, int textLimit, TextEditingController editingController
   }
 }
 
-Widget customeKeyboard(TextEditingController editingController, bool showKeyboard, int textLimit)
+Widget customKeyboard(TextEditingController editingController, bool showKeyboard, int textLimit, [Function? method])
 {
   return Container(
     color: Colors.amber.shade50,
@@ -237,7 +237,7 @@ Widget customeKeyboard(TextEditingController editingController, bool showKeyboar
                   KeyboardKey('4', (){editText("4", textLimit, editingController);}),
                   KeyboardKey('5', (){editText("5", textLimit, editingController);}),
                   KeyboardKey('6', (){editText("6", textLimit, editingController);}),
-                  KeyboardKey('- 5', (){editText("+5", textLimit, editingController);}),
+                  KeyboardKey('- 5', (){editText("-5", textLimit, editingController);}),
                 ]
             ),
           ),
@@ -257,7 +257,7 @@ Widget customeKeyboard(TextEditingController editingController, bool showKeyboar
                   KeyboardKey('clear', (){editText("clear", textLimit, editingController);}),
                   KeyboardKey('0', (){editText("0", textLimit, editingController);}),
                   KeyboardKey('.', (){editText(".", textLimit, editingController);}),
-                  KeyboardKey('check', (){print("HESAF"); showKeyboard = false;}),
+                  KeyboardKey('check', method!),
                 ]
             ),
           ),
