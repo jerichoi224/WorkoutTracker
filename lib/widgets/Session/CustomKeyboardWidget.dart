@@ -1,4 +1,4 @@
-
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/StringTool.dart';
 
@@ -24,8 +24,9 @@ Widget KeyboardKey(String text, Function method)
         child: Padding(
           padding: const EdgeInsets.all(1.0),
           child: InkWell(
-            onTap: () => {
-              method()
+            onTap: () {
+              HapticFeedback.lightImpact();
+              method();
             },
             child: Container(
               margin: EdgeInsets.all(2),
@@ -51,8 +52,9 @@ Widget KeyboardKey(String text, Function method)
         child: Padding(
           padding: const EdgeInsets.all(1.0),
           child: InkWell(
-            onTap: () => {
-              method()
+            onTap: () {
+              HapticFeedback.lightImpact();
+              method();
             },
             child: Container(
               margin: EdgeInsets.all(2),
@@ -78,8 +80,9 @@ Widget KeyboardKey(String text, Function method)
     child: Padding(
       padding: const EdgeInsets.all(1.0),
       child: InkWell(
-        onTap: () => {
-          method()
+        onTap: () {
+          HapticFeedback.lightImpact();
+          method();
         },
         child: Container(
           margin: EdgeInsets.all(2),

@@ -2,6 +2,7 @@
     package="com.kahluabear.workout_tracker">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:label="Workout Tracker"
         android:icon="@mipmap/ic_launcher">
