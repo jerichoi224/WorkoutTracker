@@ -460,9 +460,11 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
               height: 40,
               child: new TextField(
                 onTap: (){
-                  showKeyboard = true;
-                  editingController = workoutCardList[cardInd].metricController[index];
-                  textLimit = 5;
+                  setState(() {
+                    showKeyboard = true;
+                    editingController = workoutCardList[cardInd].metricController[index];
+                    textLimit = 5;
+                  });
                   },
                 cursorColor: Colors.black54,
                 maxLength: 5,
@@ -492,10 +494,13 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                 height: 40,
                 child: new TextField(
                   onTap: (){
-                    showKeyboard = true;
-                    editingController = workoutCardList[cardInd].countController[index];
-                    textLimit = 3;
+                    setState(() {
+                      showKeyboard = true;
+                      editingController = workoutCardList[cardInd].countController[index];
+                      textLimit = 3;
+                    });
                   },
+
                   cursorColor: Colors.black54,
                   maxLength: 3,
                   keyboardType: TextInputType.none,
@@ -539,8 +544,11 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                     filled: true
                 ),
                 onTap: (){
-                  workoutCardList[cardInd].countController[index].selection = TextSelection.fromPosition(TextPosition(offset: workoutCardList[cardInd].countController[index].text.length));
-                },
+                  setState(() {
+                    workoutCardList[cardInd].countController[index].selection = TextSelection.fromPosition(TextPosition(offset: workoutCardList[cardInd].countController[index].text.length));
+                    showKeyboard = false;
+                  });
+                  },
                 onChanged: (String value){
                   value = value.replaceAll(":", "");
                   while(value.length > 0 && value.substring(0, 1) == "0"){

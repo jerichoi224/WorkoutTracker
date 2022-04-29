@@ -4,7 +4,6 @@ import 'package:workout_tracker/util/StringTool.dart';
 
 Widget KeyboardKey(String text, Function method)
 {
-  Color color = Colors.white;
   switch(text)
   {
     case "+ 5":

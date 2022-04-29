@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:workout_tracker/util/koreanSearch.dart';
 import 'package:workout_tracker/util/objectbox.dart';
 import 'package:workout_tracker/util/typedef.dart';
+import 'package:workout_tracker/widgets/HomeWidget.dart';
 import 'package:workout_tracker/widgets/UIComponents.dart';
 import 'package:workout_tracker/widgets/Workout/AddEditWorkoutEntryWidget.dart';
 import 'package:workout_tracker/dbModels/workout_entry_model.dart';
@@ -283,10 +284,12 @@ class _WorkoutState extends State<WorkoutWidget> {
     return <Widget>[
       IconButton(
         icon: const Icon(Icons.search),
-        onPressed: _startSearch,
-      ),
-      IconButton(
-          icon: Icon(Icons.add),
+        onPressed: (){
+          _startSearch();
+          },
+    ),
+    IconButton(
+        icon: Icon(Icons.add),
           onPressed: () {
             _addWorkoutEntry(context);
           }

@@ -14,6 +14,13 @@ bool containsKr(String searchWord, String targetWord) {
   List search = searchWord.codeUnits;
   List find = targetWord.codeUnits;
 
+  // check if both are korean.
+  if(search.any((element) => (element < 12593 || (element > 12642 && element < 44032) || element > 52044)))
+    return false;
+
+  if(find.any((element) => (element < 12593 || (element > 12642 && element < 44032) || element > 52044)))
+    return false;
+
   bool ret = false;
   for(int i = 0; i < search.length; i++)
   {
@@ -54,6 +61,7 @@ bool containsKr(String searchWord, String targetWord) {
 }
 
 bool charContainsKr(int target, int searchChar) {
+
   int fn, sn, tn = 0;
 
   target = target - ga;

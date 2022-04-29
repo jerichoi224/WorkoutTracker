@@ -93,14 +93,15 @@ class _WorkoutListState extends State<WorkoutListWidget> {
           ]);
 
       workoutWidgetList.add(
-        Container(
-          margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
-          child: Wrap(
-              alignment: WrapAlignment.center,
-              children: selectPartList()
+          IntrinsicWidth(
+            child: Container(
+                margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
+                child: Wrap(
+                    alignment: WrapAlignment.center,
+                    children: selectPartList()
+                )
+            ),
           )
-
-        )
       );
 
     widget.objectbox.workoutList.sort((a, b) => a.caption.toLowerCase().compareTo(b.caption.toLowerCase()));
