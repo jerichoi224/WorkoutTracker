@@ -30,8 +30,15 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
     String? temp = widget.objectbox.getPref("locale");
     locale = temp != null ? temp : 'en';
 
-    routineEntry = widget.objectbox.routineBox.get(widget.id);
+    updateInfo();
+  }
+
+  void updateInfo()
+  {
+    routineEntry = widget.objectbox.routineList.firstWhere((element) => element.id == widget.id);
+    WorkoutEntryList.clear();
     partList = routineEntry!.parts;
+
     for(String i in routineEntry!.workoutIds) {
       WorkoutEntry? tmp = widget.objectbox.workoutBox.get(int.parse(i));
       if (tmp != null) {
@@ -40,11 +47,6 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
     }
 
     setState(() {});
-  }
-
-  void updateInfo()
-  {
-    routineEntry = widget.objectbox.routineList.firstWhere((element) => element.id == widget.id);
   }
 
   Widget buildWorkoutCards(BuildContext context, int index) {
@@ -82,11 +84,11 @@ class _ViewRoutineEntryState extends State<ViewRoutineEntryWidget> {
         MaterialPageRoute(
           builder: (context) => AddRoutineEntryWidget(objectbox: widget.objectbox, edit:true, id:entry.id),
         ));
-
     if(result)
     {
+      widget.objectbox.routineList.clear();
+      widget.objectbox.routineList = widget.objectbox.routineBox.getAll();
       updateInfo();
-      setState(() {});
     }
   }
 

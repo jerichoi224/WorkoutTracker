@@ -1129,7 +1129,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                             ),
                           ),
                           if(showKeyboard)
-                            customKeyboard(editingController!, showKeyboard, textLimit, (){showKeyboard = false;})
+                            customKeyboard(editingController!, showKeyboard, textLimit, (){showKeyboard = false; FocusScope.of(context).unfocus();})
                         ]
                     )
                 )

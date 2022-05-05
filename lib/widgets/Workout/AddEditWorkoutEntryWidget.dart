@@ -159,6 +159,18 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
     widget.objectbox.workoutList = widget.objectbox.workoutBox.getAll().where((element) => element.visible).toList();
     Navigator.pop(context, true);
   }
+
+  List<Widget> _buildActions() {
+    return <Widget>[
+      IconButton(
+        icon: const Icon(Icons.save),
+        onPressed: (){
+          saveWorkout();
+        },
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -173,6 +185,7 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
             child: new Scaffold(
                 appBar: AppBar(
                   title: Text(widget.edit? AppLocalizations.of(context)!.workout_edit_workout : AppLocalizations.of(context)!.workout_add_workout),
+                  actions: _buildActions(),
                   backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
@@ -373,11 +386,13 @@ class _AddWorkoutEntryState extends State<AddWorkoutEntryWidget> {
                                         ]
                                     )
                                 ),
+                                /*
                                 CardButton(
                                     Theme.of(context).colorScheme.primary,
                                     widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.workout_add_workout,
                                         () {saveWorkout();}
                                 ),
+                                 */
                               ],
                             )
                         )

@@ -83,6 +83,12 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
 
   void removeWorkout(int ind){
     WorkoutEntryList.removeAt(ind);
+    partList.clear();
+
+    for(WorkoutEntry entry in WorkoutEntryList)
+      for(String part in entry.partList)
+        if(!partList.contains(part))
+          partList.add(part);
     setState(() {});
   }
 
@@ -207,6 +213,17 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
     return tagList;
   }
 
+  List<Widget> _buildActions() {
+    return <Widget>[
+      IconButton(
+        icon: const Icon(Icons.save),
+        onPressed: (){
+          saveRoutine();
+        },
+      ),
+    ];
+  }
+
   void saveRoutine()
   {
     if(routineNameController.text.isEmpty) {
@@ -242,6 +259,7 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
             child: new Scaffold(
                 appBar: AppBar(
                   title: Text(widget.edit? AppLocalizations.of(context)!.routine_edit_routine : AppLocalizations.of(context)!.routine_add_routine),
+                  actions: _buildActions(),
                   backgroundColor: Colors.amberAccent,
                 ),
                 body: Builder(
@@ -359,11 +377,14 @@ class _AddRoutineEntryState extends State<AddRoutineEntryWidget> {
                                         ]
                                     )
                                 ),
+/*
                                 CardButton(
                                     Theme.of(context).colorScheme.primary,
                                     widget.edit ? AppLocalizations.of(context)!.save_changes : AppLocalizations.of(context)!.routine_add_routine,
                                         () {saveRoutine();}
                                 ),
+
+ */
                               ],
                             )
                         )

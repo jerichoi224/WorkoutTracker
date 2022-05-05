@@ -89,15 +89,12 @@ class _RoutineState extends State<RoutineWidget>{
 
   void _openViewWidget(int id) async {
     // start the SecondScreen and wait for it to finish with a   result
-    bool result = await Navigator.push(
+    await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ViewRoutineEntryWidget(objectbox: widget.objectbox, id:id),
         ));
-    if(result.runtimeType == bool && result)
-    {
-      setState(() {});
-    }
+    setState(() {});
   }
 
   String workoutListToString(List<String> workoutIds)
