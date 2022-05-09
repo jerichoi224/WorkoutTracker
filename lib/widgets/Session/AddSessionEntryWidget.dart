@@ -469,6 +469,8 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                 cursorColor: Colors.black54,
                 maxLength: 5,
                 keyboardType: TextInputType.none,
+                enableInteractiveSelection: false,
+                textAlign: TextAlign.right,
                 controller: workoutCardList[cardInd].metricController[index],
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -504,6 +506,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   cursorColor: Colors.black54,
                   maxLength: 3,
                   keyboardType: TextInputType.none,
+                  enableInteractiveSelection: false,
                   controller: workoutCardList[cardInd].countController[index],
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -528,6 +531,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                 // 0:00:00 (7) + input (1) = 8
                 maxLength: 8,
                 keyboardType: TextInputType.number,
+                enableInteractiveSelection: false,
                 controller: workoutCardList[cardInd].countController[index],
                 style: TextStyle(
                   fontSize: 16
