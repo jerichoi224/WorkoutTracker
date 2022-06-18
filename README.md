@@ -14,18 +14,18 @@ The basic function is to keep track of workout sessions, and see how you progres
 
 ### Functionality
 <p float="left">
-  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/1.png?token=GHSAT0AAAAAABUY76HQDE2KCP2W3372G7UCYVNUZOQ" width="250">
-  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/2.png?token=GHSAT0AAAAAABUY76HRMQ667OG7T2SN2C5IYVNUZ6Q" width="250">
-  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/6.png?token=GHSAT0AAAAAABUY76HRR5A4DI5YPRGTCIQWYVNU2FA" width="250">
+  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/1.png" width="250">
+  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/2.png" width="250">
+  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/6.png" width="250">
 </p>
 The three screenshots above show the basic functionality of the app.</br>
 The Dashboard screen shows you your workouts so far in the month, and options to start a new session/routine. </br>
 The second screen shows you how the "Add Session" Screen looks. Once done, the third screen shows you the overview of the workout session
 
 <p float="left">
-  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/3.png?token=GHSAT0AAAAAABUY76HQGUSQLVYWOULO5WEIYVNU5BA" width="250">
-  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/4.png?token=GHSAT0AAAAAABUY76HRFQB4B6IAXWMGPUXKYVNU5BQ" width="250">
-  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/5.png?token=GHSAT0AAAAAABUY76HRX3F4VRO66C6PFXJGYVNU5CA" width="250">
+  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/3.png" width="250">
+  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/4.png" width="250">
+  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/5.png" width="250">
 </p>
 
 As you add multiple sessions, you can see how you're max/avg weight of the specific workout changes over time </br>
