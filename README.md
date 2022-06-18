@@ -1,6 +1,6 @@
 
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/feature.png?token=GHSAT0AAAAAABUY76HR2WPQPZIJO7WUA3JQYVNUVZQ" width="600">
+  <img src="https://raw.githubusercontent.com/jerichoi224/WorkoutTracker/main/assets/feature.png" width="600">
 </h1>
 
 Application for Tracking Workouts, made with Flutter.
