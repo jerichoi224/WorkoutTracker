@@ -32,8 +32,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 31
-
+    compileSdkVersion 33
+    ndkVersion rootProject.ext.ndkVersion
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -42,7 +42,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.kahluabear.workout_tracker"
         minSdkVersion 19
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

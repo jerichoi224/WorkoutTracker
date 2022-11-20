@@ -132,6 +132,7 @@ class _InstructionState extends State<InstructionWidget>{
                       buttonWidth: 200,
                       buttonPadding: const EdgeInsets.only(left: 14, right: 14),
                       buttonDecoration: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: Colors.black26,

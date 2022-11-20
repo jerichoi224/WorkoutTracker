@@ -409,7 +409,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                   prev = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
                   prev += " " + workoutCardList[cardInd].entry.metric;
                 }
-              if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
+              if([MetricType.kg.name, MetricType.lb.name ].contains(workoutCardList[cardInd].entry.metric))
                 prev += " × " + sessionItem.sets[index].countValue.toString();
             }
           }
@@ -439,7 +439,7 @@ class _AddSessionEntryState extends State<AddSessionEntryWidget> {
                       {
                         workoutCardList[cardInd].metricController[index].text = sessionItem.sets[index].metricValue.toStringRemoveTrailingZero();
                       }
-                      if([MetricType.kg.name].contains(workoutCardList[cardInd].entry.metric))
+                      if([MetricType.kg.name, MetricType.lb.name].contains(workoutCardList[cardInd].entry.metric))
                         workoutCardList[cardInd].countController[index].text = sessionItem.sets[index].countValue.toString();
                     }
                   }
